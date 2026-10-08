@@ -1,0 +1,13 @@
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Assets de session : volumineux et stables entre deux builds
+[[headers]]
+  for = "/sessions/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
