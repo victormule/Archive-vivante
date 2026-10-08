@@ -4,14 +4,31 @@
     "$comment": "Réglages communs à toutes les sessions, dans le repère commun (celui de j1-s1, calé sur la table).",
     "initial_view": {
       "$comment": "Vue d'arrivée. Shift+V dans le viewer copie la vue courante.",
-      "position": [-5.9127, 2.1506, 0.2935],
-      "quaternion": [-0.201934, -0.440872, -0.103937, 0.868361],
-      "target": [-0.36, -1.2434, -3.7707],
+      "position": [
+        -5.9127,
+        2.1506,
+        0.2935
+      ],
+      "quaternion": [
+        -0.201934,
+        -0.440872,
+        -0.103937,
+        0.868361
+      ],
+      "target": [
+        -0.36,
+        -1.2434,
+        -3.7707
+      ],
       "fovY": 48.271
     },
     "orbit": {
       "$comment": "Rotation automatique après inactivité : axe vertical passant par center (milieu de la table), changement de session tous les switch_degrees.",
-      "center": [-0.62, -0.71, -4.2],
+      "center": [
+        -0.62,
+        -0.71,
+        -4.2
+      ],
       "idle_seconds": 30,
       "turn_seconds": 80,
       "switch_degrees": 180
@@ -45,7 +62,24 @@
       "register_anchor": "table",
       "world_transform": {
         "$comment": "Calibré le 2026-10-08 sur la table (ligne de séparation gris/blanc), par recalage de vues de dessus rendues (tools/session-registration). Prime sur le recalage automatique.",
-        "matrix": [0.9142421, -0.0099491, 0.0242363, 0.0, 0.0096754, 0.9145068, 0.0104329, 0.0, -0.0243468, -0.0101722, 0.9142368, 0.0, -0.0850507, -0.146117, -0.5074531, 1.0]
+        "matrix": [
+          0.9142421,
+          -0.0099491,
+          0.0242363,
+          0.0,
+          0.0096754,
+          0.9145068,
+          0.0104329,
+          0.0,
+          -0.0243468,
+          -0.0101722,
+          0.9142368,
+          0.0,
+          -0.0850507,
+          -0.146117,
+          -0.5074531,
+          1.0
+        ]
       },
       "annotations": {
         "$comment": "Mêmes annotations que j1-s1, reposées ailleurs : le contenu vient de l'export de j1-s1.",
@@ -100,8 +134,28 @@
       "index": 5,
       "export_dir": "Journée2-session4&5",
       "arkit_session": "0447EF10",
-      "register_to": "j1-s1",
-      "register_anchor": "table"
+      "register_to": "j2-s4",
+      "world_transform": {
+        "$comment": "Calibré le 2026-10-09 sur la table en bois de j2-s4 (même lieu, 20 min plus tard) : empreinte du plateau (IoU) puis ICP sur l'ensemble de la scène. Le recalage automatique visait la table grise/blanche de j1-s1, absente ici.",
+        "matrix": [
+          0.0098683,
+          0.0013867,
+          0.9999504,
+          0.0,
+          0.0105102,
+          0.9999436,
+          -0.0014904,
+          0.0,
+          -0.9998961,
+          0.0105244,
+          0.0098531,
+          0.0,
+          -2.4872627,
+          0.2177686,
+          -4.3457608,
+          1.0
+        ]
+      }
     }
   ]
 }

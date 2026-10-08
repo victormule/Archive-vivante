@@ -70,37 +70,27 @@
       ]
     },
     "world": {
-      "reference": "j1-s1",
-      "coarse": {
-        "method": "icp-cloud-to-cloud",
-        "medianResidualBefore": 0.2108,
-        "medianResidualAfter": 0.034,
-        "inlierRatio": 0.547
-      },
-      "anchor": {
-        "method": "icp-table-top-luminance",
-        "medianResidualBefore": 0.1654,
-        "medianResidualAfter": 0.0328,
-        "inlierRatio": 0.161
-      }
+      "reference": "j2-s4",
+      "method": "calibrated",
+      "note": "Calibré le 2026-10-09 sur la table en bois de j2-s4 (même lieu, 20 min plus tard) : empreinte du plateau (IoU) puis ICP sur l'ensemble de la scène. Le recalage automatique visait la table grise/blanche de j1-s1, absente ici."
     }
   },
   "worldTransform": [
-    0.995718,
-    0.0050406,
-    0.0923049,
+    0.0098683,
+    0.0013867,
+    0.9999504,
     0.0,
-    -0.0061254,
-    0.9999154,
-    0.0114728,
+    0.0105102,
+    0.9999436,
+    -0.0014904,
     0.0,
-    -0.0922392,
-    -0.0119891,
-    0.9956647,
+    -0.9998961,
+    0.0105244,
+    0.0098531,
     0.0,
-    1.4229286,
-    0.0966934,
-    -0.690319,
+    -2.4872627,
+    0.2177686,
+    -4.3457608,
     1.0
   ],
   "playback": null,
