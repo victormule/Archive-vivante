@@ -51,6 +51,20 @@
       "day": 2,
       "index": 3,
       "startDate": "2026-10-07T12:19:41Z"
+    },
+    {
+      "id": "j2-s4",
+      "title": "Journée 2 — Session 4",
+      "day": 2,
+      "index": 4,
+      "startDate": "2026-10-07T14:01:11Z"
+    },
+    {
+      "id": "j2-s5",
+      "title": "Journée 2 — Session 5",
+      "day": 2,
+      "index": 5,
+      "startDate": "2026-10-07T14:20:18Z"
     }
   ]
 }

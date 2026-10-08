@@ -15,6 +15,7 @@ Performance Archive/
 ├── Journée1-session4/          Export de la session 2 de la journée (splat, photogrammétrie, nuage)
 ├── Journée2-session3/          Export de la session 3 (deux sessions ARKit : splat 1076BA54, vidéo BF499316)
 ├── Journée2-session3-video/    Vidéo de la session 3, exportée à part
+├── Journée2-session4&5/        Sessions 4 (F21895A2, avec vidéo) et 5 (0447EF10), même export
 ├── Journée1-annotation*.zip    Annotations de j1-s1 / j1-s2 (non versionnées)
 ├── Doc1.jpeg …                 Images des annotations, associées par titre (non versionnées)
 ├── pipeline/                   Préparation des assets web (Python + numpy/scipy)

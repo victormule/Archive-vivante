@@ -1,0 +1,119 @@
+{
+  "id": "j2-s5",
+  "title": "Journée 2 — Session 5",
+  "day": 2,
+  "index": 5,
+  "sessionId": "0447EF10-328F-40F5-9B78-65BEB961F4E1",
+  "startDate": "2026-10-07T14:20:18Z",
+  "endDate": "2026-10-07T14:21:17Z",
+  "author": "Victor Mulé",
+  "layers": {
+    "splat": {
+      "url": "splat.spz",
+      "bytes": 4451035,
+      "count": 200226,
+      "shDegree": 3
+    },
+    "mesh": {
+      "url": "mesh.glb",
+      "bytes": 1373832,
+      "triangles": 25000
+    },
+    "pointCloud": {
+      "url": "points.bin",
+      "bytes": 3509856,
+      "count": 389984,
+      "voxelSize": 0.01,
+      "boundsMin": [
+        -5.641876842699332,
+        -1.5722453701433774,
+        -6.203815361640797
+      ],
+      "boundsMax": [
+        1.1458338185941719,
+        -0.12839154737860808,
+        0.668545900176418
+      ]
+    }
+  },
+  "annotations": null,
+  "alignment": {
+    "reference": "splat",
+    "mesh": {
+      "method": "dür.air alignment matrix",
+      "scale": 1.507465,
+      "avgErrorToArkit": 0.022158483
+    },
+    "pointCloud": {
+      "method": "icp-point-to-plane",
+      "target": "mesh",
+      "medianResidualBefore": 0.1899,
+      "medianResidualAfter": 0.1861,
+      "inlierRatio": 0.417,
+      "transform": [
+        0.999945,
+        0.001516,
+        -0.010404,
+        0.0,
+        -0.001524,
+        0.999999,
+        -0.000769,
+        0.0,
+        0.010402,
+        0.000784,
+        0.999946,
+        0.0,
+        0.031226,
+        0.001414,
+        -0.006365,
+        1.0
+      ]
+    },
+    "world": {
+      "reference": "j1-s1",
+      "coarse": {
+        "method": "icp-cloud-to-cloud",
+        "medianResidualBefore": 0.2108,
+        "medianResidualAfter": 0.034,
+        "inlierRatio": 0.547
+      },
+      "anchor": {
+        "method": "icp-table-top-luminance",
+        "medianResidualBefore": 0.1654,
+        "medianResidualAfter": 0.0328,
+        "inlierRatio": 0.161
+      }
+    }
+  },
+  "worldTransform": [
+    0.995718,
+    0.0050406,
+    0.0923049,
+    0.0,
+    -0.0061254,
+    0.9999154,
+    0.0114728,
+    0.0,
+    -0.0922392,
+    -0.0119891,
+    0.9956647,
+    0.0,
+    1.4229286,
+    0.0966934,
+    -0.690319,
+    1.0
+  ],
+  "playback": null,
+  "bounds": {
+    "min": [
+      -3.9029975,
+      -1.4838148,
+      -4.7390037
+    ],
+    "max": [
+      0.023174047,
+      -0.29212677,
+      -1.0092893
+    ]
+  }
+}

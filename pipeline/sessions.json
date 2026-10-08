@@ -78,6 +78,30 @@
         "reference_images": true,
         "media_dir": "."
       }
+    },
+    {
+      "id": "j2-s4",
+      "title": "Journée 2 — Session 4",
+      "day": 2,
+      "index": 4,
+      "export_dir": "Journée2-session4&5",
+      "arkit_session": "F21895A2",
+      "register_to": "j1-s1",
+      "register_anchor": "table",
+      "playback": {
+        "video_id": "29752C64",
+        "time_offset": 0.0
+      }
+    },
+    {
+      "id": "j2-s5",
+      "title": "Journée 2 — Session 5",
+      "day": 2,
+      "index": 5,
+      "export_dir": "Journée2-session4&5",
+      "arkit_session": "0447EF10",
+      "register_to": "j1-s1",
+      "register_anchor": "table"
     }
   ]
 }
