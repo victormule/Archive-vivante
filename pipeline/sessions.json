@@ -1,0 +1,83 @@
+{
+  "$comment": "Catalogue des sessions publiées. Chemins relatifs à la racine du projet.",
+  "scene": {
+    "$comment": "Réglages communs à toutes les sessions, dans le repère commun (celui de j1-s1, calé sur la table).",
+    "initial_view": {
+      "$comment": "Vue d'arrivée. Shift+V dans le viewer copie la vue courante.",
+      "position": [-5.9127, 2.1506, 0.2935],
+      "quaternion": [-0.201934, -0.440872, -0.103937, 0.868361],
+      "target": [-0.36, -1.2434, -3.7707],
+      "fovY": 48.271
+    },
+    "orbit": {
+      "$comment": "Rotation automatique après inactivité : axe vertical passant par center (milieu de la table), changement de session tous les switch_degrees.",
+      "center": [-0.62, -0.71, -4.2],
+      "idle_seconds": 30,
+      "turn_seconds": 80,
+      "switch_degrees": 180
+    }
+  },
+  "sessions": [
+    {
+      "id": "j1-s1",
+      "title": "Journée 1 — Session 1",
+      "day": 1,
+      "index": 1,
+      "export_dir": "Journée1-session1",
+      "playback": {
+        "$comment": "La vidéo de cet export appartient à la session 293D7954 (Journée1-session2) mais partage le même repère ARKit.",
+        "video_id": "7022E93E",
+        "time_offset": 0.0
+      },
+      "annotations": {
+        "$comment": "Images associées par titre : <titre>.jpg ou <titre>-<n>.jpg dans media_dir.",
+        "source": "Journée1-annotation.zip",
+        "media_dir": "."
+      }
+    },
+    {
+      "id": "j1-s2",
+      "title": "Journée 1 — Session 2",
+      "day": 1,
+      "index": 2,
+      "export_dir": "Journée1-session4",
+      "register_to": "j1-s1",
+      "register_anchor": "table",
+      "world_transform": {
+        "$comment": "Calibré le 2026-10-08 sur la table (ligne de séparation gris/blanc), par recalage de vues de dessus rendues (tools/session-registration). Prime sur le recalage automatique.",
+        "matrix": [0.9142421, -0.0099491, 0.0242363, 0.0, 0.0096754, 0.9145068, 0.0104329, 0.0, -0.0243468, -0.0101722, 0.9142368, 0.0, -0.0850507, -0.146117, -0.5074531, 1.0]
+      },
+      "annotations": {
+        "$comment": "Mêmes annotations que j1-s1, reposées ailleurs : le contenu vient de l'export de j1-s1.",
+        "source": "Journée1-annotation2.zip",
+        "content_source": "Journée1-annotation.zip",
+        "media_dir": "."
+      }
+    },
+    {
+      "id": "j2-s3",
+      "title": "Journée 2 — Session 3",
+      "day": 2,
+      "index": 3,
+      "export_dir": "Journée2-session3",
+      "arkit_session": "1076BA54",
+      "register_to": "j1-s1",
+      "register_anchor": "table",
+      "playback": {
+        "$comment": "Vidéo exportée à part, enregistrée dans une autre session ARKit (BF499316) : recalée sur le splat par ICP des nuages LiDAR.",
+        "export_dir": "Journée2-session3-video",
+        "arkit_session": "BF499316",
+        "video_id": "B1927B70",
+        "time_offset": 0.0
+      },
+      "annotations": {
+        "$comment": "Annotations de la session vidéo (repère ARKit de BF499316) ; illustrées par la vue caméra de l'annotation.",
+        "source": "Journée2-session3",
+        "arkit_session": "BF499316",
+        "frame": "arkit",
+        "reference_images": true,
+        "media_dir": "."
+      }
+    }
+  ]
+}

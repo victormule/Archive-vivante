@@ -1,0 +1,56 @@
+{
+  "scene": {
+    "initialView": {
+      "position": [
+        -5.9127,
+        2.1506,
+        0.2935
+      ],
+      "quaternion": [
+        -0.201934,
+        -0.440872,
+        -0.103937,
+        0.868361
+      ],
+      "target": [
+        -0.36,
+        -1.2434,
+        -3.7707
+      ],
+      "fovY": 48.271
+    },
+    "orbit": {
+      "center": [
+        -0.62,
+        -0.71,
+        -4.2
+      ],
+      "idle_seconds": 30,
+      "turn_seconds": 80,
+      "switch_degrees": 180
+    }
+  },
+  "sessions": [
+    {
+      "id": "j1-s1",
+      "title": "Journée 1 — Session 1",
+      "day": 1,
+      "index": 1,
+      "startDate": "2026-10-05T13:51:27Z"
+    },
+    {
+      "id": "j1-s2",
+      "title": "Journée 1 — Session 2",
+      "day": 1,
+      "index": 2,
+      "startDate": "2026-10-05T14:21:44Z"
+    },
+    {
+      "id": "j2-s3",
+      "title": "Journée 2 — Session 3",
+      "day": 2,
+      "index": 3,
+      "startDate": "2026-10-07T12:19:41Z"
+    }
+  ]
+}

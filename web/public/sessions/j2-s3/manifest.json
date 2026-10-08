@@ -1,0 +1,176 @@
+{
+  "id": "j2-s3",
+  "title": "Journée 2 — Session 3",
+  "day": 2,
+  "index": 3,
+  "sessionId": "1076BA54-01EA-4C42-9ED6-7C9A8414A8FD",
+  "startDate": "2026-10-07T12:19:41Z",
+  "endDate": "2026-10-07T12:23:12Z",
+  "author": "Victor Mulé",
+  "layers": {
+    "splat": {
+      "url": "splat.spz",
+      "bytes": 2935102,
+      "count": 153181,
+      "shDegree": 1
+    },
+    "mesh": {
+      "url": "mesh.glb",
+      "bytes": 1371100,
+      "triangles": 25000
+    },
+    "pointCloud": {
+      "url": "points.bin",
+      "bytes": 10966203,
+      "count": 1218467,
+      "voxelSize": 0.01,
+      "boundsMin": [
+        -3.963066560643769,
+        -1.2892301352666622,
+        -6.988220775910223
+      ],
+      "boundsMax": [
+        4.571134230311024,
+        1.730680339548461,
+        2.193929337291215
+      ]
+    }
+  },
+  "annotations": {
+    "url": "annotations.json",
+    "count": 4
+  },
+  "alignment": {
+    "reference": "splat",
+    "mesh": {
+      "method": "dür.air alignment matrix",
+      "scale": 2.8250701,
+      "avgErrorToArkit": 0.080128245
+    },
+    "pointCloud": {
+      "method": "icp-point-to-plane",
+      "target": "mesh",
+      "medianResidualBefore": 0.2145,
+      "medianResidualAfter": 0.1072,
+      "inlierRatio": 0.41,
+      "transform": [
+        0.99979,
+        0.015873,
+        0.012928,
+        0.0,
+        -0.016404,
+        0.99898,
+        0.042081,
+        0.0,
+        -0.012247,
+        -0.042284,
+        0.999031,
+        0.0,
+        -0.02394,
+        0.102665,
+        -0.000627,
+        1.0
+      ]
+    },
+    "camera": {
+      "method": "robust-pose-pairs",
+      "pairs": 95,
+      "inliers": 88,
+      "medianResidual": 0.048,
+      "transform": [
+        0.999844,
+        0.007461,
+        0.015987,
+        0.0,
+        -0.007335,
+        0.999941,
+        -0.007964,
+        0.0,
+        -0.016046,
+        0.007845,
+        0.99984,
+        0.0,
+        -0.028686,
+        0.022802,
+        -0.007546,
+        1.0
+      ],
+      "arkitLink": {
+        "method": "icp-lidar-to-lidar",
+        "session": "BF499316-330B-45F2-BF45-0951A334F3C4",
+        "medianResidualBefore": 0.0924,
+        "medianResidualAfter": 0.1019,
+        "inlierRatio": 0.307,
+        "transform": [
+          0.999998,
+          -0.000657,
+          0.001974,
+          0.0,
+          0.000666,
+          0.99999,
+          -0.004488,
+          0.0,
+          -0.001971,
+          0.004489,
+          0.999988,
+          0.0,
+          -0.124831,
+          -0.051328,
+          0.022025,
+          1.0
+        ]
+      }
+    },
+    "world": {
+      "reference": "j1-s1",
+      "coarse": {
+        "method": "icp-cloud-to-cloud",
+        "medianResidualBefore": 0.3453,
+        "medianResidualAfter": 0.1365,
+        "inlierRatio": 0.285
+      },
+      "anchor": {
+        "method": "icp-table-top-luminance",
+        "medianResidualBefore": 0.2092,
+        "medianResidualAfter": 0.0384,
+        "inlierRatio": 0.139
+      }
+    }
+  },
+  "worldTransform": [
+    0.5931223,
+    0.032058,
+    -0.8044738,
+    0.0,
+    -0.0681707,
+    0.9976184,
+    -0.0105061,
+    0.0,
+    0.8022211,
+    0.061073,
+    0.5938952,
+    0.0,
+    1.7750577,
+    -0.244485,
+    -1.2454675,
+    1.0
+  ],
+  "playback": {
+    "audioUrl": "audio.m4a",
+    "cameraPathUrl": "camera_path.json",
+    "duration": 1452.7652839422226,
+    "recordedAt": "2026-10-07T12:28:08Z"
+  },
+  "bounds": {
+    "min": [
+      -2.9186432,
+      -1.2055287,
+      -6.7306376
+    ],
+    "max": [
+      3.812877,
+      0.9421977,
+      1.6901426
+    ]
+  }
+}

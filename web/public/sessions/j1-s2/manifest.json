@@ -1,0 +1,110 @@
+{
+  "id": "j1-s2",
+  "title": "Journée 1 — Session 2",
+  "day": 1,
+  "index": 2,
+  "sessionId": "177F6012-92CD-46C8-AFBE-CC220343EC2C",
+  "startDate": "2026-10-05T14:21:44Z",
+  "endDate": "2026-10-05T14:23:43Z",
+  "author": "Victor Mulé",
+  "layers": {
+    "splat": {
+      "url": "splat.spz",
+      "bytes": 3501019,
+      "count": 160000,
+      "shDegree": 3
+    },
+    "mesh": {
+      "url": "mesh.glb",
+      "triangles": 25000
+    },
+    "pointCloud": {
+      "url": "points.bin",
+      "count": 972812,
+      "voxelSize": 0.01,
+      "boundsMin": [
+        -7.6016641763867785,
+        -1.7269468696074823,
+        -7.800435567711171
+      ],
+      "boundsMax": [
+        3.9640659208827236,
+        0.8895321348247984,
+        2.515867424444445
+      ]
+    }
+  },
+  "annotations": {
+    "url": "annotations.json",
+    "count": 5
+  },
+  "alignment": {
+    "reference": "splat",
+    "mesh": {
+      "method": "dür.air alignment matrix",
+      "scale": 2.6848257,
+      "avgErrorToArkit": 0.05076422
+    },
+    "pointCloud": {
+      "method": "icp-point-to-plane",
+      "target": "mesh",
+      "medianResidualBefore": 0.184,
+      "medianResidualAfter": 0.1423,
+      "inlierRatio": 0.389,
+      "transform": [
+        0.999957,
+        0.009138,
+        0.001799,
+        0.0,
+        -0.009085,
+        0.999576,
+        -0.027662,
+        0.0,
+        -0.002051,
+        0.027645,
+        0.999616,
+        0.0,
+        -0.134516,
+        0.122653,
+        -0.004467,
+        1.0
+      ]
+    },
+    "world": {
+      "reference": "j1-s1",
+      "method": "calibrated",
+      "note": "Calibré le 2026-10-08 sur la table (ligne de séparation gris/blanc), par recalage de vues de dessus rendues (tools/session-registration). Prime sur le recalage automatique."
+    }
+  },
+  "worldTransform": [
+    0.9142421,
+    -0.0099491,
+    0.0242363,
+    0.0,
+    0.0096754,
+    0.9145068,
+    0.0104329,
+    0.0,
+    -0.0243468,
+    -0.0101722,
+    0.9142368,
+    0.0,
+    -0.0850507,
+    -0.146117,
+    -0.5074531,
+    1.0
+  ],
+  "playback": null,
+  "bounds": {
+    "min": [
+      -5.499164,
+      -1.4556106,
+      -8.738322
+    ],
+    "max": [
+      4.31908,
+      0.85761964,
+      3.6543548
+    ]
+  }
+}

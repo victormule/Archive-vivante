@@ -1,0 +1,130 @@
+{
+  "annotations": [
+    {
+      "id": "6C48E8B6-C77D-4D9B-A543-5667E0775603",
+      "title": "Doc1",
+      "colorIndex": 0,
+      "text": "Création de groupes de travail.",
+      "kind": "point",
+      "points": [
+        [
+          -0.03729,
+          -0.7786,
+          -3.58126
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-08T10:14:20Z",
+      "images": [
+        {
+          "url": "annotations/6c48e8b6-1.jpg",
+          "width": 900,
+          "height": 1600,
+          "source": "Doc1.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "103EBF36-1235-404A-9238-0C9AFC0A2CD1",
+      "title": "Doc2",
+      "colorIndex": 1,
+      "text": "Carte mentale.\nAxe de travail pour la réalisation du happening. Premières idées clefs.",
+      "kind": "point",
+      "points": [
+        [
+          -0.46659,
+          -0.76236,
+          -3.73386
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-08T10:15:23Z",
+      "images": [
+        {
+          "url": "annotations/103ebf36-1.jpg",
+          "width": 900,
+          "height": 1600,
+          "source": "Doc2.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "FCBEAE2E-F96A-46ED-B6DB-14F6D52EC5E0",
+      "title": "Doc3",
+      "colorIndex": 2,
+      "text": "Ébauche du travail de textile, groupe A.\nFormes et couleurs.",
+      "kind": "point",
+      "points": [
+        [
+          -0.20439,
+          -0.81318,
+          -3.05772
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-08T10:16:51Z",
+      "images": [
+        {
+          "url": "annotations/fcbeae2e-1.jpg",
+          "width": 1600,
+          "height": 1200,
+          "source": "Doc3.jpg"
+        }
+      ]
+    },
+    {
+      "id": "8DC3FEA8-DC0F-4E4B-9ED8-0C1F26884FFD",
+      "title": "Doc4",
+      "colorIndex": 3,
+      "text": "Documentation générale du workshop. Listing des projets. Organisation.",
+      "kind": "point",
+      "points": [
+        [
+          0.14078,
+          -0.81874,
+          -4.73656
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-08T10:18:23Z",
+      "images": [
+        {
+          "url": "annotations/8dc3fea8-1.jpg",
+          "width": 1202,
+          "height": 1600,
+          "source": "Doc4-1.jpeg"
+        },
+        {
+          "url": "annotations/8dc3fea8-2.jpg",
+          "width": 1202,
+          "height": 1600,
+          "source": "Doc4-2.jpeg"
+        }
+      ]
+    },
+    {
+      "id": "BE9C133F-C243-47FE-BF11-C3DD62ADD2EC",
+      "title": "Doc5",
+      "colorIndex": 4,
+      "text": "Élaboration du projet - groupe B.\n\nUtilisation du papier craft / café / photographie",
+      "kind": "point",
+      "points": [
+        [
+          -1.63089,
+          -0.7472,
+          -6.20687
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-08T10:21:09Z",
+      "images": [
+        {
+          "url": "annotations/be9c133f-1.jpg",
+          "width": 1200,
+          "height": 1600,
+          "source": "Doc5.jpeg"
+        }
+      ]
+    }
+  ]
+}

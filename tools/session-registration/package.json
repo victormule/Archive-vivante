@@ -1,0 +1,9 @@
+{
+  "name": "session-registration",
+  "private": true,
+  "type": "module",
+  "description": "Calibration du recalage entre sessions (vues de dessus de la table)",
+  "dependencies": {
+    "playwright-core": "^1.50.0"
+  }
+}

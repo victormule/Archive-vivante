@@ -1,0 +1,134 @@
+{
+  "id": "j1-s1",
+  "title": "Journée 1 — Session 1",
+  "day": 1,
+  "index": 1,
+  "sessionId": "72D0511C-242D-4F4B-8E5B-F84F8A8717EE",
+  "startDate": "2026-10-05T13:51:27Z",
+  "endDate": "2026-10-05T13:55:50Z",
+  "author": "Victor Mulé",
+  "layers": {
+    "splat": {
+      "url": "splat.spz",
+      "bytes": 2086780,
+      "count": 132132,
+      "shDegree": 3
+    },
+    "mesh": {
+      "url": "mesh.glb",
+      "triangles": 24999
+    },
+    "pointCloud": {
+      "url": "points.bin",
+      "count": 997594,
+      "voxelSize": 0.01,
+      "boundsMin": [
+        -5.460757114752872,
+        -1.784761135539172,
+        -9.313445080178104
+      ],
+      "boundsMax": [
+        4.328261059492331,
+        1.063738487890967,
+        1.3630254951507808
+      ]
+    }
+  },
+  "annotations": {
+    "url": "annotations.json",
+    "count": 5
+  },
+  "alignment": {
+    "reference": "splat",
+    "mesh": {
+      "method": "dür.air alignment matrix",
+      "scale": 2.8616047,
+      "avgErrorToArkit": 0.13171987
+    },
+    "pointCloud": {
+      "method": "icp-point-to-plane",
+      "target": "mesh",
+      "medianResidualBefore": 0.0623,
+      "medianResidualAfter": 0.0471,
+      "inlierRatio": 0.639,
+      "transform": [
+        0.999373,
+        0.006305,
+        -0.034852,
+        0.0,
+        -0.00643,
+        0.999973,
+        -0.003476,
+        0.0,
+        0.034829,
+        0.003698,
+        0.999386,
+        0.0,
+        0.226277,
+        0.063901,
+        0.017775,
+        1.0
+      ]
+    },
+    "camera": {
+      "method": "robust-pose-pairs",
+      "pairs": 148,
+      "inliers": 133,
+      "medianResidual": 0.0631,
+      "transform": [
+        0.999339,
+        0.001137,
+        -0.036322,
+        0.0,
+        -0.00133,
+        0.999985,
+        -0.005306,
+        0.0,
+        0.036316,
+        0.00535,
+        0.999326,
+        0.0,
+        0.242093,
+        0.025258,
+        -0.019667,
+        1.0
+      ]
+    }
+  },
+  "worldTransform": [
+    1.0,
+    0,
+    0,
+    0,
+    0,
+    1.0,
+    0,
+    0,
+    0,
+    0,
+    1.0,
+    0,
+    0,
+    0,
+    0,
+    1.0
+  ],
+  "playback": {
+    "audioUrl": "audio.m4a",
+    "cameraPathUrl": "camera_path.json",
+    "duration": 32.26497399806976,
+    "recordedAt": "2026-10-05T14:00:19Z"
+  },
+  "bounds": {
+    "min": [
+      -5.329158,
+      -1.5177264,
+      -8.963373
+    ],
+    "max": [
+      4.0434494,
+      0.9136509,
+      0.47466373
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "annotations": [
+    {
+      "id": "81799646-24FD-4B28-8D2F-6AA15E3187C3",
+      "title": "Bon appétit",
+      "colorIndex": 5,
+      "text": "Papier craft et café sur grand format",
+      "kind": "point",
+      "points": [
+        [
+          1.30346,
+          -0.49154,
+          -2.88983
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-07T13:02:01Z",
+      "images": [
+        {
+          "url": "annotations/81799646-1.jpg",
+          "width": 1600,
+          "height": 1200,
+          "source": "annotation_81799646_reference.jpg"
+        }
+      ]
+    },
+    {
+      "id": "71FA26A8-42A8-480F-BC70-5FDF11DD1E0A",
+      "title": "Le golem",
+      "colorIndex": 6,
+      "text": "Préparation de la structure porteuse. Bois/branchage\n\nPréparation de la structure porteuse. Bois/branchage",
+      "kind": "point",
+      "points": [
+        [
+          0.39416,
+          -0.49867,
+          -3.3608
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-07T12:58:41Z",
+      "images": [
+        {
+          "url": "annotations/71fa26a8-1.jpg",
+          "width": 1600,
+          "height": 1200,
+          "source": "annotation_71FA26A8_reference.jpg"
+        }
+      ]
+    },
+    {
+      "id": "03FEC37D-1EAE-4B9A-A9B8-4DFC1CD2EA22",
+      "title": "Tissage",
+      "colorIndex": 7,
+      "text": "Au début, toile en préparation. Dimension du lieu par rapport au processus.",
+      "kind": "point",
+      "points": [
+        [
+          0.04864,
+          -0.4631,
+          -2.56032
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-07T13:12:43Z",
+      "images": [
+        {
+          "url": "annotations/03fec37d-1.jpg",
+          "width": 1600,
+          "height": 1200,
+          "source": "annotation_03FEC37D_reference.jpg"
+        }
+      ]
+    },
+    {
+      "id": "815463CA-2905-4497-96F4-1B375E518D9C",
+      "title": "À la prochaine",
+      "colorIndex": 8,
+      "text": "Archive poetiqué, inhumation de l’archive",
+      "kind": "point",
+      "points": [
+        [
+          0.4223,
+          -0.45814,
+          -1.06108
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-07T13:09:57Z",
+      "images": [
+        {
+          "url": "annotations/815463ca-1.jpg",
+          "width": 1600,
+          "height": 1200,
+          "source": "annotation_815463CA_reference.jpg"
+        }
+      ]
+    }
+  ]
+}
