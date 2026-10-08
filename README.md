@@ -32,7 +32,6 @@ Performance Archive/
 │       ├── gltf.py, obj.py, ply.py   Formats 3D
 │       └── media.py            Audio, textures (ffmpeg), splats SPZ (Node)
 ├── tools/session-registration/ Calibration du calage entre sessions (sur la table)
-├── netlify.toml                Déploiement Netlify (build de web/)
 └── web/                        Viewer (Vite + TypeScript + three.js + Spark)
     ├── public/sessions/        Assets générés par le pipeline (versionnés : servis tels quels en production)
     └── src/
@@ -77,9 +76,18 @@ Paramètres d'URL :
 
 Tests : `cd web && npm test`.
 
-## Déploiement (Netlify)
+## Déploiement (Cloudflare Pages)
 
-Brancher le dépôt GitHub sur Netlify : [netlify.toml](netlify.toml) suffit (base `web/`, commande `npm run build`, publication de `web/dist/`, Node 22). Les assets de `web/public/sessions/` sont versionnés et copiés tels quels dans le build : après un passage du pipeline, commiter et pousser met le site à jour.
+Projet Cloudflare Pages relié au dépôt GitHub : chaque push sur `main` redéploie le site.
+
+| Réglage | Valeur |
+| --- | --- |
+| Framework preset | None (ou Vite) |
+| Root directory | `web` |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+
+La version de Node vient de [web/.nvmrc](web/.nvmrc), les en-têtes de cache de [web/public/_headers](web/public/_headers). Les assets de `web/public/sessions/` sont versionnés et copiés tels quels dans le build : après un passage du pipeline, commiter et pousser met le site à jour. Limite Cloudflare : 25 Mo par fichier (l'audio de j2-s3 en fait 22).
 
 ## Utilisation
 
