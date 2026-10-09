@@ -25,7 +25,7 @@ from .camera_path import build_camera_path
 from .annotations import read_annotations
 from .export_reader import PhotogrammetryAsset, SessionExport, resolve_dir, resolve_path
 from .gltf import write_glb
-from .media import encode_jpeg, encode_web_image, extract_audio, transcode_spz
+from .media import encode_jpeg, encode_web_image, encode_web_video, extract_audio, extract_poster, render_pdf_thumbnail, transcode_spz
 from .obj import read_mtl_diffuse_map, read_obj
 from .ply import read_ply_vertices, xyz
 from .point_cloud import PointCloud, read_points_bin, read_points_bin_colors, voxel_downsample, write_points_bin
@@ -272,7 +272,7 @@ class SessionBuilder:
         source = resolve_path(self.project_root, cfg["source"])
         media_dir = resolve_path(self.project_root, cfg.get("media_dir", "."))
         content = resolve_path(self.project_root, cfg["content_source"]) if cfg.get("content_source") else None
-        annotations = read_annotations(source, cfg.get("arkit_session") or self.export.session_id, media_dir, content)
+        annotations = read_annotations(source, cfg.get("arkit_session") or self.export.session_id, media_dir, content, cfg.get("media"))
 
         # Points en repère ARKit (session sans splat) : même recalage que la vidéo
         to_splat = None
@@ -296,6 +296,26 @@ class SessionBuilder:
                 name = f"{a.id[:8].lower()}-{n}.jpg"
                 width, height = encode_web_image(image, media_out / name)
                 images.append({"url": f"annotations/{name}", "width": width, "height": height, "source": image.name})
+            videos = []
+            for n, video in enumerate(a.videos, start=1):
+                stem = f"{a.id[:8].lower()}-v{n}"
+                width, height, duration = encode_web_video(video, media_out / f"{stem}.mp4")
+                pw, ph = extract_poster(media_out / f"{stem}.mp4", media_out / f"{stem}.jpg")
+                videos.append({
+                    "url": f"annotations/{stem}.mp4", "width": width, "height": height, "duration": round(duration, 2),
+                    "poster": {"url": f"annotations/{stem}.jpg", "width": pw, "height": ph, "source": video.name},
+                    "source": video.name,
+                })
+            documents = []
+            for n, document in enumerate(a.documents, start=1):
+                stem = f"{a.id[:8].lower()}-d{n}"
+                shutil.copy2(document, media_out / f"{stem}.pdf")
+                width, height, pages = render_pdf_thumbnail(document, media_out / f"{stem}.jpg")
+                documents.append({
+                    "url": f"annotations/{stem}.pdf", "pages": pages,
+                    "thumbnail": {"url": f"annotations/{stem}.jpg", "width": width, "height": height, "source": document.name},
+                    "source": document.name,
+                })
             items.append({
                 "id": a.id,
                 "title": a.title,
@@ -308,10 +328,15 @@ class SessionBuilder:
                 "closed": a.closed,
                 "updatedAt": a.created_at,
                 "images": images,
+                "videos": videos,
+                "documents": documents,
             })
         write_json(self.out / "annotations.json", {"annotations": items})
         self.manifest["annotations"] = {"url": "annotations.json", "count": len(items)}
-        self.log(f"  annotations {len(items)} ({sum(len(i['images']) for i in items)} images)")
+        self.log(
+            f"  annotations {len(items)} ({sum(len(i['images']) for i in items)} images, "
+            f"{sum(len(i['videos']) for i in items)} vidéos, {sum(len(i['documents']) for i in items)} PDF)"
+        )
 
     def arkit_link(self, session: str) -> tuple[np.ndarray, dict[str, Any]]:
         """Repère ARKit d'une autre session du même export -> repère ARKit du splat.

@@ -125,6 +125,31 @@ export interface AnnotationImage {
   source: string;
 }
 
+/** Vidéo d'annotation : lue en boucle, sans le son. */
+export interface AnnotationVideo {
+  url: string;
+  width: number;
+  height: number;
+  duration?: number;
+  /** Image d'attente (premier plan de la vidéo). */
+  poster: AnnotationImage;
+  source: string;
+}
+
+/** Document PDF d'annotation, illustré par sa première page. */
+export interface AnnotationDocument {
+  url: string;
+  pages: number;
+  thumbnail: AnnotationImage;
+  source: string;
+}
+
+/** Un média d'annotation tel que la visionneuse l'affiche. */
+export type MediaItem =
+  | { kind: "image"; url: string; source: string }
+  | { kind: "video"; url: string; poster: string; source: string }
+  | { kind: "pdf"; url: string; source: string; pages: number };
+
 export interface Annotation {
   id: string;
   title: string;
@@ -138,6 +163,9 @@ export interface Annotation {
   closed: boolean;
   updatedAt: string | null;
   images: AnnotationImage[];
+  /** Absents des manifests construits avant l'ajout des vidéos et des PDF. */
+  videos?: AnnotationVideo[];
+  documents?: AnnotationDocument[];
 }
 
 export interface AnnotationsData {

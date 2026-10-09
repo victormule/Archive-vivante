@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { loadAnnotations, loadCameraPath, sessionAssetUrl } from "@/data/sessionRepository";
-import type { AnnotationImage, LayerId, SessionManifest } from "@/data/types";
+import type { LayerId, MediaItem, SessionManifest } from "@/data/types";
 import { CameraPath } from "@/playback/CameraPath";
 import { PlaybackController } from "@/playback/PlaybackController";
 import { AnnotationOverlay, type Insets } from "@/ui/annotations/AnnotationOverlay";
@@ -24,7 +24,7 @@ export interface SessionSceneOptions {
   overlayContainer: HTMLElement;
   cameraSmoothing: number;
   insets: () => Insets;
-  onOpenImage: (images: AnnotationImage[], index: number, title: string) => void;
+  onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
   /** Notifié à chaque changement d'état d'une couche (chargement, progression). */
   onLayerChange: (id: LayerId) => void;
 }
@@ -97,7 +97,7 @@ export class SessionScene {
           // La photogrammétrie sert d'écran pour atténuer les annotations cachées
           occluder: () => this.layerObject("mesh"),
           insets: options.insets,
-          onOpenImage: options.onOpenImage,
+          onOpenMedia: options.onOpenMedia,
         });
         this.annotations.setOpacity(this.opacity);
         this.annotations.setVisible(this.annotationsVisible);

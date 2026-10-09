@@ -125,6 +125,21 @@
       "playback": {
         "video_id": "29752C64",
         "time_offset": 0.0
+      },
+      "annotations": {
+        "$comment": "Points déjà dans le repère du splat. Les fichiers ne portent pas le titre des annotations : association explicite (images, vidéo en boucle muette, PDF).",
+        "source": "Journée2-session4&5-annotation",
+        "arkit_session": "F21895A2",
+        "media_dir": ".",
+        "media": {
+          "Doc1-carnet de recherche": [
+            "session4- Doc1 carnet de recherche - 1.jpeg",
+            "session4- Doc1 carnet de recherche - 2.jpeg",
+            "session4- Doc1 carnet de recherche - 3.jpeg"
+          ],
+          "Experimentation": ["session4- experimentation - 1.mp4"],
+          "Premiers essais": ["session4-premiere essais.pdf"]
+        }
       }
     },
     {
@@ -155,6 +170,15 @@
           -0.9279152,
           1.0
         ]
+      },
+      "annotations": {
+        "$comment": "Points déjà dans le repère du splat de j2-s5 ; le décalage de la session est appliqué à l'affichage.",
+        "source": "Journée2-session4&5-annotation",
+        "arkit_session": "0447EF10",
+        "media_dir": ".",
+        "media": {
+          "Résultat de la deuxième journée": ["session5- resultat.jpeg"]
+        }
       }
     },
     {

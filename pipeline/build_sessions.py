@@ -72,6 +72,23 @@ def scene_config(document: dict) -> dict:
     }
 
 
+def open_export(entry: dict, only: set[str]) -> SessionExport:
+    """Export brut de la session. Pour reconstruire seulement les annotations, l'export
+    brut (volumineux, parfois supprimé) n'est pas nécessaire : l'export d'annotations
+    contient les mêmes métadonnées de projet et de session."""
+    try:
+        return SessionExport.open(resolve_dir(PROJECT_ROOT, entry["export_dir"]), entry.get("arkit_session"))
+    except ExportError:
+        annotations = entry.get("annotations")
+        if not (only and only <= {"annotations"} and annotations):
+            raise
+        source = resolve_path(PROJECT_ROOT, annotations["source"])
+        if not source.is_dir():
+            raise
+        print(f"  ! export brut absent ({entry['export_dir']}) : métadonnées lues dans l'export d'annotations")
+        return SessionExport.open(source, entry.get("arkit_session"))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("ids", nargs="*", help="Identifiants de sessions à construire (défaut : toutes)")
@@ -91,7 +108,7 @@ def main() -> int:
     selected.sort(key=lambda s: "register_to" in s)
     for entry in selected:
         print(f"→ {entry['id']} ({entry['export_dir']})")
-        export = SessionExport.open(resolve_dir(PROJECT_ROOT, entry["export_dir"]), entry.get("arkit_session"))
+        export = open_export(entry, set(args.only or ()))
         reference = entry.get("register_to")
         SessionBuilder(
             entry, export, OUTPUT_ROOT / entry["id"], PROJECT_ROOT,

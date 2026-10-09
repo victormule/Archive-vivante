@@ -29,9 +29,18 @@ export function loadCameraPath(manifest: SessionManifest): Promise<CameraPathDat
 export async function loadAnnotations(manifest: SessionManifest): Promise<AnnotationsData> {
   if (!manifest.annotations) return { annotations: [] };
   const data = await fetchJson<AnnotationsData>(sessionAssetUrl(manifest.id, manifest.annotations.url));
-  // Les URLs d'images sont relatives au dossier de la session
+  // Les URLs des médias (images, vidéos, PDF et leurs vignettes) sont relatives au dossier de la session
+  const resolve = (url: string) => sessionAssetUrl(manifest.id, url);
   for (const a of data.annotations) {
-    for (const img of a.images) img.url = sessionAssetUrl(manifest.id, img.url);
+    for (const img of a.images) img.url = resolve(img.url);
+    for (const video of a.videos ?? []) {
+      video.url = resolve(video.url);
+      video.poster.url = resolve(video.poster.url);
+    }
+    for (const document of a.documents ?? []) {
+      document.url = resolve(document.url);
+      document.thumbnail.url = resolve(document.thumbnail.url);
+    }
   }
   return data;
 }

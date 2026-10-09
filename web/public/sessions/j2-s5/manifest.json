@@ -36,7 +36,10 @@
       ]
     }
   },
-  "annotations": null,
+  "annotations": {
+    "url": "annotations.json",
+    "count": 1
+  },
   "alignment": {
     "reference": "splat",
     "mesh": {

@@ -49,7 +49,8 @@ Par session :
   "annotations": {                   // optionnel
     "source": "Journée1-annotation.zip",   // export d'annotations dür.air (zip ou dossier)
     "content_source": "…",                 // optionnel : reprendre textes et images d'un autre export, par titre
-    "media_dir": ".",                      // dossier des images associées
+    "media_dir": ".",                      // dossier des médias associés (images, vidéos, PDF)
+    "media": { "Titre": ["fichier.jpeg"] }, // optionnel : association explicite titre -> fichiers (sinon par nom)
     "arkit_session": "BF499316",           // optionnel : session ARKit des annotations
     "frame": "arkit",                      // optionnel : points en repère ARKit (session sans splat) -> recalés
     "reference_images": true               // optionnel : sans image par titre, montrer la vue caméra de l'annotation
@@ -98,6 +99,8 @@ j1-s2 → j1-s1 : 3,3° / ~40 cm, résidu médian 9,7 → 6,0 cm, 45 % des point
 - Annotations reposées dans une autre session (mêmes titres, autres emplacements) : `content_source` reprend leur texte de l'export d'origine ; seul l'emplacement vient de la session.
 - Couleur : un indice commun à toutes les sessions est attribué par titre. Les couleurs déjà publiées ne changent jamais ; un nouveau titre prend l'indice suivant (ordre du catalogue, puis ordre naturel des titres). Une source d'annotations absente n'empêche pas le build : ses couleurs publiées sont conservées.
 - Images : associées par **titre** dans `media_dir` : `Doc3.jpg` pour une image unique, `Doc4-1.jpeg`, `Doc4-2.jpeg`… pour plusieurs (ordre numérique). Elles sont ré-encodées en JPEG, 1600 px maximum.
+- Vidéos et PDF : `media` associe explicitement des fichiers à un titre ; chacun est rangé selon son extension (image, vidéo `.mp4`/`.mov`/`.m4v`/`.webm`, document `.pdf`). Une vidéo est recopiée sans sa piste son (lecture muette en boucle dans le viewer, au survol et au clic) avec une image d'attente ; un PDF est copié tel quel avec la première page en vignette (PyMuPDF).
+- Reconstruire seulement les annotations (`--only annotations`) ne demande pas l'export brut de la session : à défaut, les métadonnées sont lues dans l'export d'annotations.
 - Repère : les points sont déjà dans le repère du splat (posés sur le modèle aligné, à moins de 1,5 cm de la surface photogrammétrique) ; aucune transformation n'est appliquée. Exception : annotations faites pendant une session sans splat (`frame: "arkit"`), recalées comme la vidéo de cette session.
 - Sans image associée par titre, `reference_images` illustre l'annotation par la vue caméra enregistrée au moment où elle a été posée.
 

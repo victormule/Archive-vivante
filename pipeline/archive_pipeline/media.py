@@ -72,6 +72,68 @@ def encode_web_image(image: Path, output: Path, max_size: int = 1600, quality: i
     return width, height
 
 
+def encode_web_video(video: Path, output: Path) -> tuple[int, int, float]:
+    """Vidéo d'annotation : H.264 sans piste son (lecture muette en boucle), prête à lire.
+
+    Le flux vidéo est recopié s'il est déjà en H.264, ré-encodé sinon.
+    Retourne (largeur, hauteur, durée en s).
+    """
+    ffprobe = require_tool("ffprobe")
+    codec = subprocess.run(
+        [ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name",
+         "-of", "csv=p=0", str(video)],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    video_codec = ["-c:v", "copy"] if codec == "h264" else ["-c:v", "libx264", "-crf", "23", "-pix_fmt", "yuv420p"]
+    subprocess.run(
+        [require_ffmpeg(), "-y", "-loglevel", "error", "-i", str(video),
+         "-map", "0:v:0", *video_codec, "-an", "-movflags", "+faststart", str(output)],
+        check=True,
+    )
+    probe = subprocess.run(
+        [ffprobe, "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height:format=duration",
+         "-of", "json", str(output)],
+        check=True, capture_output=True, text=True,
+    )
+    info = json.loads(probe.stdout)
+    stream = info["streams"][0]
+    return int(stream["width"]), int(stream["height"]), float(info["format"]["duration"])
+
+
+def extract_poster(video: Path, output: Path, at: float = 0.5, max_size: int = 800) -> tuple[int, int]:
+    """Image d'attente d'une vidéo (JPEG)."""
+    scale = f"scale='if(gt(iw,ih),min({max_size},iw),-2)':'if(gt(iw,ih),-2,min({max_size},ih))'"
+    subprocess.run(
+        [require_ffmpeg(), "-y", "-loglevel", "error", "-ss", str(at), "-i", str(video),
+         "-vf", scale, "-q:v", "4", "-frames:v", "1", str(output)],
+        check=True,
+    )
+    return _image_size(output)
+
+
+def render_pdf_thumbnail(pdf: Path, output: Path, max_size: int = 800) -> tuple[int, int, int]:
+    """Première page d'un PDF en JPEG. Retourne (largeur, hauteur, nombre de pages)."""
+    try:
+        import pymupdf
+    except ImportError as exc:  # pragma: no cover - dépendance du pipeline
+        raise RuntimeError("pymupdf requis pour les documents PDF (pip install -r pipeline/requirements.txt)") from exc
+    with pymupdf.open(pdf) as document:
+        page = document[0]
+        zoom = max_size / max(page.rect.width, page.rect.height)
+        pixmap = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
+        pixmap.save(output, jpg_quality=85)
+        return pixmap.width, pixmap.height, document.page_count
+
+
+def _image_size(path: Path) -> tuple[int, int]:
+    probe = subprocess.run(
+        [require_tool("ffprobe"), "-v", "error", "-show_entries", "stream=width,height", "-of", "csv=p=0", str(path)],
+        check=True, capture_output=True, text=True,
+    )
+    width, height = (int(v) for v in probe.stdout.strip().split(",")[:2])
+    return width, height
+
+
 def transcode_spz(ply: Path, output: Path, max_sh: int = 3) -> tuple[int, int]:
     """Gaussian splat PLY -> SPZ compressé (voir scripts/transcode_spz.mjs).
 

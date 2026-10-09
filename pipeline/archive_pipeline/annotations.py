@@ -9,6 +9,9 @@ la surface photogrammétrique).
 
 Médias : les images d'une annotation sont associées par son titre, dans
 `media_dir` : `<titre>.<ext>` ou `<titre>-<n>.<ext>` (jpg, jpeg, png, webp).
+Quand les noms de fichiers ne suivent pas les titres, `media` les associe
+explicitement : {titre: [fichiers…]}. Chaque fichier est rangé selon son
+extension : image, vidéo (mp4, mov, m4v, webm) ou document PDF.
 
 Une même annotation peut être reposée dans plusieurs sessions (même titre,
 autre emplacement). Le contenu (texte) peut alors être repris d'un export de
@@ -29,6 +32,8 @@ from pathlib import Path
 from typing import Any, Iterator
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v", ".webm"}
+DOCUMENT_EXTENSIONS = {".pdf"}
 
 
 @dataclass(frozen=True)
@@ -41,6 +46,8 @@ class Annotation:
     tool: str
     created_at: str | None
     images: list[Path] = field(default_factory=list)
+    videos: list[Path] = field(default_factory=list)
+    documents: list[Path] = field(default_factory=list)
     # Vue caméra au moment de l'annotation (exports en dossier uniquement)
     reference_image: Path | None = None
 
@@ -87,6 +94,12 @@ def find_images(media_dir: Path, title: str) -> list[Path]:
     return [p for _, p in sorted(found)]
 
 
+def split_media(files: list[Path]) -> tuple[list[Path], list[Path], list[Path]]:
+    """Fichiers -> (images, vidéos, documents), dans l'ordre donné."""
+    by_kind = lambda extensions: [f for f in files if f.suffix.lower() in extensions]
+    return by_kind(IMAGE_EXTENSIONS), by_kind(VIDEO_EXTENSIONS), by_kind(DOCUMENT_EXTENSIONS)
+
+
 def read_titles(source: Path, session_id: str | None = None) -> set[str]:
     """Titres des annotations d'un export (d'une session, ou de toutes)."""
     return {
@@ -100,7 +113,10 @@ def read_annotations(
     session_id: str,
     media_dir: Path | None = None,
     content_source: Path | None = None,
+    media: dict[str, list[str]] | None = None,
 ) -> list[Annotation]:
+    """`media` : fichiers (relatifs à `media_dir`) associés explicitement à un titre."""
+    explicit = {_nfc(title).casefold(): names for title, names in (media or {}).items()}
     reference: dict[str, str] = {}
     if content_source:
         for data, _ in _iter_annotation_json(content_source):
@@ -113,6 +129,10 @@ def read_annotations(
         user = data.get("B_description_utilisateur", {})
         contour = data["C_trace_2d_et_3d"]["contour_3d"]
         title = _nfc(user.get("titre", "")).strip()
+        if media_dir and title.casefold() in explicit:
+            images, videos, documents = split_media([_media_file(media_dir, n) for n in explicit[title.casefold()]])
+        else:
+            images, videos, documents = (find_images(media_dir, title) if media_dir else []), [], []
         result.append(Annotation(
             id=info["id"],
             title=title,
@@ -121,10 +141,24 @@ def read_annotations(
             closed=bool(contour.get("forme_fermee", False)),
             tool=info.get("outil_utilise", "point"),
             created_at=user.get("date_mise_a_jour") or info.get("timestamp_creation"),
-            images=find_images(media_dir, title) if media_dir else [],
+            images=images,
+            videos=videos,
+            documents=documents,
             reference_image=_reference_image(folder, info),
         ))
     return sorted(result, key=lambda a: (a.title.casefold(), a.id))
+
+
+def _media_file(media_dir: Path, name: str) -> Path:
+    """Fichier d'un dossier, quelle que soit la normalisation Unicode de son nom."""
+    path = media_dir / name
+    if path.exists():
+        return path
+    target = _nfc(name)
+    for child in media_dir.iterdir():
+        if _nfc(child.name) == target:
+            return child
+    raise FileNotFoundError(f"média d'annotation introuvable : {path}")
 
 
 def _reference_image(folder: Path | None, info: dict[str, Any]) -> Path | None:

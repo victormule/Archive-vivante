@@ -1,0 +1,106 @@
+{
+  "annotations": [
+    {
+      "id": "B255AD04-395E-4BE8-A499-3B5FD50BEE31",
+      "title": "Doc1-carnet de recherche",
+      "colorIndex": 9,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -1.14325,
+          -1.40325,
+          -1.44796
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-09T08:00:06Z",
+      "images": [
+        {
+          "url": "annotations/b255ad04-1.jpg",
+          "width": 1200,
+          "height": 1600,
+          "source": "session4- Doc1 carnet de recherche - 1.jpeg"
+        },
+        {
+          "url": "annotations/b255ad04-2.jpg",
+          "width": 1200,
+          "height": 1600,
+          "source": "session4- Doc1 carnet de recherche - 2.jpeg"
+        },
+        {
+          "url": "annotations/b255ad04-3.jpg",
+          "width": 1200,
+          "height": 1600,
+          "source": "session4- Doc1 carnet de recherche - 3.jpeg"
+        }
+      ],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "37580959-CD0D-49F3-8EFC-7463E87354FE",
+      "title": "Experimentation",
+      "colorIndex": 10,
+      "text": "Teste pour une utilisation du café et du savon sur papier - élaboration d’un protocole.",
+      "kind": "point",
+      "points": [
+        [
+          -1.73323,
+          -1.42391,
+          -1.11832
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-09T08:01:21Z",
+      "images": [],
+      "videos": [
+        {
+          "url": "annotations/37580959-v1.mp4",
+          "width": 576,
+          "height": 1024,
+          "duration": 10.96,
+          "poster": {
+            "url": "annotations/37580959-v1.jpg",
+            "width": 450,
+            "height": 800,
+            "source": "session4- experimentation - 1.mp4"
+          },
+          "source": "session4- experimentation - 1.mp4"
+        }
+      ],
+      "documents": []
+    },
+    {
+      "id": "2B83B87E-C4F9-4FFD-8E06-A6B60D8ADDE9",
+      "title": "Premiers essais",
+      "colorIndex": 11,
+      "text": "Papier craft ou papier blanc?",
+      "kind": "point",
+      "points": [
+        [
+          -2.16911,
+          -0.85976,
+          -2.48534
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-09T08:04:03Z",
+      "images": [],
+      "videos": [],
+      "documents": [
+        {
+          "url": "annotations/2b83b87e-d1.pdf",
+          "pages": 5,
+          "thumbnail": {
+            "url": "annotations/2b83b87e-d1.jpg",
+            "width": 566,
+            "height": 800,
+            "source": "session4-premiere essais.pdf"
+          },
+          "source": "session4-premiere essais.pdf"
+        }
+      ]
+    }
+  ]
+}

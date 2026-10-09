@@ -3,7 +3,7 @@ import { loadSessionManifest } from "@/data/sessionRepository";
 import type { CameraView, LayerId, SceneConfig, SessionSummary } from "@/data/types";
 import type { Insets } from "@/ui/annotations/AnnotationOverlay";
 import { formatDayAndTime } from "@/ui/formatTime";
-import { ImageLightbox } from "@/ui/ImageLightbox";
+import { MediaLightbox } from "@/ui/MediaLightbox";
 import { ANNOTATIONS_ITEM, LAYER_ITEMS, type LayerToggleItem, LayerToggles, type ToggleId } from "@/ui/LayerToggles";
 import { PlayerControls } from "@/ui/PlayerControls";
 import { SessionSwitcher } from "@/ui/SessionSwitcher";
@@ -46,7 +46,7 @@ export class ArchiveView {
   private viewer!: SceneViewer;
   private toggles: LayerToggles | null = null;
   private switcher: SessionSwitcher | null = null;
-  private lightbox: ImageLightbox | null = null;
+  private lightbox: MediaLightbox | null = null;
   private controls: PlayerControls | null = null;
 
   private readonly scenes = new Map<string, Promise<SessionScene>>();
@@ -91,7 +91,7 @@ export class ArchiveView {
   async start(initialId: string): Promise<void> {
     const loaderBar = this.root.querySelector<HTMLElement>(".loader__bar span")!;
     this.viewer = new SceneViewer({ container: this.stage });
-    this.lightbox = new ImageLightbox(this.root);
+    this.lightbox = new MediaLightbox(this.root);
     this.setupSwitcher();
     this.disposers.push(this.viewer.onFrame(() => this.onFrame()));
 
@@ -250,7 +250,7 @@ export class ArchiveView {
             overlayContainer: this.stage,
             cameraSmoothing: this.options.cameraSmoothing,
             insets: () => this.overlayInsets(),
-            onOpenImage: (images, index, title) => this.lightbox?.open(images, index, title),
+            onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title),
             onLayerChange: (layerId) => this.refreshToggle(layerId),
           }),
       );

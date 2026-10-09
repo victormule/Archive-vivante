@@ -1,0 +1,30 @@
+{
+  "annotations": [
+    {
+      "id": "B78BF1C8-8723-4F4C-B77D-AE01F0825459",
+      "title": "Résultat de la deuxième journée",
+      "colorIndex": 12,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -2.03123,
+          -0.81766,
+          -2.49675
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-09T08:06:03Z",
+      "images": [
+        {
+          "url": "annotations/b78bf1c8-1.jpg",
+          "width": 1568,
+          "height": 1600,
+          "source": "session5- resultat.jpeg"
+        }
+      ],
+      "videos": [],
+      "documents": []
+    }
+  ]
+}

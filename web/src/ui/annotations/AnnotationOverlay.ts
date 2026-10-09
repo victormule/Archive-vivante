@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import type { Annotation, AnnotationImage } from "@/data/types";
+import type { Annotation, MediaItem } from "@/data/types";
+import { annotationMedia } from "./annotationMedia";
 import { layoutLabels, leaderPath, type LayoutBounds, type Side } from "./labelLayout";
 
 /** Couleurs des étiquettes, attribuées dans l'ordre des annotations. */
@@ -9,6 +10,8 @@ const PALETTE = ["#4f9066", "#d99a35", "#3f74b5", "#7b5bb5", "#c25a87", "#3e8f93
 const OCCLUSION_INTERVAL = 150;
 /** Vitesse de lissage des déplacements d'étiquettes (1/s). */
 const FOLLOW_RATE = 14;
+
+const MEDIA_LABEL = { image: "Agrandir l'image", video: "Agrandir la vidéo", pdf: "Ouvrir le document" } as const;
 
 const PIN_ICON = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.4 4.5 8.6 4.5 8.6s4.5-5.2 4.5-8.6c0-2.5-2-4.5-4.5-4.5zM8 4.1a1.95 1.95 0 1 0 0 3.9 1.95 1.95 0 0 0 0-3.9z" fill="currentColor" fill-rule="evenodd"/></svg>`;
 
@@ -29,7 +32,7 @@ export interface AnnotationOverlayOptions {
   occluder: () => THREE.Object3D | null;
   /** Marges à laisser libres (boutons, barre de lecture…). */
   insets: () => Insets;
-  onOpenImage: (images: AnnotationImage[], index: number, title: string) => void;
+  onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
 }
 
 interface Pin {
@@ -51,6 +54,8 @@ interface Pin {
   occluded: boolean;
   hovered: boolean;
   pinned: boolean;
+  /** Vidéos de l'étiquette : lues en boucle, sans le son, tant qu'elle est dépliée. */
+  videos: HTMLVideoElement[];
 }
 
 /**
@@ -66,6 +71,7 @@ export class AnnotationOverlay {
   private readonly projected = new THREE.Vector3();
   private lastOcclusion = 0;
   private _visible = true;
+  private inert = false;
 
   constructor(private readonly options: AnnotationOverlayOptions) {
     this.element = document.createElement("div");
@@ -88,12 +94,19 @@ export class AnnotationOverlay {
   setVisible(visible: boolean): void {
     this._visible = visible;
     this.element.classList.toggle("is-hidden", !visible);
+    this.syncVideos();
   }
 
   /** Opacité globale (fondus entre sessions) ; inactif à 0. */
   setOpacity(opacity: number): void {
     this.element.style.setProperty("--session-opacity", String(opacity));
-    this.element.classList.toggle("is-inert", opacity < 0.5);
+    const inert = opacity < 0.5;
+    this.element.classList.toggle("is-inert", inert);
+    // Une session estompée ne fait pas tourner ses vidéos en arrière-plan
+    if (inert !== this.inert) {
+      this.inert = inert;
+      this.syncVideos();
+    }
   }
 
   /** À appeler à chaque frame, une fois la caméra à jour. */
@@ -183,7 +196,8 @@ export class AnnotationOverlay {
       <div class="annotation-label__detail"><div class="annotation-label__inner"></div></div>
     `;
     label.querySelector(".annotation-label__title")!.textContent = data.title || "Sans titre";
-    this.fillDetail(label.querySelector<HTMLElement>(".annotation-label__inner")!, data);
+    const videos: HTMLVideoElement[] = [];
+    this.fillDetail(label.querySelector<HTMLElement>(".annotation-label__inner")!, data, videos);
 
     const leader = document.createElementNS("http://www.w3.org/2000/svg", "path");
     leader.classList.add("annotation-leader");
@@ -196,7 +210,7 @@ export class AnnotationOverlay {
     const pin: Pin = {
       data, anchor, dot, label, leader,
       ax: 0, ay: 0, x: 0, y: 0, placed: false, collapsedHeight: 0,
-      visible: false, occluded: false, hovered: false, pinned: false,
+      visible: false, occluded: false, hovered: false, pinned: false, videos,
     };
 
     const setHovered = (hovered: boolean) => {
@@ -224,7 +238,7 @@ export class AnnotationOverlay {
     return pin;
   }
 
-  private fillDetail(inner: HTMLElement, data: Annotation): void {
+  private fillDetail(inner: HTMLElement, data: Annotation, videos: HTMLVideoElement[]): void {
     if (data.text) {
       const text = document.createElement("div");
       text.className = "annotation-label__text";
@@ -238,23 +252,47 @@ export class AnnotationOverlay {
       }
       inner.appendChild(text);
     }
-    if (data.images.length > 0) {
+    const media = annotationMedia(data);
+    if (media.length > 0) {
+      const items = media.map((m) => m.item);
       const gallery = document.createElement("div");
       gallery.className = "annotation-label__images";
-      gallery.dataset.count = String(Math.min(data.images.length, 3));
-      data.images.forEach((image, index) => {
+      gallery.dataset.count = String(Math.min(media.length, 3));
+      media.forEach(({ item, thumbnail }, index) => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "annotation-label__image";
-        button.setAttribute("aria-label", `Agrandir l'image ${index + 1} : ${data.title}`);
-        const img = document.createElement("img");
-        img.src = image.url;
-        img.alt = `${data.title} — ${image.source}`;
-        img.loading = "lazy";
-        img.width = image.width;
-        img.height = image.height;
-        button.appendChild(img);
-        button.addEventListener("click", () => this.options.onOpenImage(data.images, index, data.title));
+        button.className = `annotation-label__image annotation-label__image--${item.kind}`;
+        button.setAttribute("aria-label", `${MEDIA_LABEL[item.kind]} ${index + 1} : ${data.title}`);
+        if (item.kind === "video") {
+          // Image d'attente, puis lecture en boucle sans le son quand l'étiquette se déplie
+          const video = document.createElement("video");
+          video.poster = thumbnail.url;
+          video.src = item.url;
+          video.muted = true;
+          video.loop = true;
+          video.playsInline = true;
+          video.preload = "none";
+          video.width = thumbnail.width;
+          video.height = thumbnail.height;
+          video.setAttribute("aria-hidden", "true");
+          button.appendChild(video);
+          videos.push(video);
+        } else {
+          const img = document.createElement("img");
+          img.src = thumbnail.url;
+          img.alt = `${data.title} — ${item.source}`;
+          img.loading = "lazy";
+          img.width = thumbnail.width;
+          img.height = thumbnail.height;
+          button.appendChild(img);
+        }
+        if (item.kind === "pdf") {
+          const badge = document.createElement("span");
+          badge.className = "annotation-label__badge";
+          badge.textContent = item.pages > 1 ? `PDF · ${item.pages} p.` : "PDF";
+          button.appendChild(badge);
+        }
+        button.addEventListener("click", () => this.options.onOpenMedia(items, index, data.title));
         gallery.appendChild(button);
       });
       inner.appendChild(gallery);
@@ -268,6 +306,24 @@ export class AnnotationOverlay {
     pin.label.setAttribute("aria-expanded", String(expanded));
     pin.dot.classList.toggle("is-active", expanded);
     pin.leader.classList.toggle("is-active", expanded);
+    this.syncVideo(pin);
+  }
+
+  /** Les vidéos tournent en boucle, sans le son, tant que l'étiquette est dépliée et visible. */
+  private syncVideo(pin: Pin): void {
+    const play = (pin.hovered || pin.pinned) && this._visible && !this.inert;
+    for (const video of pin.videos) {
+      if (play) {
+        void video.play().catch(() => {});
+      } else if (!video.paused) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    }
+  }
+
+  private syncVideos(): void {
+    for (const pin of this.pins) this.syncVideo(pin);
   }
 
   // --- Projection et visibilité -------------------------------------------------
