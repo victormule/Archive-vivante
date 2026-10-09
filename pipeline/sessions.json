@@ -156,6 +156,22 @@
           1.0
         ]
       }
+    },
+    {
+      "id": "j3-s6",
+      "title": "Journée 3 — Session 6",
+      "day": 3,
+      "index": 6,
+      "export_dir": "Journée3-session6",
+      "arkit_session": "3F48326B",
+      "world_transform": {
+        "$comment": "Placé le 2026-10-09 (autre lieu, sans décor commun) : sol déjà au niveau de j1-s1 (-1,44 m, horizontal à 0,2°) ; le groupe sur le lit, visé par la vidéo, centré sur l'axe de rotation ; rotation de -10,6° pour filmer depuis le côté de la vue d'arrivée.",
+        "matrix": [0.9829812, 0.0, 0.1837064, 0.0, 0.0, 1.0, 0.0, 0.0, -0.1837064, 0.0, 0.9829812, 0.0, -1.1660463, 0.0, -1.0174503, 1.0]
+      },
+      "playback": {
+        "video_id": "B3E9C54D",
+        "time_offset": 0.0
+      }
     }
   ]
 }
