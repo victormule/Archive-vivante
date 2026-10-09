@@ -13,6 +13,7 @@ const IDLE_CROSSFADE_DURATION = 5000;
  *  - `session=<id>`   session affichée (défaut : première de l'index)
  *  - `smoothing=<s>`  lissage du trajet caméra en secondes (0 = trajet brut)
  *  - `idle=0`         désactive la rotation automatique (outils, captures)
+ *  - `enter=0`        ouvre la scène sans bouton « Entrer » ni plein écran (outils, captures)
  */
 export class App {
   private view: ArchiveView | null = null;
@@ -34,6 +35,7 @@ export class App {
         cameraSmoothing: Number.isFinite(smoothing) ? Math.max(0, smoothing) : DEFAULT_CAMERA_SMOOTHING,
         crossfadeDuration: CROSSFADE_DURATION,
         idleCrossfadeDuration: IDLE_CROSSFADE_DURATION,
+        skipEntry: params.get("enter") === "0",
       });
       // Outils de développement (console, tests automatisés) : jamais en production
       if (import.meta.env.DEV) Object.assign(window, { __archive: this.view });

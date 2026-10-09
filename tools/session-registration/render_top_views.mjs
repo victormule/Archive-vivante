@@ -40,7 +40,7 @@ const browser = await chromium.launch({
       : [`--use-angle=${process.env.ANGLE ?? "d3d11"}`, "--enable-gpu", "--ignore-gpu-blocklist"],
 });
 const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
-await page.goto(`${o.url}/?session=${o.reference}&idle=0`);
+await page.goto(`${o.url}/?session=${o.reference}&idle=0&enter=0`);
 await page.waitForSelector(".session.is-ready", { timeout: 600_000 });
 await page.keyboard.press("4"); // annotations masquées
 await page.addStyleTag({

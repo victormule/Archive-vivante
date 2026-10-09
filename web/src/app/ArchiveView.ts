@@ -19,6 +19,8 @@ export interface ArchiveViewOptions {
   crossfadeDuration: number;
   /** Durée (ms) du fondu pendant la rotation automatique (plus lent, contemplatif). */
   idleCrossfadeDuration: number;
+  /** Ouvre directement la scène, sans bouton « Entrer » ni plein écran (outils, captures). */
+  skipEntry?: boolean;
 }
 
 /** Taille supposée d'une couche dont le manifest n'indique pas le poids. */
@@ -77,6 +79,7 @@ export class ArchiveView {
       <div class="session__loader" role="status">
         <div class="loader__bar"><span></span></div>
         <p class="loader__label">Chargement de la session…</p>
+        <button class="loader__enter" type="button" hidden>Entrer</button>
       </div>
       <p class="session__hint">Glisser : orbiter · Clic droit : déplacer · Molette : zoom</p>
       <footer class="session__footer"></footer>
@@ -113,10 +116,30 @@ export class ArchiveView {
       this.root.querySelector(".loader__label")!.textContent = "Erreur de chargement";
       throw err;
     }
+    // Tout est prêt : l'écran d'accueil attend un clic, qui passe aussi en plein écran
+    if (!this.options.skipEntry) await this.waitForEntry();
     this.root.classList.add("is-ready");
     window.addEventListener("keydown", this.onKeyDown);
     this.disposers.push(() => window.removeEventListener("keydown", this.onKeyDown));
     this.setupIdleOrbit();
+  }
+
+  /** Bouton « Entrer » : le plein écran doit être demandé dans le geste de l'utilisateur. */
+  private waitForEntry(): Promise<void> {
+    const button = this.root.querySelector<HTMLButtonElement>(".loader__enter")!;
+    this.root.classList.add("is-waiting");
+    button.hidden = false;
+    button.focus();
+    return new Promise((resolve) => {
+      button.addEventListener(
+        "click",
+        () => {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+          resolve();
+        },
+        { once: true },
+      );
+    });
   }
 
   /** Charge toutes les couches ; progression pondérée par le poids des fichiers. */
