@@ -21,21 +21,21 @@
           "count": 301988,
           "shDegree": 1,
           "transform": [
-            0.9979775,
-            -0.0634463,
-            0.0039321,
+            0.9906674,
+            -0.0421842,
+            0.1296094,
             0.0,
-            0.0635588,
-            0.9969767,
-            -0.0446955,
+            0.0449867,
+            0.9988112,
+            -0.01877,
             0.0,
-            -0.0010845,
-            0.044855,
-            0.9989929,
+            -0.1286636,
+            0.0244255,
+            0.9913875,
             0.0,
-            0.0832375,
-            0.0033141,
-            -0.1091759,
+            0.5763166,
+            1.258796,
+            0.0549598,
             1.0
           ]
         },
@@ -45,21 +45,21 @@
           "count": 133067,
           "shDegree": 1,
           "transform": [
-            0.9999706,
+            0.9994987,
             0.0073466,
-            0.0022134,
+            0.0307963,
             0.0,
-            -0.0073175,
+            -0.0069462,
             0.9998902,
-            -0.0128869,
+            -0.0130908,
             0.0,
-            -0.0023079,
+            -0.0308891,
             0.0128703,
-            0.9999145,
+            0.99944,
             0.0,
-            0.0350486,
-            0.0160094,
-            0.0739007,
+            1.0175141,
+            1.1856228,
+            1.1360694,
             1.0
           ]
         },
@@ -69,21 +69,21 @@
           "count": 299764,
           "shDegree": 1,
           "transform": [
-            0.999948,
-            -0.0030861,
-            0.0097207,
+            0.9998279,
+            0.0064487,
+            -0.0173935,
             0.0,
-            0.0030095,
-            0.9999644,
-            0.0078802,
+            -0.0063587,
+            0.9999661,
+            0.0052242,
             0.0,
-            -0.0097447,
-            -0.0078505,
-            0.9999217,
+            0.0174266,
+            -0.0051127,
+            0.9998351,
             0.0,
-            -0.0649871,
-            -0.0444209,
-            0.0855618,
+            -1.1233034,
+            1.3530094,
+            0.1425647,
             1.0
           ]
         },
@@ -93,21 +93,21 @@
           "count": 159983,
           "shDegree": 3,
           "transform": [
-            0.9993726,
-            -0.0322457,
-            -0.0146467,
+            0.9929686,
+            -0.0325526,
+            -0.1138142,
             0.0,
-            0.0320439,
-            0.999391,
-            -0.0138118,
+            0.0310496,
+            0.999406,
+            -0.0149542,
             0.0,
-            0.0150831,
-            0.0133338,
-            0.9997973,
+            0.1142334,
+            0.0113151,
+            0.9933895,
             0.0,
-            -0.0942378,
-            0.1292229,
-            0.0140503,
+            -1.0954193,
+            1.368966,
+            1.3289909,
             1.0
           ]
         },
@@ -117,21 +117,21 @@
           "count": 160563,
           "shDegree": 3,
           "transform": [
-            0.9951509,
+            0.9699531,
             -0.0873524,
-            -0.0452129,
+            -0.2270696,
             0.0,
-            0.0818051,
+            0.0597429,
             0.9902615,
-            -0.1126506,
+            -0.1257498,
             0.0,
-            0.0546129,
+            0.2358428,
             0.1084057,
-            0.9926055,
+            0.9657258,
             0.0,
-            -1.244844,
-            -4.0989204,
-            -0.253191,
+            -4.979704,
+            -2.8274995,
+            -0.391642,
             1.0
           ]
         }
@@ -139,83 +139,288 @@
     },
     "mesh": {
       "url": "mesh.glb",
-      "bytes": 6180256,
+      "bytes": 6180252,
       "triangles": 108876
     },
     "pointCloud": {
       "url": "points.bin",
-      "bytes": 15183918,
-      "count": 1687102,
+      "bytes": 13855068,
+      "count": 1539452,
       "voxelSize": 0.05,
       "boundsMin": [
-        -20.02720069885254,
-        -1.965149998664856,
-        -18.178600311279297
+        -19.959028244018555,
+        -1.3351500034332275,
+        -17.142553329467773
       ],
       "boundsMax": [
         14.514200210571289,
-        3.91510009765625,
+        4.437951564788818,
         39.61439895629883
       ]
     }
   },
   "annotations": null,
   "alignment": {
-    "reference": "arkit-worldmap",
+    "reference": "lidar:1A4B75F5-097F-4A7A-B4F2-AC3F9D631C00",
     "parts": [
       {
         "session": "0DA08ED9-F645-469B-8E14-12B4E47394BE",
-        "method": "icp-lidar-to-photogrammetry",
-        "start": "identity",
-        "medianResidualBefore": 0.235,
-        "medianResidualAfter": 0.0877,
-        "inlierRatio": 0.482,
-        "correctionDegrees": 4.46,
-        "correctionMeters": 0.137
+        "method": "floor-level + icp-yaw-lidar-to-photogrammetry",
+        "fitScores": {
+          "leveled": 0.133,
+          "free": 0.136
+        },
+        "floorTiltDegrees": 2.79,
+        "floorOffsetMeters": -0.036,
+        "medianResidualBefore": 0.2256,
+        "medianResidualAfter": 0.0896,
+        "inlierRatio": 0.478,
+        "correctionDegrees": 2.8,
+        "correctionMeters": 0.181,
+        "lidarLink": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.1523,
+          "medianResidualAfter": 0.0743,
+          "inlierRatio": 0.183,
+          "dense": {
+            "medianResidualBefore": 0.0533,
+            "medianResidualAfter": 0.0537,
+            "inlierRatio": 0.16
+          },
+          "transform": [
+            0.9921261,
+            0.0,
+            0.1252431,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            -0.1252431,
+            0.0,
+            0.9921261,
+            0.0,
+            0.4869453,
+            1.3616549,
+            0.1437423,
+            1.0
+          ]
+        },
+        "polish": {
+          "method": "icp-yaw-reference-to-photogrammetry + floor",
+          "scoreBefore": 0.057,
+          "scoreAfter": 0.083,
+          "accepted": true,
+          "floorOffsetMeters": -0.06
+        }
       },
       {
         "session": "F667DF09-A48F-498C-AB73-D9C5638A6B51",
         "method": "icp-lidar-to-photogrammetry",
-        "start": "identity",
+        "fitScores": {
+          "leveled": 0.16,
+          "free": 0.194
+        },
+        "floorTiltDegrees": 0.0,
+        "floorOffsetMeters": -0.103,
         "medianResidualBefore": 0.1093,
         "medianResidualAfter": 0.1053,
         "inlierRatio": 0.466,
         "correctionDegrees": 0.86,
-        "correctionMeters": 0.083
+        "correctionMeters": 0.119,
+        "lidarLink": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.25,
+          "medianResidualAfter": 0.1242,
+          "inlierRatio": 0.099,
+          "dense": {
+            "medianResidualBefore": 0.1159,
+            "medianResidualAfter": 0.1156,
+            "inlierRatio": 0.048
+          },
+          "transform": [
+            0.999467,
+            0.0,
+            -0.0326448,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0326448,
+            0.0,
+            0.999467,
+            0.0,
+            0.8633052,
+            1.2431014,
+            0.1834612,
+            1.0
+          ]
+        },
+        "polish": {
+          "method": "icp-yaw-reference-to-photogrammetry + floor",
+          "scoreBefore": 0.041,
+          "scoreAfter": 0.085,
+          "accepted": true,
+          "floorOffsetMeters": -0.103
+        }
       },
       {
         "session": "D33647FE-51F3-44B1-A3BB-6CFB410487C5",
-        "method": "icp-lidar-to-photogrammetry",
-        "start": "identity",
+        "method": "floor-level + icp-yaw-lidar-to-photogrammetry",
+        "fitScores": {
+          "leveled": 0.106,
+          "free": 0.102
+        },
+        "floorTiltDegrees": 0.47,
+        "floorOffsetMeters": -0.001,
         "medianResidualBefore": 0.3462,
-        "medianResidualAfter": 0.3259,
-        "inlierRatio": 0.271,
-        "correctionDegrees": 0.74,
-        "correctionMeters": 0.116
+        "medianResidualAfter": 0.3268,
+        "inlierRatio": 0.268,
+        "correctionDegrees": 0.71,
+        "correctionMeters": 0.11,
+        "lidarLink": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.1463,
+          "medianResidualAfter": 0.1517,
+          "inlierRatio": 0.083,
+          "dense": {
+            "medianResidualBefore": 0.1338,
+            "medianResidualAfter": 0.1325,
+            "inlierRatio": 0.106
+          },
+          "transform": [
+            0.9990766,
+            0.0,
+            -0.0429652,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0429652,
+            0.0,
+            0.9990766,
+            0.0,
+            -0.8899822,
+            1.3914002,
+            -0.0705434,
+            1.0
+          ]
+        },
+        "polish": {
+          "method": "icp-yaw-reference-to-photogrammetry + floor",
+          "scoreBefore": 0.027,
+          "scoreAfter": 0.044,
+          "accepted": true,
+          "floorOffsetMeters": -0.056
+        }
       },
       {
         "session": "A35473D1-5FA7-47F7-9FBF-A255A2EDC981",
-        "method": "icp-lidar-to-photogrammetry",
-        "start": "identity",
-        "medianResidualBefore": 0.159,
-        "medianResidualAfter": 0.1254,
+        "method": "floor-level + icp-yaw-lidar-to-photogrammetry",
+        "fitScores": {
+          "leveled": 0.126,
+          "free": 0.127
+        },
+        "floorTiltDegrees": 1.98,
+        "floorOffsetMeters": 0.002,
+        "medianResidualBefore": 0.1396,
+        "medianResidualAfter": 0.1261,
         "inlierRatio": 0.429,
-        "correctionDegrees": 2.17,
-        "correctionMeters": 0.161
+        "correctionDegrees": 2.14,
+        "correctionMeters": 0.181,
+        "lidarLink": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.2173,
+          "medianResidualAfter": 0.1663,
+          "inlierRatio": 0.053,
+          "dense": {
+            "medianResidualBefore": 0.1652,
+            "medianResidualAfter": 0.1651,
+            "inlierRatio": 0.015
+          },
+          "transform": [
+            0.9998282,
+            0.0,
+            -0.0185352,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0185352,
+            0.0,
+            0.9998282,
+            0.0,
+            0.0308608,
+            1.3559414,
+            0.4675839,
+            1.0
+          ]
+        },
+        "polish": {
+          "method": "icp-yaw-reference-to-photogrammetry + floor",
+          "scoreBefore": 0.033,
+          "scoreAfter": 0.084,
+          "accepted": true,
+          "floorOffsetMeters": -0.068
+        }
       },
       {
         "session": "547AE7B0-5AC9-4EA7-A52A-176A23B17B75",
         "method": "icp-lidar-to-photogrammetry",
-        "start": "identity",
+        "fitScores": {
+          "leveled": 0.306,
+          "free": 0.325
+        },
+        "floorTiltDegrees": 0.0,
+        "floorOffsetMeters": -0.005,
         "medianResidualBefore": 0.5917,
         "medianResidualAfter": 0.0982,
         "inlierRatio": 0.482,
         "correctionDegrees": 8.5,
-        "correctionMeters": 4.291
+        "correctionMeters": 4.296,
+        "lidarLink": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.2378,
+          "medianResidualAfter": 0.1969,
+          "inlierRatio": 0.064,
+          "dense": {
+            "medianResidualBefore": 0.2006,
+            "medianResidualAfter": 0.1982,
+            "inlierRatio": 0.015
+          },
+          "transform": [
+            0.999732,
+            0.0,
+            -0.0231503,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0231503,
+            0.0,
+            0.999732,
+            0.0,
+            0.179375,
+            1.2858714,
+            0.697967,
+            1.0
+          ]
+        },
+        "polish": {
+          "method": "icp-yaw-reference-to-photogrammetry + floor",
+          "scoreBefore": 0.085,
+          "scoreAfter": 0.097,
+          "accepted": true,
+          "floorOffsetMeters": -0.081
+        }
       }
     ],
     "pointCloud": {
-      "method": "arkit-worldmap",
+      "method": "lidar-to-reference",
       "sources": [
         "sparse_cloud_0DA08ED9-F645-469B-8E14-12B4E47394BE.ply",
         "sparse_cloud_F667DF09-A48F-498C-AB73-D9C5638A6B51.ply",
@@ -223,11 +428,219 @@
         "sparse_cloud_A35473D1-5FA7-47F7-9FBF-A255A2EDC981.ply",
         "sparse_cloud_547AE7B0-5AC9-4EA7-A52A-176A23B17B75.ply",
         "sparse_cloud_1A4B75F5-097F-4A7A-B4F2-AC3F9D631C00.ply"
-      ]
+      ],
+      "links": {
+        "sparse_cloud_0DA08ED9-F645-469B-8E14-12B4E47394BE.ply": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.1523,
+          "medianResidualAfter": 0.0743,
+          "inlierRatio": 0.183,
+          "dense": {
+            "medianResidualBefore": 0.0533,
+            "medianResidualAfter": 0.0537,
+            "inlierRatio": 0.16
+          },
+          "transform": [
+            0.9921261,
+            0.0,
+            0.1252431,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            -0.1252431,
+            0.0,
+            0.9921261,
+            0.0,
+            0.4869453,
+            1.3616549,
+            0.1437423,
+            1.0
+          ]
+        },
+        "sparse_cloud_F667DF09-A48F-498C-AB73-D9C5638A6B51.ply": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.25,
+          "medianResidualAfter": 0.1242,
+          "inlierRatio": 0.099,
+          "dense": {
+            "medianResidualBefore": 0.1159,
+            "medianResidualAfter": 0.1156,
+            "inlierRatio": 0.048
+          },
+          "transform": [
+            0.999467,
+            0.0,
+            -0.0326448,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0326448,
+            0.0,
+            0.999467,
+            0.0,
+            0.8633052,
+            1.2431014,
+            0.1834612,
+            1.0
+          ]
+        },
+        "sparse_cloud_D33647FE-51F3-44B1-A3BB-6CFB410487C5.ply": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.1463,
+          "medianResidualAfter": 0.1517,
+          "inlierRatio": 0.083,
+          "dense": {
+            "medianResidualBefore": 0.1338,
+            "medianResidualAfter": 0.1325,
+            "inlierRatio": 0.106
+          },
+          "transform": [
+            0.9990766,
+            0.0,
+            -0.0429652,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0429652,
+            0.0,
+            0.9990766,
+            0.0,
+            -0.8899822,
+            1.3914002,
+            -0.0705434,
+            1.0
+          ]
+        },
+        "sparse_cloud_A35473D1-5FA7-47F7-9FBF-A255A2EDC981.ply": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.2173,
+          "medianResidualAfter": 0.1663,
+          "inlierRatio": 0.053,
+          "dense": {
+            "medianResidualBefore": 0.1652,
+            "medianResidualAfter": 0.1651,
+            "inlierRatio": 0.015
+          },
+          "transform": [
+            0.9998282,
+            0.0,
+            -0.0185352,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0185352,
+            0.0,
+            0.9998282,
+            0.0,
+            0.0308608,
+            1.3559414,
+            0.4675839,
+            1.0
+          ]
+        },
+        "sparse_cloud_547AE7B0-5AC9-4EA7-A52A-176A23B17B75.ply": {
+          "method": "floor-height + icp-yaw-lidar-to-reference",
+          "medianResidualBefore": 0.2378,
+          "medianResidualAfter": 0.1969,
+          "inlierRatio": 0.064,
+          "dense": {
+            "medianResidualBefore": 0.2006,
+            "medianResidualAfter": 0.1982,
+            "inlierRatio": 0.015
+          },
+          "transform": [
+            0.999732,
+            0.0,
+            -0.0231503,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0231503,
+            0.0,
+            0.999732,
+            0.0,
+            0.179375,
+            1.2858714,
+            0.697967,
+            1.0
+          ]
+        },
+        "sparse_cloud_1A4B75F5-097F-4A7A-B4F2-AC3F9D631C00.ply": {
+          "method": "reference"
+        }
+      }
     },
     "camera": {
-      "method": "arkit-worldmap",
-      "smoothingSeconds": 2.0
+      "method": "video-session-lidar",
+      "sessionLink": {
+        "method": "reference"
+      },
+      "smoothingSeconds": 2.0,
+      "clock": {
+        "method": "session-waypoints",
+        "waypoints": 1013,
+        "originUncertainty": 0.877
+      },
+      "corrections": [
+        {
+          "t": 0,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "t": 792,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "t": 840,
+          "offset": [
+            -0.75,
+            0.0,
+            -1.1
+          ]
+        },
+        {
+          "t": 1746,
+          "offset": [
+            -0.75,
+            0.0,
+            -1.1
+          ]
+        },
+        {
+          "t": 1938,
+          "offset": [
+            -0.25,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "t": 2930,
+          "offset": [
+            -0.25,
+            0.0,
+            0.0
+          ]
+        }
+      ]
     }
   },
   "worldTransform": [
@@ -301,39 +714,39 @@
   },
   "bounds": {
     "min": [
-      -16.8297,
-      -3.0686,
-      -4.2747
+      -16.0078,
+      -1.7972,
+      -4.0934
     ],
     "max": [
-      10.6752,
-      2.3166,
-      30.1535
+      11.1618,
+      3.4862,
+      31.837
     ]
   },
   "view": {
     "position": [
-      -6.6234,
+      -6.6355,
       6.0738,
-      15.527
+      15.5186
     ],
     "quaternion": [
-      -0.152467,
-      0.221984,
-      0.035167,
-      0.962414
+      -0.152511,
+      0.220775,
+      0.034976,
+      0.962692
     ],
     "target": [
-      -10.1274,
+      -10.1215,
       3.4738,
-      8.3352
+      8.318
     ]
   },
   "orbit": {
     "center": [
-      -0.641,
+      -1.125,
       0.824,
-      13.567
+      13.572
     ],
     "radius": {
       "min": 6.0,

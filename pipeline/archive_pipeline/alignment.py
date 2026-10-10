@@ -69,16 +69,22 @@ def umeyama(src: np.ndarray, dst: np.ndarray, with_scale: bool) -> np.ndarray:
     return m
 
 
-def _point_to_plane_step(src: np.ndarray, dst: np.ndarray, normals: np.ndarray, with_scale: bool) -> np.ndarray:
-    """Pas linéarisé (petits angles) minimisant sum(n·(T(p) - q))²."""
+def _point_to_plane_step(src: np.ndarray, dst: np.ndarray, normals: np.ndarray, with_scale: bool, yaw_only: bool = False) -> np.ndarray:
+    """Pas linéarisé (petits angles) minimisant sum(n·(T(p) - q))².
+
+    `yaw_only` : rotation autour de la verticale seulement (repères calés sur la gravité).
+    """
     center = src.mean(0)
     p = src - center
-    cols = [np.cross(p, normals), normals]
+    cross = np.cross(p, normals)
+    cols = [cross[:, 1:2] if yaw_only else cross, normals]
     if with_scale:
         cols.append(np.einsum("ij,ij->i", p, normals)[:, None])
     a = np.hstack(cols)
     b = np.einsum("ij,ij->i", dst - src, normals)
     x = np.linalg.lstsq(a, b, rcond=None)[0]
+    if yaw_only:
+        x = np.r_[0.0, x[0], 0.0, x[1:]]
     w, t = x[:3], x[3:6]
     ds = x[6] if with_scale else 0.0
     # Rotation exacte (Rodrigues) à partir du vecteur w
@@ -114,6 +120,7 @@ def icp(
     iterations: int = 60,
     with_scale: bool = False,
     initial: np.ndarray | None = None,
+    yaw_only: bool = False,
 ) -> IcpResult:
     """ICP (point-à-plan si `target_normals`, sinon point-à-point) avec rejet
     progressif des appariements lointains.
@@ -136,7 +143,7 @@ def icp(
         if target_normals is None:
             step = umeyama(moved[inliers], target[idx[inliers]], with_scale)
         else:
-            step = _point_to_plane_step(moved[inliers], target[idx[inliers]], target_normals[idx[inliers]], with_scale)
+            step = _point_to_plane_step(moved[inliers], target[idx[inliers]], target_normals[idx[inliers]], with_scale, yaw_only)
         m = step @ m
     median_after = float(np.median(tree.query(apply(m, source), workers=-1)[0]))
     return IcpResult(m, median_before, median_after, float(inliers.mean()))
@@ -180,7 +187,7 @@ def fit_pose_pairs(source_poses: list[np.ndarray], target_poses: list[np.ndarray
 
 def estimate_normals(points: np.ndarray, k: int = 12) -> np.ndarray:
     """Normales locales par ACP sur les k plus proches voisins."""
-    _, idx = cKDTree(points).query(points, k=k)
+    _, idx = cKDTree(points).query(points, k=k, workers=-1)
     neigh = points[idx] - points[idx].mean(axis=1, keepdims=True)
     cov = np.einsum("nki,nkj->nij", neigh, neigh)
     _, vecs = np.linalg.eigh(cov)
