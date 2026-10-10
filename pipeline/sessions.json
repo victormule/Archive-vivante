@@ -216,8 +216,8 @@
       "export_dir": "Journée 3-session7",
       "arkit_session": "4EFC311B",
       "world_transform": {
-        "$comment": "Placé le 2026-10-10 : la table ovale de j3-s7 (centre 0,57 ; -3,50 dans son repère) est posée sur la table de j2-s3 (centre 0,19 ; -2,95), plateau à -0,71 m, après une rotation de -60° autour de la verticale (recouvrement des plateaux maximal entre -80° et -50°).",
-        "matrix": [0.5, 0.0, -0.8660254, 0.0, 0.0, 1.0, 0.0, 0.0, 0.8660254, 0.0, 0.5, 0.0, 2.933181, -0.01, -0.6984382, 1.0]
+        "$comment": "Placé le 2026-10-10, affiné sur des rendus de dessus : un ovale (stade, 3,2 x 1,55 m) ajusté sur le contour de la table de j3-s7 et de celle de j2-s3 ; les deux ovales sont superposés à moins de 4 cm et 1° près, plateau à -0,71 m.",
+        "matrix": [0.373918, 0.0, -0.9274618, 0.0, 0.0, 1.0, 0.0, 0.0, 0.9274618, 0.0, 0.373918, 0.0, 3.2984443, -0.01, -1.1601856, 1.0]
       },
       "playback": {
         "$comment": "Deux vidéos dans l'export : E12BFA67 (8 min 21, enregistrement principal) et C9107E38 (clip de 5 s, ignoré).",
