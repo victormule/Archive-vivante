@@ -106,7 +106,7 @@
     "j2-s3": {
       "Bon appétit": {
         "title": "Bon appétit",
-        "color": "#3e8f93",
+        "color": "#c25a87",
         "text": "Papier craft et café sur grand format",
         "media": [
           "sessions/j2-s3/annotations/81799646-1.jpg"
@@ -125,7 +125,7 @@
       },
       "Tissage": {
         "title": "Tissage",
-        "color": "#4f9066",
+        "color": "#3f74b5",
         "text": "Au début, toile en préparation. Dimension du lieu par rapport au processus.",
         "media": [
           "sessions/j2-s3/annotations/03fec37d-1.jpg"
@@ -142,8 +142,8 @@
     },
     "j2-s4": {
       "Doc1-carnet de recherche": {
-        "title": "Doc1-carnet de recherche",
-        "color": "#3f74b5",
+        "title": "Bon appétit - Carnet de recherche",
+        "color": "#c25a87",
         "text": "",
         "media": [
           "sessions/j2-s4/annotations/b255ad04-1.jpg",
@@ -153,7 +153,7 @@
       },
       "Experimentation": {
         "title": "Experimentation",
-        "color": "#7b5bb5",
+        "color": "#c25a87",
         "text": "Teste pour une utilisation du café et du savon sur papier - élaboration d’un protocole.",
         "media": [
           { "file": "sessions/j2-s4/annotations/37580959-v1.mp4", "poster": "sessions/j2-s4/annotations/37580959-v1.jpg" }
@@ -164,18 +164,24 @@
         "color": "#c25a87",
         "text": "Papier craft ou papier blanc?",
         "media": [
-          { "file": "sessions/j2-s4/annotations/2b83b87e-d1.pdf", "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg", "pages": 5 }
+          { "file": "sessions/j2-s4/annotations/frame_0061.jpg", "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg", "pages": 5 }
         ]
       }
     },
     "j2-s5": {
       "Résultat de la deuxième journée": {
         "title": "Résultat de la deuxième journée",
-        "color": "#3e8f93",
+        "color": "#c25a87",
         "text": "",
         "media": [
           "sessions/j2-s5/annotations/b78bf1c8-1.jpg"
         ]
+      },
+      "Rédaction du projet": {
+        "title": "Rédaction du projet",
+        "color": "#b8613a",
+        "text": "Rédaction d’un protocol de recherche.\nSimulation /preparation en vue de la présentation.",
+        "media": []
       }
     }
   }

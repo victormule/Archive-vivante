@@ -38,7 +38,7 @@
   },
   "annotations": {
     "url": "annotations.json",
-    "count": 1
+    "count": 2
   },
   "alignment": {
     "reference": "splat",

@@ -1,6 +1,25 @@
 {
   "annotations": [
     {
+      "id": "CBDB6957-B576-40DA-8781-11ACA1E9EF5E",
+      "title": "Rédaction du projet",
+      "colorIndex": 13,
+      "text": "Rédaction d’un protocol de recherche.\nSimulation /preparation en vue de la présentation.",
+      "kind": "point",
+      "points": [
+        [
+          -1.62094,
+          -0.81919,
+          -1.81891
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:03:29Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
       "id": "B78BF1C8-8723-4F4C-B77D-AE01F0825459",
       "title": "Résultat de la deuxième journée",
       "colorIndex": 12,

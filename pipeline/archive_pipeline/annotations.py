@@ -48,6 +48,8 @@ class Annotation:
     images: list[Path] = field(default_factory=list)
     videos: list[Path] = field(default_factory=list)
     documents: list[Path] = field(default_factory=list)
+    # Fichiers cités par `media` mais absents du disque
+    missing_media: list[str] = field(default_factory=list)
     # Vue caméra au moment de l'annotation (exports en dossier uniquement)
     reference_image: Path | None = None
 
@@ -129,8 +131,12 @@ def read_annotations(
         user = data.get("B_description_utilisateur", {})
         contour = data["C_trace_2d_et_3d"]["contour_3d"]
         title = _nfc(user.get("titre", "")).strip()
+        missing: list[str] = []
         if media_dir and title.casefold() in explicit:
-            images, videos, documents = split_media([_media_file(media_dir, n) for n in explicit[title.casefold()]])
+            names = explicit[title.casefold()]
+            files = {name: _media_file(media_dir, name) for name in names}
+            missing = [name for name, path in files.items() if path is None]
+            images, videos, documents = split_media([path for path in files.values() if path is not None])
         else:
             images, videos, documents = (find_images(media_dir, title) if media_dir else []), [], []
         result.append(Annotation(
@@ -144,13 +150,14 @@ def read_annotations(
             images=images,
             videos=videos,
             documents=documents,
+            missing_media=missing,
             reference_image=_reference_image(folder, info),
         ))
     return sorted(result, key=lambda a: (a.title.casefold(), a.id))
 
 
-def _media_file(media_dir: Path, name: str) -> Path:
-    """Fichier d'un dossier, quelle que soit la normalisation Unicode de son nom."""
+def _media_file(media_dir: Path, name: str) -> Path | None:
+    """Fichier d'un dossier, quelle que soit la normalisation Unicode de son nom (None s'il est absent)."""
     path = media_dir / name
     if path.exists():
         return path
@@ -158,7 +165,7 @@ def _media_file(media_dir: Path, name: str) -> Path:
     for child in media_dir.iterdir():
         if _nfc(child.name) == target:
             return child
-    raise FileNotFoundError(f"média d'annotation introuvable : {path}")
+    return None
 
 
 def _reference_image(folder: Path | None, info: dict[str, Any]) -> Path | None:

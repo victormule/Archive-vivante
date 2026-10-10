@@ -12,6 +12,7 @@ LiDAR des deux sessions (`arkit_session` dans sessions.json).
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -34,6 +35,9 @@ from .point_cloud import PointCloud, read_points_bin, read_points_bin_colors, vo
 STEPS = ("splat", "mesh", "pointCloud", "playback", "annotations", "registration")
 STEP_DEPENDENCIES = {"pointCloud": {"mesh"}, "playback": {"mesh"}}
 
+# Médias d'annotation produits par le build : <id>-<n>.jpg, <id>-v<n>.mp4/.jpg, <id>-d<n>.pdf/.jpg
+GENERATED_MEDIA = re.compile(r"^[0-9a-f]{8}-[vd]?\d+\.(?:jpg|mp4|pdf)$")
+
 IDENTITY = [1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0]
 
 ICP_SOURCE_POINTS = 150_000
@@ -45,6 +49,11 @@ LINK_VOXEL = 0.03
 
 def write_json(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _media_urls(media: dict[str, Any]) -> list[str]:
+    """URLs d'un média publié : le fichier, et sa vignette ou son image d'attente."""
+    return [media["url"], *(media[k]["url"] for k in ("poster", "thumbnail") if media.get(k))]
 
 
 def read_manifest(session_out: Path) -> dict[str, Any]:
@@ -283,21 +292,33 @@ class SessionBuilder:
             if cfg.get("arkit_session"):
                 to_splat = to_splat @ self.arkit_link(cfg["arkit_session"])[0]
 
+        # Les médias déjà publiés servent de repli quand leurs fichiers sources ont été retirés du disque
+        previous_file = self.out / "annotations.json"
+        previous = {
+            a["id"]: a for a in json.loads(previous_file.read_text(encoding="utf-8"))["annotations"]
+        } if previous_file.exists() else {}
         media_out = self.out / "annotations"
-        if media_out.exists():
-            shutil.rmtree(media_out)
-        media_out.mkdir()
+        media_out.mkdir(exist_ok=True)
 
         items = []
         for a in annotations:
-            images = []
-            sources = a.images or ([a.reference_image] if cfg.get("reference_images") and a.reference_image else [])
+            published = previous.get(a.id)
+            has_media = bool(a.images or a.videos or a.documents or (cfg.get("reference_images") and a.reference_image))
+            kept = published and (a.missing_media or not has_media) and any(
+                published.get(k) for k in ("images", "videos", "documents")
+            )
+            if a.missing_media and not kept:
+                self.log(f"  ! {a.title} : médias absents du disque ({', '.join(a.missing_media)})")
+            if kept:
+                self.log(f"  = {a.title} : sources absentes, médias déjà publiés conservés")
+            images = list(published.get("images", [])) if kept else []
+            sources = [] if kept else a.images or ([a.reference_image] if cfg.get("reference_images") and a.reference_image else [])
             for n, image in enumerate(sources, start=1):
                 name = f"{a.id[:8].lower()}-{n}.jpg"
                 width, height = encode_web_image(image, media_out / name)
                 images.append({"url": f"annotations/{name}", "width": width, "height": height, "source": image.name})
-            videos = []
-            for n, video in enumerate(a.videos, start=1):
+            videos = list(published.get("videos", [])) if kept else []
+            for n, video in enumerate([] if kept else a.videos, start=1):
                 stem = f"{a.id[:8].lower()}-v{n}"
                 width, height, duration = encode_web_video(video, media_out / f"{stem}.mp4")
                 pw, ph = extract_poster(media_out / f"{stem}.mp4", media_out / f"{stem}.jpg")
@@ -306,8 +327,8 @@ class SessionBuilder:
                     "poster": {"url": f"annotations/{stem}.jpg", "width": pw, "height": ph, "source": video.name},
                     "source": video.name,
                 })
-            documents = []
-            for n, document in enumerate(a.documents, start=1):
+            documents = list(published.get("documents", [])) if kept else []
+            for n, document in enumerate([] if kept else a.documents, start=1):
                 stem = f"{a.id[:8].lower()}-d{n}"
                 shutil.copy2(document, media_out / f"{stem}.pdf")
                 width, height, pages = render_pdf_thumbnail(document, media_out / f"{stem}.jpg")
@@ -331,6 +352,12 @@ class SessionBuilder:
                 "videos": videos,
                 "documents": documents,
             })
+        # Ne retire que les fichiers qu'il a lui-même produits (et qui ne servent plus) : les médias
+        # ajoutés à la main dans ce dossier (cités par annotations.config.json) restent en place.
+        referenced = {Path(u).name for i in items for m in (*i["images"], *i["videos"], *i["documents"]) for u in _media_urls(m)}
+        for file in media_out.iterdir():
+            if GENERATED_MEDIA.match(file.name) and file.name not in referenced:
+                file.unlink()
         write_json(self.out / "annotations.json", {"annotations": items})
         self.manifest["annotations"] = {"url": "annotations.json", "count": len(items)}
         self.log(

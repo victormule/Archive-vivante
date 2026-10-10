@@ -128,7 +128,7 @@
       },
       "annotations": {
         "$comment": "Points déjà dans le repère du splat. Les fichiers ne portent pas le titre des annotations : association explicite (images, vidéo en boucle muette, PDF).",
-        "source": "Journée2-session4&5-annotation",
+        "source": "Project 2026-10-07 #48_export_2026-10-10T11-05-07",
         "arkit_session": "F21895A2",
         "media_dir": ".",
         "media": {
@@ -173,7 +173,7 @@
       },
       "annotations": {
         "$comment": "Points déjà dans le repère du splat de j2-s5 ; le décalage de la session est appliqué à l'affichage.",
-        "source": "Journée2-session4&5-annotation",
+        "source": "Project 2026-10-07 #48_export_2026-10-10T11-05-07",
         "arkit_session": "0447EF10",
         "media_dir": ".",
         "media": {
