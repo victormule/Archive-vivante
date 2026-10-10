@@ -49,7 +49,7 @@ from .export_reader import SessionExport, resolve_path
 from .gltf import MeshPart, write_glb_parts
 from .media import encode_jpeg, require_ffmpeg, require_tool, transcode_spz
 from .obj import read_mtl_diffuse_map, read_obj
-from .ply import CACHE_DIR, iter_ply_vertices, xyz
+from .ply import CACHE_DIR, iter_ply_vertices, read_ply_vertices, xyz
 from .point_cloud import PointCloud, voxel_downsample, write_points_bin
 
 EVENT_STEPS = ("parts", "pointCloud", "playback")
@@ -173,7 +173,7 @@ class EventBuilder:
         meshes: list[MeshPart] = []
         reports: list[dict[str, Any]] = []
         corners: list[np.ndarray] = []
-        for n, export in enumerate(exports, start=1):
+        for n, (export, part_cfg) in enumerate(zip(exports, self.entry["parts"]), start=1):
             tag = export.session_id[:8]
             photo = export.photogrammetry()
             mesh = read_obj(photo.obj)
@@ -187,18 +187,31 @@ class EventBuilder:
             transform, polish = self._polish(transform, positions, mesh.faces, tag)
             reports.append({"session": export.session_id, **report, "lidarLink": link_report, "polish": polish})
 
-            gaussian = export.gaussian()
+            gaussian, source_ply, splat_transform = export.gaussian(), None, transform
+            override = part_cfg.get("gaussian")
+            if override:
+                # Gaussian recalculé à part ; s'il a été entraîné dans le repère du modèle photogrammétrique
+                # (caméras non alignées), seuls ses splats entraînés sont gardés et la matrice d'alignement
+                # dür.air (similitude) est composée à sa transformation, appliquée à l'affichage
+                gaussian = self._open(override["export_dir"]).gaussian()
+                if override.get("frame") == "model":
+                    splat_transform = transform @ to_splat
+                if override.get("drop_untrained"):
+                    source_ply = _trained_only(gaussian.ply, self.log)
             spz = self.out / f"splat-{n}.spz"
-            if not spz.exists() or spz.stat().st_mtime < gaussian.ply.stat().st_mtime:
-                size_in, size_out = transcode_spz(gaussian.ply, spz)
+            ply = source_ply or gaussian.ply
+            if not spz.exists() or spz.stat().st_mtime < ply.stat().st_mtime:
+                size_in, size_out = transcode_spz(ply, spz)
                 self.log(f"  splat {n}     {tag} : SPZ {size_in / 1e6:.1f} -> {size_out / 1e6:.1f} Mo")
-            meta = gaussian.metadata
+            meta = dict(gaussian.metadata)
+            if source_ply is not None:
+                meta["splatCount"] = _ply_count(source_ply)
             splats.append({
                 "url": spz.name,
                 "bytes": spz.stat().st_size,
                 "count": meta.get("splatCount"),
                 "shDegree": meta.get("shDegree"),
-                "transform": _rounded(transform),
+                "transform": _rounded(splat_transform),
             })
             lo, hi = (np.asarray(meta.get(k), np.float64) for k in ("meshBoundsMin", "meshBoundsMax"))
             box = np.array([[x, y, z] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
@@ -617,6 +630,45 @@ class SessionClock:
                     "quaternion": rotation_to_quaternion(m),
                 })
         return out
+
+
+def _trained_only(ply: Path, log: Any = print) -> Path:
+    """Copie du PLY sans les splats jamais optimisés (opacité restée à sa valeur d'initialisation).
+
+    Le seuil d'initialisation est la valeur d'opacité partagée par un grand
+    nombre de splats (graines posées sur la photogrammétrie). Le résultat est
+    mis en cache à côté du pipeline.
+    """
+    stat = ply.stat()
+    out = CACHE_DIR / f"{ply.stem[:8]}-trained-{stat.st_size}-{stat.st_mtime_ns}.ply"
+    if out.exists():
+        return out
+    with ply.open("rb") as f:
+        header = b""
+        while not header.endswith(b"end_header\n"):
+            header += f.readline()
+    vertices = read_ply_vertices(ply, cache=False)
+    values, counts = np.unique(vertices["opacity"], return_counts=True)
+    init = vertices["opacity"] == values[counts.argmax()]
+    kept = vertices[~init]
+    # En-tête recopié octet pour octet (commentaires non ASCII), seul le nombre de sommets change
+    lines = [b"element vertex %d" % len(kept) if line.startswith(b"element vertex") else line for line in header.splitlines()]
+    CACHE_DIR.mkdir(exist_ok=True)
+    with out.open("wb") as f:
+        f.write(b"\n".join(lines) + b"\n")
+        f.write(kept.tobytes())
+    log(f"  gaussian    {ply.name[:8]} : {int(init.sum())} splats jamais optimisés retirés, {len(kept)} gardés")
+    return out
+
+
+def _ply_count(ply: Path) -> int:
+    with ply.open("rb") as f:
+        for line in f:
+            if line.startswith(b"element vertex"):
+                return int(line.split()[2])
+            if line.startswith(b"end_header"):
+                break
+    return 0
 
 
 def _floor_cells(points: np.ndarray) -> dict[tuple[int, int], float]:

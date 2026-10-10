@@ -288,7 +288,11 @@
         { "export_dir": "Event/Journee4-event-4" },
         { "export_dir": "Event/Journee4-event-5" },
         { "export_dir": "Event/Journee4-event-6" },
-        { "export_dir": "Event/Journee4-event-7" }
+        {
+          "export_dir": "Event/Journee4-event-7",
+          "$gaussian": "Gaussian recalculé le 2026-10-10 (Gaussian-7). dür.air l'a entraîné avec les caméras du modèle photogrammétrique non aligné : ses splats entraînés sont en repère modèle (à 4,5 cm du maillage-modèle), les 80 000 graines posées sur la photogrammétrie alignée ne sont jamais optimisées. On garde les splats entraînés et on leur applique la matrice d'alignement.",
+          "gaussian": { "export_dir": "Gaussian-7", "frame": "model", "drop_untrained": true }
+        }
       ],
       "$lidar": "reference_lidar : LiDAR de la session vidéo, repère de l'Event (il couvre tout le lieu et porte le trajet caméra) ; tous les LiDAR, photogrammétries et splats y sont recalés.",
       "reference_lidar": "Event/Journee4-event-9-LiDAR",
