@@ -16,6 +16,8 @@ import { SessionScene } from "./SessionScene";
 export interface ArchiveViewOptions {
   /** Écart-type (s) du lissage du trajet caméra. */
   cameraSmoothing: number;
+  /** Lissage imposé (paramètre d'URL) : prime sur celui que fixe une session. */
+  cameraSmoothingForced?: boolean;
   /** Durée (ms) du fondu enchaîné entre deux sessions. */
   crossfadeDuration: number;
   /** Durée (ms) du fondu pendant la rotation automatique (plus lent, contemplatif). */
@@ -254,6 +256,7 @@ export class ArchiveView {
             viewer: this.viewer,
             overlayContainer: this.stage,
             cameraSmoothing: this.options.cameraSmoothing,
+            cameraSmoothingForced: this.options.cameraSmoothingForced === true,
             insets: () => this.overlayInsets(),
             onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title),
             onPlayAudio: (audio, title) => this.audioPlayer?.open(audio, title),

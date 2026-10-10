@@ -99,7 +99,7 @@
     "world": {
       "reference": null,
       "method": "calibrated",
-      "note": "Placé le 2026-10-10 (scène en bande étroite, sans table de repère) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné de 44,4° pour filmer du côté de la vue d'arrivée."
+      "note": "Placé le 2026-10-10 (scène en bande étroite, sans table de repère) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné de 44,4° pour filmer du côté de la vue d'arrivée, puis reculé de 2.3 m le long du rayon de la vue d'arrivée (la scène reste au même endroit à l'écran, en plus petit : demande « un peu plus loin »)."
     }
   },
   "worldTransform": [
@@ -115,16 +115,17 @@
     0.0,
     0.7139909,
     0.0,
-    1.3541687,
-    0.629825,
-    0.3691527,
+    3.0186814,
+    -0.387582,
+    -0.8491577,
     1.0
   ],
   "playback": {
     "audioUrl": "audio.m4a",
     "cameraPathUrl": "camera_path.json",
     "duration": 135.85277605056763,
-    "recordedAt": "2026-10-08T14:48:03Z"
+    "recordedAt": "2026-10-08T14:48:03Z",
+    "cameraSmoothing": 2.5
   },
   "bounds": {
     "min": [

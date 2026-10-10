@@ -22,7 +22,10 @@ interface LayerSlot {
 export interface SessionSceneOptions {
   viewer: SceneViewer;
   overlayContainer: HTMLElement;
+  /** Lissage par défaut du trajet caméra (s). */
   cameraSmoothing: number;
+  /** Le lissage a été imposé (URL) : il prime sur celui d'une session. */
+  cameraSmoothingForced: boolean;
   insets: () => Insets;
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
   onPlayAudio: (audio: Extract<MediaItem, { kind: "audio" }>, title: string) => void;
@@ -85,7 +88,10 @@ export class SessionScene {
         loadAnnotations(manifest),
       ]);
       if (pathData) {
-        this.path = new CameraPath(pathData, { smoothing: options.cameraSmoothing });
+        // Une prise de vue très tremblée peut demander un lissage plus fort que celui par défaut (manifest)
+        const sessionSmoothing = manifest.playback?.cameraSmoothing;
+        const smoothing = !options.cameraSmoothingForced && sessionSmoothing !== undefined ? sessionSmoothing : options.cameraSmoothing;
+        this.path = new CameraPath(pathData, { smoothing });
         this.playback = new PlaybackController(sessionAssetUrl(manifest.id, manifest.playback!.audioUrl), this.path.duration);
         this.createPathLine(this.path);
       }

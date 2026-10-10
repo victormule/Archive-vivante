@@ -239,12 +239,13 @@
       "export_dir": "Journee3-session8",
       "arkit_session": "4B2D039A",
       "world_transform": {
-        "$comment": "Placé le 2026-10-10 (scène en bande étroite, sans table de repère) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné de 44,4° pour filmer du côté de la vue d'arrivée.",
-        "matrix": [0.7139909, 0.0, -0.7001549, 0.0, 0.0, 1.0, 0.0, 0.0, 0.7001549, 0.0, 0.7139909, 0.0, 1.3541687, 0.629825, 0.3691527, 1.0]
+        "$comment": "Placé le 2026-10-10 (scène en bande étroite, sans table de repère) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné de 44,4° pour filmer du côté de la vue d'arrivée, puis reculé de 2.3 m le long du rayon de la vue d'arrivée (la scène reste au même endroit à l'écran, en plus petit : demande « un peu plus loin »).",
+        "matrix": [0.7139909, 0.0, -0.7001549, 0.0, 0.0, 1.0, 0.0, 0.0, 0.7001549, 0.0, 0.7139909, 0.0, 3.0186814, -0.387582, -0.8491577, 1.0]
       },
       "playback": {
         "video_id": "483983F8",
-        "time_offset": 0.0
+        "time_offset": 0.0,
+        "camera_smoothing": 2.5
       },
       "annotations": {
         "$comment": "Annotation « Commentaire dartist » : ses deux annotations vocales (40 s et 1 min 53, métadonnées dans l'export, fichiers son à fournir) s'y rattachent via `media`.",

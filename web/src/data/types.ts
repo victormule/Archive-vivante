@@ -87,6 +87,8 @@ export interface SessionManifest extends SessionSummary {
     cameraPathUrl: string;
     duration: number;
     recordedAt: string;
+    /** Lissage gaussien du trajet caméra (s) propre à la session ; à défaut, celui de l'application. */
+    cameraSmoothing?: number;
   } | null;
 }
 

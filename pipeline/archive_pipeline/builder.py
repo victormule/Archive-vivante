@@ -272,6 +272,9 @@ class SessionBuilder:
             "duration": video.metadata["duration"],
             "recordedAt": video.metadata["startTime"],
         }
+        # Lissage du trajet propre à la session (s) : prises de vue très tremblées
+        if playback.get("camera_smoothing") is not None:
+            self.manifest["playback"]["cameraSmoothing"] = float(playback["camera_smoothing"])
         self.log(f"  playback    {len(path['keyframes'])} keyframes, {path['duration']:.1f} s")
 
     def build_annotations(self) -> None:
