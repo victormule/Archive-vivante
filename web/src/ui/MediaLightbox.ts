@@ -99,7 +99,8 @@ export class MediaLightbox {
       this.img.src = item.url;
       this.img.alt = `${this.title} — ${item.source}`;
     } else if (item.kind === "video") {
-      this.video.poster = item.poster;
+      if (item.poster) this.video.poster = item.poster;
+      else this.video.removeAttribute("poster");
       this.video.src = item.url;
       this.video.muted = true;
       void this.video.play().catch(() => {});

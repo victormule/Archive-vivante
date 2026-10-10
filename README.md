@@ -35,6 +35,8 @@ Performance Archive/
 ├── tools/session-registration/ Calibration du calage entre sessions (sur la table)
 └── web/                        Viewer (Vite + TypeScript + three.js + Spark)
     ├── public/sessions/        Assets générés par le pipeline (versionnés : servis tels quels en production)
+    ├── public/annotations.config.json  Titres, textes, couleurs, médias des annotations (à éditer)
+    ├── public/media/           Médias (images, vidéos, PDF) cités par ce fichier
     └── src/
         ├── app/                Orchestration (App, ArchiveView, SessionScene, IdleWatcher)
         ├── data/               Contrat de données et chargement
@@ -119,6 +121,31 @@ La ligne dorée dans la scène matérialise le trajet de la caméra d'enregistre
 Pour ne reconstruire qu'une étape (ex. après avoir modifié des annotations) : `--only annotations`.
 
 Voir [pipeline/README.md](pipeline/README.md) pour le détail du format et du recalage.
+
+## Gérer les annotations : `annotations.config.json`
+
+[web/public/annotations.config.json](web/public/annotations.config.json) est l'endroit où l'on règle tout ce qui touche aux annotations : **titre, description, couleur, médias** (images, vidéos, PDF), masquage, petit décalage de l'épingle. Le site le lit au chargement, par-dessus les annotations du pipeline (qui restent intactes) : on enregistre, on recharge la page, sans rien reconstruire. Tout est facultatif ; une annotation ou un champ absent garde sa valeur d'origine. Le bloc `$aide` en tête du fichier rappelle les options.
+
+```jsonc
+"j2-s4": {
+  "Experimentation": {                 // titre d'origine (dür.air) ou 8 premiers caractères de l'id
+    "title": "Expérimentation",
+    "color": "#e63946",                // couleur CSS, ou numéro de la palette
+    "text": ["Premier paragraphe.", "Second paragraphe."],
+    "media": [                         // remplace tous les médias, dans cet ordre
+      { "file": "sessions/j2-s4/annotations/37580959-v1.mp4", "poster": "sessions/j2-s4/annotations/37580959-v1.jpg" },
+      "mon-image.jpg",                 // un nom seul : web/public/media/
+      "carnet.pdf"
+    ],
+    "hidden": false,                   // true : masquer
+    "offset": [0, 0.3, 0]              // décaler l'épingle (m, repère de la session, y vers le haut)
+  }
+}
+```
+
+- **Médias** : déposer les fichiers dans [web/public/media/](web/public/media) et les citer par leur nom. Une vidéo se lit en boucle, sans le son, au survol et au clic ; un PDF s'ouvre dans la visionneuse. Garder les fichiers légers (images ≲ 1 Mo, vidéos de quelques Mo).
+- **Nouvelles annotations** posées dans dür.air : après le build du pipeline, `.venv/Scripts/python pipeline/sync_annotations_config.py` ajoute leurs entrées au fichier, sans toucher aux réglages existants.
+- **Erreurs** : une coquille (virgule, guillemet) ne casse pas le site, qui garde les valeurs d'origine ; la console du navigateur (F12) dit ce qui ne va pas, y compris une annotation introuvable ou un format de fichier inconnu.
 
 ## Contrat de données
 

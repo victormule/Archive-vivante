@@ -83,7 +83,7 @@ export class AnnotationOverlay {
 
     this.pins = options.annotations
       .filter((a) => a.points.length > 0)
-      .map((a, i) => this.createPin(a, PALETTE[(a.colorIndex ?? i) % PALETTE.length]));
+      .map((a, i) => this.createPin(a, a.color ?? PALETTE[(a.colorIndex ?? i) % PALETTE.length]));
     options.container.appendChild(this.element);
   }
 
@@ -264,32 +264,36 @@ export class AnnotationOverlay {
         button.className = `annotation-label__image annotation-label__image--${item.kind}`;
         button.setAttribute("aria-label", `${MEDIA_LABEL[item.kind]} ${index + 1} : ${data.title}`);
         if (item.kind === "video") {
-          // Image d'attente, puis lecture en boucle sans le son quand l'étiquette se déplie
+          // Image d'attente (ou premier plan), puis lecture en boucle sans le son quand l'étiquette se déplie
           const video = document.createElement("video");
-          video.poster = thumbnail.url;
-          video.src = item.url;
+          if (thumbnail) video.poster = thumbnail.url;
+          video.src = thumbnail ? item.url : `${item.url}#t=0.001`;
           video.muted = true;
           video.loop = true;
           video.playsInline = true;
-          video.preload = "none";
-          video.width = thumbnail.width;
-          video.height = thumbnail.height;
+          video.preload = thumbnail ? "none" : "metadata";
+          setSize(video, thumbnail);
           video.setAttribute("aria-hidden", "true");
           button.appendChild(video);
           videos.push(video);
-        } else {
+        } else if (thumbnail) {
           const img = document.createElement("img");
           img.src = thumbnail.url;
           img.alt = `${data.title} — ${item.source}`;
           img.loading = "lazy";
-          img.width = thumbnail.width;
-          img.height = thumbnail.height;
+          setSize(img, thumbnail);
           button.appendChild(img);
+        } else {
+          // PDF sans vignette : une carte avec le nom du fichier
+          const card = document.createElement("span");
+          card.className = "annotation-label__card";
+          card.textContent = item.source;
+          button.appendChild(card);
         }
         if (item.kind === "pdf") {
           const badge = document.createElement("span");
           badge.className = "annotation-label__badge";
-          badge.textContent = item.pages > 1 ? `PDF · ${item.pages} p.` : "PDF";
+          badge.textContent = item.pages && item.pages > 1 ? `PDF · ${item.pages} p.` : "PDF";
           button.appendChild(badge);
         }
         button.addEventListener("click", () => this.options.onOpenMedia(items, index, data.title));
@@ -371,6 +375,13 @@ export class AnnotationOverlay {
       }
     }
   }
+}
+
+/** Dimensions d'origine (quand on les connaît) : réservent la place avant le chargement. */
+function setSize(el: HTMLImageElement | HTMLVideoElement, thumbnail: { width: number; height: number } | null): void {
+  if (!thumbnail || thumbnail.width <= 0 || thumbnail.height <= 0) return;
+  el.width = thumbnail.width;
+  el.height = thumbnail.height;
 }
 
 function averagePoint(points: [number, number, number][]): [number, number, number] {

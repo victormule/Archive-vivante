@@ -22,6 +22,6 @@ describe("annotationMedia", () => {
     expect(entries.map((e) => e.item.kind)).toEqual(["image", "image", "video", "pdf"]);
     expect(entries[2].item).toEqual({ kind: "video", url: "annotations/a-v1.mp4", poster: "annotations/a-v1.jpg", source: "essai.mp4" });
     expect(entries[3].item).toMatchObject({ kind: "pdf", pages: 5 });
-    expect(entries[3].thumbnail.url).toBe("annotations/a-d1.jpg");
+    expect(entries[3].thumbnail?.url).toBe("annotations/a-d1.jpg");
   });
 });

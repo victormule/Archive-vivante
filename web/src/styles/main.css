@@ -444,6 +444,21 @@ html, body, #app {
 .annotation-label__images[data-count="1"] .annotation-label__image :is(img, video) { height: auto; }
 .annotation-label__images:not([data-count="1"]) .annotation-label__image :is(img, video) { aspect-ratio: 3 / 4; }
 .annotation-label__image:hover :is(img, video) { transform: scale(1.04); }
+/* PDF sans vignette : carte portrait avec le nom du fichier */
+.annotation-label__card {
+  display: grid;
+  place-items: center;
+  min-height: 96px;
+  aspect-ratio: 3 / 4;
+  max-height: 220px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
 /* Pastille « PDF · n p. » sur la vignette de la première page */
 .annotation-label__badge {
   position: absolute;

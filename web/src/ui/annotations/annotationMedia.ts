@@ -1,25 +1,25 @@
-import type { Annotation, AnnotationImage, MediaItem } from "@/data/types";
+import type { Annotation, AnnotationMediaEntry } from "@/data/types";
 
-/** Un média d'annotation : ce que montre la visionneuse, et sa vignette dans l'étiquette. */
-export interface AnnotationMediaEntry {
-  item: MediaItem;
-  thumbnail: AnnotationImage;
-}
+export type { AnnotationMediaEntry };
 
-/** Médias d'une annotation, dans l'ordre : images, vidéos, documents PDF. */
+/**
+ * Médias d'une annotation. Si la configuration en impose la liste, elle est suivie
+ * telle quelle ; sinon : images, vidéos, puis documents PDF (sortie du pipeline).
+ */
 export function annotationMedia(annotation: Annotation): AnnotationMediaEntry[] {
+  if (annotation.media) return annotation.media;
   return [
     ...annotation.images.map((image): AnnotationMediaEntry => ({
       item: { kind: "image", url: image.url, source: image.source },
       thumbnail: image,
     })),
     ...(annotation.videos ?? []).map((video): AnnotationMediaEntry => ({
-      item: { kind: "video", url: video.url, poster: video.poster.url, source: video.source },
-      thumbnail: video.poster,
+      item: { kind: "video", url: video.url, poster: video.poster?.url, source: video.source },
+      thumbnail: video.poster ?? null,
     })),
     ...(annotation.documents ?? []).map((document): AnnotationMediaEntry => ({
       item: { kind: "pdf", url: document.url, source: document.source, pages: document.pages },
-      thumbnail: document.thumbnail,
+      thumbnail: document.thumbnail ?? null,
     })),
   ];
 }

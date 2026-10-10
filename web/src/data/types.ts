@@ -132,23 +132,29 @@ export interface AnnotationVideo {
   height: number;
   duration?: number;
   /** Image d'attente (premier plan de la vidéo). */
-  poster: AnnotationImage;
+  poster?: AnnotationImage;
   source: string;
 }
 
 /** Document PDF d'annotation, illustré par sa première page. */
 export interface AnnotationDocument {
   url: string;
-  pages: number;
-  thumbnail: AnnotationImage;
+  pages?: number;
+  thumbnail?: AnnotationImage;
   source: string;
 }
 
 /** Un média d'annotation tel que la visionneuse l'affiche. */
 export type MediaItem =
   | { kind: "image"; url: string; source: string }
-  | { kind: "video"; url: string; poster: string; source: string }
-  | { kind: "pdf"; url: string; source: string; pages: number };
+  | { kind: "video"; url: string; poster?: string; source: string }
+  | { kind: "pdf"; url: string; source: string; pages?: number };
+
+/** Un média d'annotation tel que la visionneuse l'affiche, avec sa vignette (absente : vignette de repli). */
+export interface AnnotationMediaEntry {
+  item: MediaItem;
+  thumbnail: AnnotationImage | null;
+}
 
 export interface Annotation {
   id: string;
@@ -166,6 +172,10 @@ export interface Annotation {
   /** Absents des manifests construits avant l'ajout des vidéos et des PDF. */
   videos?: AnnotationVideo[];
   documents?: AnnotationDocument[];
+  /** Couleur CSS imposée (annotations.config.json). */
+  color?: string;
+  /** Médias dans l'ordre voulu (annotations.config.json) : prioritaires sur images / vidéos / documents. */
+  media?: AnnotationMediaEntry[];
 }
 
 export interface AnnotationsData {

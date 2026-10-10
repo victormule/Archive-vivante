@@ -1,3 +1,4 @@
+import { applyAnnotationConfig, EMPTY_CONFIG, parseAnnotationConfig, type AnnotationConfig } from "./annotationConfig";
 import type { AnnotationsData, CameraPathData, SessionIndex, SessionManifest } from "./types";
 
 const SESSIONS_ROOT = `${import.meta.env.BASE_URL}sessions`;
@@ -11,6 +12,27 @@ async function fetchJson<T>(url: string): Promise<T> {
 /** Résout une URL relative d'un manifest vers une URL absolue servie. */
 export function sessionAssetUrl(sessionId: string, relative: string): string {
   return `${SESSIONS_ROOT}/${sessionId}/${relative}`;
+}
+
+let annotationConfig: Promise<AnnotationConfig> | null = null;
+
+/**
+ * Configuration éditoriale des annotations (`annotations.config.json`), lue une fois.
+ * Fichier absent ou illisible : les annotations gardent leurs valeurs d'origine.
+ */
+export function loadAnnotationConfig(): Promise<AnnotationConfig> {
+  annotationConfig ??= (async () => {
+    const warn = (message: string) => console.warn(`[annotations.config.json] ${message}`);
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}annotations.config.json`, { cache: "no-cache" });
+      if (!res.ok) return EMPTY_CONFIG;
+      return parseAnnotationConfig(await res.json(), warn);
+    } catch (err) {
+      console.error("[annotations.config.json] fichier illisible (virgule, guillemet ou accolade manquants ?), valeurs d'origine conservées :", err);
+      return EMPTY_CONFIG;
+    }
+  })();
+  return annotationConfig;
 }
 
 export function loadSessionIndex(): Promise<SessionIndex> {
@@ -35,12 +57,14 @@ export async function loadAnnotations(manifest: SessionManifest): Promise<Annota
     for (const img of a.images) img.url = resolve(img.url);
     for (const video of a.videos ?? []) {
       video.url = resolve(video.url);
-      video.poster.url = resolve(video.poster.url);
+      if (video.poster) video.poster.url = resolve(video.poster.url);
     }
     for (const document of a.documents ?? []) {
       document.url = resolve(document.url);
-      document.thumbnail.url = resolve(document.thumbnail.url);
+      if (document.thumbnail) document.thumbnail.url = resolve(document.thumbnail.url);
     }
   }
-  return data;
+  const config = await loadAnnotationConfig();
+  const warn = (message: string) => console.warn(`[annotations.config.json] ${message}`);
+  return { annotations: applyAnnotationConfig(manifest.id, data.annotations, config, import.meta.env.BASE_URL, warn) };
 }
