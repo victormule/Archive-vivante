@@ -106,6 +106,27 @@ j1-s2 → j1-s1 : 3,3° / ~40 cm, résidu médian 9,7 → 6,0 cm, 45 % des point
 - Repère : les points sont déjà dans le repère du splat (posés sur le modèle aligné, à moins de 1,5 cm de la surface photogrammétrique) ; aucune transformation n'est appliquée. Exception : annotations faites pendant une session sans splat (`frame: "arkit"`), recalées comme la vidéo de cette session.
 - Sans image associée par titre, `reference_images` illustre l'annotation par la vue caméra enregistrée au moment où elle a été posée.
 
+## Event
+
+Entrée `"kind": "event"` de `sessions.json` (voir `archive_pipeline/event.py`) : plusieurs exports réunis en une seule scène.
+
+```jsonc
+{
+  "id": "j4-event", "kind": "event", "title": "Journée 4 — Événement", "day": 4, "index": 10,
+  "parts": [{ "export_dir": "Event/Journee4-event-1" }],   // captures : splat + photogrammétrie + LiDAR
+  "lidar": ["Event/Journee4-event-9-LiDAR"],               // nuages LiDAR supplémentaires
+  "point_cloud": { "max_points": 2000000 },                // le nuage fusionné est revoxelisé jusqu'à tenir sous ce nombre
+  "playback": { "export_dir": "Event/Journee4-event-9-video", "skip_videos": ["73A1CAA5"], "camera_smoothing": 2.0 },
+  "view": { "position": [], "quaternion": [], "target": [] }, // optionnel : vue d'arrivée (sinon déduite des bornes)
+  "orbit": { "center": [], "radius": { "min": 0, "max": 0 }, "height": { "min": 0, "max": 0 } } // optionnel
+}
+```
+
+- **Repère** : le repère ARKit commun. Toutes les sessions de l'Event ont été relocalisées par dür.air sur la même carte (même `ARWorldMap`, même ancre) : les nuages LiDAR et les trajectoires vidéo s'y superposent sans recalage.
+- **Splats et photogrammétries** : chaque capture est replacée par ICP de son LiDAR (rogné autour de sa photogrammétrie) sur sa photogrammétrie. Deux départs sont essayés (aucune correction, poses de capture quand l'export les contient), et le meilleur est retenu. La photogrammétrie est réécrite dans le repère de l'Event (un seul `mesh.glb`, une texture par capture). Le splat garde son fichier : sa matrice est appliquée à l'affichage.
+- **Nuage** : les nuages LiDAR sont des PLY ASCII (jusqu'à 1 Go, plus que la RAM disponible une fois convertis d'un bloc). Ils sont lus par blocs et voxelisés à 2,5 cm au fil de l'eau ; le résultat est mis en cache dans `.cache/`. Ils sont ensuite fusionnés et revoxelisés jusqu'à passer sous `max_points`.
+- **Bande son et trajet** : les vidéos sont triées par heure de début et leurs bandes son mises bout à bout (AAC mono 64 kb/s, sous la limite de 25 Mo par fichier). Chaque trajectoire est décalée de la durée réelle des sons qui la précèdent. Le trajet entier est rééchantillonné à 10 Hz, lissé (filtre gaussien, position et orientation) et publié à 4 Hz ; le viewer n'ajoute qu'un lissage léger (0,25 s). Les raccords entre vidéos sont quasi continus (moins de 0,5 m d'écart, environ 1 s entre deux prises).
+
 ## Points d'attention
 
 - **Noms de dossiers Unicode** : les exports iOS sont en NFD (`Journée`). `resolve_dir` les retrouve quelle que soit la normalisation.

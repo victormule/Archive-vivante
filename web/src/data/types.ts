@@ -12,6 +12,8 @@ export interface SessionSummary {
   day: number;
   index: number;
   startDate?: string;
+  /** « event » : l'Event qui conclut les sessions (scène, vue et rotation propres). */
+  kind?: "event";
 }
 
 /** Réglages communs à toutes les sessions (repère commun du projet). */
@@ -30,6 +32,10 @@ export interface OrbitConfig {
   /** Durée (s) d'un tour complet ; une session par tour. */
   turn_seconds?: number;
   switch_degrees?: number;
+  /** Distance horizontale à l'axe (m) où se place la caméra (défaut : 3,5 à 9). */
+  radius?: { min: number; max: number };
+  /** Hauteur au-dessus du centre (m) (défaut : 1,2 à 4,5). */
+  height?: { min: number; max: number };
 }
 
 export interface SessionIndex {
@@ -41,10 +47,21 @@ export type LayerId = "splat" | "mesh" | "pointCloud";
 
 export interface SplatLayerData {
   url: string;
-  /** Taille du fichier (progression globale du chargement). */
+  /** Taille du fichier (progression globale du chargement) ; avec `parts`, leur total. */
   bytes?: number;
   count: number | null;
   shDegree: number | null;
+  /** Plusieurs splats réunis en une scène (Event), chacun placé par sa matrice. */
+  parts?: SplatPart[];
+}
+
+export interface SplatPart {
+  url: string;
+  bytes?: number;
+  count: number | null;
+  shDegree: number | null;
+  /** Repère du splat -> repère de la session (4x4 column-major). */
+  transform?: number[];
 }
 
 export interface MeshLayerData {
@@ -90,6 +107,10 @@ export interface SessionManifest extends SessionSummary {
     /** Lissage gaussien du trajet caméra (s) propre à la session ; à défaut, celui de l'application. */
     cameraSmoothing?: number;
   } | null;
+  /** Vue d'arrivée propre (Event) : la caméra la rejoint quand on y entre. */
+  view?: CameraView;
+  /** Rotation automatique propre (Event), autour de son centre. */
+  orbit?: OrbitConfig;
 }
 
 export interface CameraView {

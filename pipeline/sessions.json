@@ -275,6 +275,29 @@
         "arkit_session": "2FA996A4",
         "media_dir": "."
       }
+    },
+    {
+      "id": "j4-event",
+      "kind": "event",
+      "$comment": "Event de la journée 4 : il conclut les sessions. Cinq captures (zones d'un même lieu, relocalisées par dür.air sur une même carte ARKit) réunies en une seule scène, avec le LiDAR de la session vidéo ; une seule bande son et un seul trajet, faits des vidéos tournées à la suite (voir pipeline/archive_pipeline/event.py).",
+      "title": "Journée 4 — Événement",
+      "day": 4,
+      "index": 10,
+      "parts": [
+        { "export_dir": "Event/Journee4-event-1" },
+        { "export_dir": "Event/Journee4-event-4" },
+        { "export_dir": "Event/Journee4-event-5" },
+        { "export_dir": "Event/Journee4-event-6" },
+        { "export_dir": "Event/Journee4-event-7" }
+      ],
+      "lidar": ["Event/Journee4-event-9-LiDAR"],
+      "point_cloud": { "max_points": 2000000 },
+      "playback": {
+        "$comment": "Vidéos de la session 1A4B75F5 mises bout à bout dans l'ordre de tournage ; la première (73A1CAA5, 3 s) est écartée. Seuls le son et la trajectoire sont gardés, trajet lissé (écart-type en secondes).",
+        "export_dir": "Event/Journee4-event-9-video",
+        "skip_videos": ["73A1CAA5"],
+        "camera_smoothing": 2.0
+      }
     }
   ]
 }

@@ -112,6 +112,15 @@ La version de Node vient de [web/.nvmrc](web/.nvmrc), les en-têtes de cache de 
 
 La ligne dorée dans la scène matérialise le trajet de la caméra d'enregistrement. Une annotation cachée par la scène (d'après la géométrie photogrammétrique) apparaît atténuée.
 
+## L'Event (journée 4)
+
+L'Event conclut les sessions et s'en démarque : il a son propre lieu (environ 35 × 35 m), sa vue d'arrivée et son axe de rotation, et apparaît en doré à la fin de la barre (« Événement »). Choisir l'Event fait voler la caméra jusqu'à sa vue ; revenir à une session la ramène à la table. En rotation automatique, l'Event tourne seul autour de son centre ; les sessions se succèdent entre elles.
+
+- **Une seule scène** : les cinq captures de la journée (dossier `Event/`, events 1, 4, 5, 6 et 7) sont réunies. dür.air les a relocalisées sur une même carte ARKit : leurs splats, leurs photogrammétries et tous les nuages LiDAR (y compris celui de la session vidéo, event 9) partagent ce repère.
+- **Une seule bande son, un seul trajet** : les vidéos de la session 1A4B75F5 sont mises bout à bout dans l'ordre de tournage (48 min 45 s). La première, de 3 s (`73A1CAA5`), est écartée. Seuls le son et la trajectoire sont gardés ; le trajet est lissé (écart-type de 2 s, `camera_smoothing`).
+
+Exports bruts : `Event/*.zip`, extraits dans `Event/<nom du zip>/` (non versionnés). Reconstruction : `.venv/Scripts/python pipeline/build_sessions.py j4-event` (étapes `parts`, `pointCloud`, `playback`). Détail dans [pipeline/README.md](pipeline/README.md#event).
+
 ## Ajouter une session
 
 1. Déposer l'export dür.air à la racine (ex. `Journée2-session1/`).
@@ -154,7 +163,7 @@ Le pipeline produit, par session, dans `web/public/sessions/<id>/` :
 | Fichier | Contenu |
 | --- | --- |
 | `manifest.json` | Métadonnées, références aux couches, rapport d'alignement |
-| `splat.spz` | Gaussian splat compressé (SPZ, ×15 plus léger que le PLY d'origine) |
+| `splat.spz` | Gaussian splat compressé (SPZ, ×15 plus léger que le PLY d'origine) ; Event : `splat-<n>.spz`, un par capture, placé par sa matrice (`layers.splat.parts`) |
 | `mesh.glb` | Photogrammétrie texturée (glTF, matériau unlit) |
 | `points.bin` | Nuage de points quantifié (format décrit dans `point_cloud.py`) |
 | `audio.m4a` | Piste audio AAC extraite de la vidéo (sans ré-encodage) |

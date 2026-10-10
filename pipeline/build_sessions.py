@@ -21,6 +21,7 @@ from pathlib import Path
 
 from archive_pipeline.annotations import read_titles
 from archive_pipeline.builder import STEPS, SessionBuilder, write_json
+from archive_pipeline.event import EVENT_STEPS, EventBuilder
 from archive_pipeline.export_reader import ExportError, SessionExport, resolve_dir, resolve_path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -92,7 +93,7 @@ def open_export(entry: dict, only: set[str]) -> SessionExport:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("ids", nargs="*", help="Identifiants de sessions à construire (défaut : toutes)")
-    parser.add_argument("--only", nargs="+", choices=STEPS, help="Étapes à reconstruire (le reste du manifest est conservé)")
+    parser.add_argument("--only", nargs="+", choices=sorted({*STEPS, *EVENT_STEPS}), help="Étapes à reconstruire (le reste du manifest est conservé)")
     args = parser.parse_args()
 
     document = json.loads(CATALOG.read_text(encoding="utf-8"))
@@ -107,6 +108,13 @@ def main() -> int:
     # Les sessions de référence d'abord : les recalages en dépendent
     selected.sort(key=lambda s: "register_to" in s)
     for entry in selected:
+        if entry.get("kind") == "event":
+            # Event : plusieurs exports réunis en une scène, une bande son et un trajet (voir event.py)
+            print(f"→ {entry['id']} (event, {len(entry['parts'])} captures)")
+            only = set(args.only) & set(EVENT_STEPS) if args.only else None
+            if only is None or only:
+                EventBuilder(entry, OUTPUT_ROOT / entry["id"], PROJECT_ROOT).build(only)
+            continue
         print(f"→ {entry['id']} ({entry['export_dir']})")
         export = open_export(entry, set(args.only or ()))
         reference = entry.get("register_to")
@@ -118,7 +126,7 @@ def main() -> int:
 
     # L'index liste toutes les sessions déjà construites
     index = [
-        {k: m.get(k) for k in ("id", "title", "day", "index", "startDate")}
+        {k: m.get(k) for k in ("id", "title", "day", "index", "startDate", "kind") if k != "kind" or m.get(k)}
         for m in (json.loads(p.read_text(encoding="utf-8")) for p in sorted(OUTPUT_ROOT.glob("*/manifest.json")))
     ]
     write_json(OUTPUT_ROOT / "index.json", {

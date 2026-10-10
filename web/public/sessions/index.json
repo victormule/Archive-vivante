@@ -93,6 +93,14 @@
       "day": 3,
       "index": 9,
       "startDate": "2026-10-08T14:55:47Z"
+    },
+    {
+      "id": "j4-event",
+      "title": "Journée 4 — Événement",
+      "day": 4,
+      "index": 10,
+      "startDate": "2026-10-09T13:06:38Z",
+      "kind": "event"
     }
   ]
 }

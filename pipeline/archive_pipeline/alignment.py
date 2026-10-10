@@ -93,7 +93,7 @@ def _point_to_plane_step(src: np.ndarray, dst: np.ndarray, normals: np.ndarray, 
 
 def fit_score(transform: np.ndarray, source: np.ndarray, tree: cKDTree, tolerance: float = 0.02) -> float:
     """Part des points source à moins de `tolerance` de la cible."""
-    return float(np.mean(tree.query(apply(transform, source))[0] < tolerance))
+    return float(np.mean(tree.query(apply(transform, source), workers=-1)[0] < tolerance))
 
 
 @dataclass(frozen=True)
@@ -124,12 +124,12 @@ def icp(
     """
     tree = cKDTree(target)
     m = np.eye(4) if initial is None else initial.copy()
-    median_before = float(np.median(tree.query(apply(m, source))[0]))
+    median_before = float(np.median(tree.query(apply(m, source), workers=-1)[0]))
     thresholds = np.geomspace(max_distance, final_distance, iterations)
     inliers = np.zeros(len(source), bool)
     for thr in thresholds:
         moved = apply(m, source)
-        dist, idx = tree.query(moved, distance_upper_bound=thr)
+        dist, idx = tree.query(moved, distance_upper_bound=thr, workers=-1)
         inliers = np.isfinite(dist)
         if inliers.sum() < 100:
             break
@@ -138,7 +138,7 @@ def icp(
         else:
             step = _point_to_plane_step(moved[inliers], target[idx[inliers]], target_normals[idx[inliers]], with_scale)
         m = step @ m
-    median_after = float(np.median(tree.query(apply(m, source))[0]))
+    median_after = float(np.median(tree.query(apply(m, source), workers=-1)[0]))
     return IcpResult(m, median_before, median_after, float(inliers.mean()))
 
 

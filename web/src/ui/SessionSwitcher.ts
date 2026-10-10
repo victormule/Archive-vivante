@@ -4,6 +4,11 @@ export type SessionButtonState = "idle" | "loading" | "active";
 
 const timeFormat = new Intl.DateTimeFormat("fr-FR", { timeStyle: "short" });
 
+/** « Session 3 », ou « Événement » pour l'Event qui conclut les sessions. */
+export function sessionLabel(session: Pick<SessionSummary, "kind" | "index">): string {
+  return session.kind === "event" ? "Événement" : `Session ${session.index}`;
+}
+
 /**
  * Barre des sessions, de gauche à droite, regroupées par journée. Le survol
  * annonce l'intention : la session peut être préchargée avant le clic.
@@ -31,11 +36,11 @@ export class SessionSwitcher {
       }
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "sessions__item";
+      button.className = session.kind === "event" ? "sessions__item sessions__item--event" : "sessions__item";
       button.dataset.state = "idle";
       const time = session.startDate ? timeFormat.format(new Date(session.startDate)) : "";
       button.innerHTML = `<span class="sessions__name"></span><span class="sessions__time"></span>`;
-      button.querySelector(".sessions__name")!.textContent = `Session ${session.index}`;
+      button.querySelector(".sessions__name")!.textContent = sessionLabel(session);
       button.querySelector(".sessions__time")!.textContent = time;
       button.setAttribute("aria-label", `${session.title}${time ? `, ${time}` : ""}`);
       button.addEventListener("click", () => onSelect(session.id));

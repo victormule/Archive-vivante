@@ -7,7 +7,7 @@ import { AudioPlayer } from "@/ui/AudioPlayer";
 import { MediaLightbox } from "@/ui/MediaLightbox";
 import { ANNOTATIONS_ITEM, LAYER_ITEMS, type LayerToggleItem, LayerToggles, type ToggleId } from "@/ui/LayerToggles";
 import { PlayerControls } from "@/ui/PlayerControls";
-import { SessionSwitcher } from "@/ui/SessionSwitcher";
+import { SessionSwitcher, sessionLabel } from "@/ui/SessionSwitcher";
 import { AutoOrbit } from "@/viewer/AutoOrbit";
 import { SceneViewer } from "@/viewer/SceneViewer";
 import { IdleWatcher } from "./IdleWatcher";
@@ -338,7 +338,18 @@ export class ArchiveView {
     this.audioPlayer?.close();
     this.deactivate(previous);
     this.activate(next);
+    // L'Event a son propre lieu : la caméra rejoint sa vue, et celle des sessions en le quittant
+    const view = next.manifest.view ?? (previous.manifest.view ? this.sceneConfig.initialView : null);
+    if (view && next !== previous) void this.flyToView(view);
     await this.crossfade(next, duration);
+  }
+
+  /** Vol vers une vue enregistrée ; à l'arrivée, l'orbite reprend son pivot. */
+  private async flyToView(view: CameraView): Promise<void> {
+    this.stopOrbit();
+    const position = new THREE.Vector3(...view.position);
+    const quaternion = new THREE.Quaternion(...view.quaternion);
+    if (await this.viewer.flyTo(position, quaternion, this.viewer.flightDuration(position, quaternion))) this.viewer.setView(view);
   }
 
   /**
@@ -374,7 +385,7 @@ export class ArchiveView {
     this.current = scene;
     const { manifest } = scene;
     const day = this.sessions.find((s) => s.id === scene.id)?.day ?? manifest.day;
-    this.root.querySelector(".session__title")!.textContent = `Journée ${day} · Session ${manifest.index}`;
+    this.root.querySelector(".session__title")!.textContent = `Journée ${day} · ${sessionLabel(manifest)}`;
     this.switcher?.reveal(scene.id);
     this.root.querySelector(".session__meta")!.textContent = formatDayAndTime(manifest.startDate);
     for (const s of this.sessions) this.switcher?.setState(s.id, s.id === scene.id ? "active" : "idle");
@@ -401,7 +412,8 @@ export class ArchiveView {
   }
 
   private placeInitialCamera(scene: SessionScene): void {
-    if (this.sceneConfig.initialView) return this.viewer.setView(this.sceneConfig.initialView);
+    const view = scene.manifest.view ?? this.sceneConfig.initialView;
+    if (view) return this.viewer.setView(view);
     const position = new THREE.Vector3();
     const quaternion = new THREE.Quaternion();
     if (scene.samplePose(0, position, quaternion)) {
@@ -526,11 +538,19 @@ export class ArchiveView {
   }
 
   private startOrbit(): void {
-    const config = this.sceneConfig.orbit;
-    if (!config || this.orbit || !this.current) return;
+    const base = this.sceneConfig.orbit;
+    if (!base || this.orbit || !this.current) return;
+    // L'Event tourne autour de son propre centre, à son échelle
+    const config = this.current.manifest.orbit ?? base;
     this.orbit = new AutoOrbit(
       this.viewer.camera,
-      { center: new THREE.Vector3(...config.center), turnSeconds: config.turn_seconds ?? 80, stepDegrees: config.switch_degrees ?? 360 },
+      {
+        center: new THREE.Vector3(...config.center),
+        turnSeconds: config.turn_seconds ?? base.turn_seconds ?? 80,
+        stepDegrees: config.switch_degrees ?? base.switch_degrees ?? 360,
+        radius: config.radius,
+        height: config.height,
+      },
       () => this.nextSessionOnTurn(),
     );
     this.viewer.setMode("auto");
@@ -556,9 +576,12 @@ export class ArchiveView {
 
   /** Chaque étape de l'orbite (`switch_degrees`) : session suivante, en fondu lent. */
   private nextSessionOnTurn(): void {
-    if (this.sessions.length < 2 || !this.current) return;
-    const i = this.sessions.findIndex((s) => s.id === this.current!.id);
-    const next = this.sessions[(i + 1) % this.sessions.length];
+    // L'Event se contemple seul ; les sessions se succèdent entre elles
+    if (!this.current || this.current.manifest.kind === "event") return;
+    const cycle = this.sessions.filter((s) => s.kind !== "event");
+    if (cycle.length < 2) return;
+    const i = cycle.findIndex((s) => s.id === this.current!.id);
+    const next = cycle[(i + 1) % cycle.length];
     this.switchTo(next.id, this.options.idleCrossfadeDuration)
       .then(() => this.current?.setPathVisible(!this.orbit))
       .catch((err) => console.error(err));

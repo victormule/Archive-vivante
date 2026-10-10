@@ -782,6 +782,11 @@ html, body, #app {
 }
 .sessions__day:not(:first-child) { margin-left: 6px; border-left: 1px solid var(--panel-border); padding-left: 14px; }
 
+/* Event : il conclut les sessions et s'en démarque (couleur d'accent) */
+.sessions__item--event { color: var(--accent); box-shadow: inset 0 0 0 1px rgba(232, 176, 74, 0.35); }
+.sessions__item--event:hover { color: var(--accent); background: rgba(232, 176, 74, 0.1); }
+.sessions__item--event[data-state="active"] { color: var(--bg); background: var(--accent); box-shadow: none; }
+
 /* Rotation automatique (inactivité) : l'interface s'efface, l'image reste */
 .session.is-idle .layers,
 .session.is-idle .session__footer,

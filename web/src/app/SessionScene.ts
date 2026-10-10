@@ -63,7 +63,10 @@ export class SessionScene {
     const url = (relative: string) => sessionAssetUrl(manifest.id, relative);
     const { layers } = manifest;
     const created: Layer[] = [];
-    if (layers.splat) created.push(new SplatLayer(url(layers.splat.url)));
+    if (layers.splat) {
+      const parts = layers.splat.parts ?? [layers.splat];
+      created.push(new SplatLayer(parts.map((p) => ({ url: url(p.url), bytes: p.bytes, transform: "transform" in p ? p.transform : undefined }))));
+    }
     if (layers.mesh) created.push(new MeshLayer(url(layers.mesh.url)));
     if (layers.pointCloud) created.push(new PointCloudLayer(url(layers.pointCloud.url), layers.pointCloud));
     for (const layer of created) {
