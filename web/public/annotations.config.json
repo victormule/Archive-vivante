@@ -179,9 +179,38 @@
       },
       "Rédaction du projet": {
         "title": "Rédaction du projet",
-        "color": "#b8613a",
+        "color": "#c25a87",
         "text": "Rédaction d’un protocol de recherche.\nSimulation /preparation en vue de la présentation.",
-        "media": []
+        "media": [
+          { "file": "sessions/j2-s5/annotations/2b83b87e-d1.pdf", "thumbnail": "sessions/j2-s5/annotations/2b83b87e-d1.jpg", "pages": 5 }
+        ]
+      }
+    },
+    "j3-s6": {
+      "Element 1": {
+        "title": "Element 1",
+        "color": "#4f9066",
+        "text": "Maille tricote",
+        "media": [
+          "sessions/j3-s6/annotations/d955242a-1.jpg"
+        ]
+      },
+      "Element 2": {
+        "title": "Element 2",
+        "color": "#d99a35",
+        "text": "Maille tricote",
+        "media": [
+          "sessions/j3-s6/annotations/f8338aa7-1.jpg"
+        ]
+      },
+      "Technique": {
+        "title": "Technique",
+        "color": "#3f74b5",
+        "text": "Tricot de maille avec une grosse laine",
+        "media": [
+          "sessions/j3-s6/annotations/2d6bd352-1.jpg",
+          "sessions/j3-s6/annotations/2d6bd352-2.jpg"
+        ]
       }
     }
   }

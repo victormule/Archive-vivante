@@ -1,0 +1,88 @@
+{
+  "annotations": [
+    {
+      "id": "D955242A-515F-4B2A-A30F-28141DA018E3",
+      "title": "Element 1",
+      "colorIndex": 14,
+      "text": "Maille tricote",
+      "kind": "point",
+      "points": [
+        [
+          0.24711,
+          -0.78195,
+          -1.65038
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:12:21Z",
+      "images": [
+        {
+          "url": "annotations/d955242a-1.jpg",
+          "width": 1200,
+          "height": 1600,
+          "source": "element1.jpeg"
+        }
+      ],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "F8338AA7-B1EF-43E6-9D26-B4C3ECCE4703",
+      "title": "Element 2",
+      "colorIndex": 15,
+      "text": "Maille tricote",
+      "kind": "point",
+      "points": [
+        [
+          -0.15044,
+          -0.86969,
+          -1.76799
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:13:13Z",
+      "images": [
+        {
+          "url": "annotations/f8338aa7-1.jpg",
+          "width": 1600,
+          "height": 1200,
+          "source": "element2.jpg"
+        }
+      ],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "2D6BD352-4EFF-4272-B5D6-E1895F22CD68",
+      "title": "Technique",
+      "colorIndex": 16,
+      "text": "Tricot de maille avec une grosse laine",
+      "kind": "point",
+      "points": [
+        [
+          -0.81326,
+          -0.84398,
+          -2.84305
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:15:02Z",
+      "images": [
+        {
+          "url": "annotations/2d6bd352-1.jpg",
+          "width": 1023,
+          "height": 636,
+          "source": "technique.jpg"
+        },
+        {
+          "url": "annotations/2d6bd352-2.jpg",
+          "width": 1200,
+          "height": 1600,
+          "source": "technique-bis.jpeg"
+        }
+      ],
+      "videos": [],
+      "documents": []
+    }
+  ]
+}

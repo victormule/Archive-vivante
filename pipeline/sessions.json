@@ -195,6 +195,17 @@
       "playback": {
         "video_id": "B3E9C54D",
         "time_offset": 0.0
+      },
+      "annotations": {
+        "$comment": "Annotations posées sur le splat de j3-s6 ; le placement de la session (world_transform) est appliqué à l'affichage. Les noms de fichiers ne portent pas les titres : association explicite.",
+        "source": "Annotation session6",
+        "arkit_session": "3F48326B",
+        "media_dir": ".",
+        "media": {
+          "Technique": ["technique.jpg", "technique-bis.jpeg"],
+          "Element 1": ["element1.jpeg"],
+          "Element 2": ["element2.jpg", "element2-bis.jpg"]
+        }
       }
     }
   ]

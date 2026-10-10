@@ -157,14 +157,14 @@ def read_annotations(
 
 
 def _media_file(media_dir: Path, name: str) -> Path | None:
-    """Fichier d'un dossier, quelle que soit la normalisation Unicode de son nom (None s'il est absent)."""
+    """Fichier d'un dossier, quelle que soit la normalisation Unicode de son nom (None s'il est absent ou vide)."""
     path = media_dir / name
     if path.exists():
-        return path
+        return path if path.stat().st_size > 0 else None
     target = _nfc(name)
     for child in media_dir.iterdir():
         if _nfc(child.name) == target:
-            return child
+            return child if child.stat().st_size > 0 else None
     return None
 
 

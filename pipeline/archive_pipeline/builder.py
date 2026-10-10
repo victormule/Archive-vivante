@@ -355,8 +355,9 @@ class SessionBuilder:
         # Ne retire que les fichiers qu'il a lui-même produits (et qui ne servent plus) : les médias
         # ajoutés à la main dans ce dossier (cités par annotations.config.json) restent en place.
         referenced = {Path(u).name for i in items for m in (*i["images"], *i["videos"], *i["documents"]) for u in _media_urls(m)}
+        own_ids = {a.id[:8].lower() for a in annotations}
         for file in media_out.iterdir():
-            if GENERATED_MEDIA.match(file.name) and file.name not in referenced:
+            if GENERATED_MEDIA.match(file.name) and file.name[:8] in own_ids and file.name not in referenced:
                 file.unlink()
         write_json(self.out / "annotations.json", {"annotations": items})
         self.manifest["annotations"] = {"url": "annotations.json", "count": len(items)}

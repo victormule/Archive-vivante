@@ -32,3 +32,12 @@ Thumbs.db
 /Journe*e*photo*.zip
 /Project */
 /Journe*e*photo*/
+/Annotation */
+# Médias déposés à la racine avant d'être rattachés aux annotations
+/*.jpg
+/*.jpeg
+/*.png
+/*.mp4
+/*.mov
+/*.pdf
+/*.zip

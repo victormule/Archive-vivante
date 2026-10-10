@@ -444,6 +444,8 @@ html, body, #app {
 .annotation-label__images[data-count="1"] .annotation-label__image :is(img, video) { height: auto; }
 .annotation-label__images:not([data-count="1"]) .annotation-label__image :is(img, video) { aspect-ratio: 3 / 4; }
 .annotation-label__image:hover :is(img, video) { transform: scale(1.04); }
+/* Vignette de PDF : le haut de la page (le titre) reste visible quand elle est rognée */
+.annotation-label__image--pdf img { object-position: top; }
 /* PDF sans vignette : carte portrait avec le nom du fichier */
 .annotation-label__card {
   display: grid;
