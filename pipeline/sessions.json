@@ -253,6 +253,28 @@
         "arkit_session": "4B2D039A",
         "media_dir": "."
       }
+    },
+    {
+      "id": "j3-s9",
+      "title": "Journée 3 — Session 9",
+      "day": 3,
+      "index": 9,
+      "export_dir": "Journee3-session9",
+      "arkit_session": "2FA996A4",
+      "world_transform": {
+        "$comment": "Placé le 2026-10-10 (scène sans table de repère, comme j3-s8) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné pour filmer du côté de la vue d'arrivée, puis reculé de 2.3 m le long du rayon de la vue d'arrivée.",
+        "matrix": [-0.445194, 0.0, 0.8954342, 0.0, 0.0, 1.0, 0.0, 0.0, -0.8954342, 0.0, -0.445194, 0.0, -2.2242468, -1.1668744, -7.1610702, 1.0]
+      },
+      "playback": {
+        "video_id": "AD245AD6",
+        "time_offset": 0.0,
+        "camera_smoothing": 2.0
+      },
+      "annotations": {
+        "source": "Journee3-session9",
+        "arkit_session": "2FA996A4",
+        "media_dir": "."
+      }
     }
   ]
 }

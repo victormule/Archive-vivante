@@ -246,6 +246,32 @@
         "text": "Présentation du projet vidéo",
         "media": []
       }
+    },
+    "j3-s9": {
+      "Corps du golem": {
+        "title": "Corps du golem",
+        "color": "#3e8f93",
+        "text": "Modélisation en carton papier, ruban adhésif",
+        "media": []
+      },
+      "Jambe du golem": {
+        "title": "Jambe du golem",
+        "color": "#b8613a",
+        "text": "Carton, ruban adhésif",
+        "media": []
+      },
+      "Pieds du golem": {
+        "title": "Pieds du golem",
+        "color": "#4f9066",
+        "text": "Bascket, bois, sangle, carton",
+        "media": []
+      },
+      "Tête du golem": {
+        "title": "Tête du golem",
+        "color": "#d99a35",
+        "text": "Carton /papier mousse polyuréthane",
+        "media": []
+      }
     }
   }
 }

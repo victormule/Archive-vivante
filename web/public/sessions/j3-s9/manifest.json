@@ -1,0 +1,142 @@
+{
+  "id": "j3-s9",
+  "title": "Journée 3 — Session 9",
+  "day": 3,
+  "index": 9,
+  "sessionId": "2FA996A4-308F-41B7-BE01-08434E7A17A1",
+  "startDate": "2026-10-08T14:55:47Z",
+  "endDate": "2026-10-08T15:02:29Z",
+  "author": "Victor Mulé",
+  "layers": {
+    "splat": {
+      "url": "splat.spz",
+      "bytes": 4217641,
+      "count": 208053,
+      "shDegree": 3
+    },
+    "mesh": {
+      "url": "mesh.glb",
+      "bytes": 1427412,
+      "triangles": 25000
+    },
+    "pointCloud": {
+      "url": "points.bin",
+      "bytes": 8844048,
+      "count": 982672,
+      "voxelSize": 0.01,
+      "boundsMin": [
+        -3.9536127468871136,
+        -1.5598826584571492,
+        -6.885733336677085
+      ],
+      "boundsMax": [
+        6.802336115139979,
+        2.022720186972036,
+        1.1349559658438946
+      ]
+    }
+  },
+  "annotations": {
+    "url": "annotations.json",
+    "count": 4
+  },
+  "alignment": {
+    "reference": "splat",
+    "mesh": {
+      "method": "dür.air alignment matrix",
+      "scale": 1.9895109,
+      "avgErrorToArkit": 0.055631783
+    },
+    "pointCloud": {
+      "method": "icp-point-to-plane",
+      "target": "mesh",
+      "medianResidualBefore": 0.287,
+      "medianResidualAfter": 0.2195,
+      "inlierRatio": 0.298,
+      "transform": [
+        0.999675,
+        -0.001563,
+        0.025462,
+        0.0,
+        0.001747,
+        0.999973,
+        -0.007197,
+        0.0,
+        -0.02545,
+        0.007239,
+        0.99965,
+        0.0,
+        0.024299,
+        0.164205,
+        0.346957,
+        1.0
+      ]
+    },
+    "camera": {
+      "method": "robust-pose-pairs",
+      "pairs": 102,
+      "inliers": 102,
+      "medianResidual": 0.0511,
+      "transform": [
+        0.999955,
+        0.004476,
+        0.008334,
+        0.0,
+        -0.00449,
+        0.999989,
+        0.001659,
+        0.0,
+        -0.008327,
+        -0.001697,
+        0.999964,
+        0.0,
+        -0.022328,
+        -0.010358,
+        -0.019801,
+        1.0
+      ]
+    },
+    "world": {
+      "reference": null,
+      "method": "calibrated",
+      "note": "Placé le 2026-10-10 (scène sans table de repère, comme j3-s8) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné pour filmer du côté de la vue d'arrivée, puis reculé de 2.3 m le long du rayon de la vue d'arrivée."
+    }
+  },
+  "worldTransform": [
+    -0.445194,
+    0.0,
+    0.8954342,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    -0.8954342,
+    0.0,
+    -0.445194,
+    0.0,
+    -2.2242468,
+    -1.1668744,
+    -7.1610702,
+    1.0
+  ],
+  "playback": {
+    "audioUrl": "audio.m4a",
+    "cameraPathUrl": "camera_path.json",
+    "duration": 138.1534779071808,
+    "recordedAt": "2026-10-08T14:55:52Z",
+    "cameraSmoothing": 2.0
+  },
+  "bounds": {
+    "min": [
+      -4.60373,
+      -1.3506255,
+      -9.1832285
+    ],
+    "max": [
+      2.6687098,
+      0.05208397,
+      0.6304171
+    ]
+  }
+}

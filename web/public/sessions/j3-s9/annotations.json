@@ -1,0 +1,84 @@
+{
+  "annotations": [
+    {
+      "id": "7260D9CC-354F-4FF5-B98D-BC0391ADA9A0",
+      "title": "Corps du golem",
+      "colorIndex": 19,
+      "text": "Modélisation en carton papier, ruban adhésif",
+      "kind": "point",
+      "points": [
+        [
+          0.84271,
+          -0.73936,
+          -4.23458
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T14:29:32Z",
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "audios": []
+    },
+    {
+      "id": "6F7D69C3-2449-4F00-9097-D02596C42F79",
+      "title": "Jambe du golem",
+      "colorIndex": 20,
+      "text": "Carton, ruban adhésif",
+      "kind": "point",
+      "points": [
+        [
+          1.51437,
+          -1.0836,
+          -4.91928
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T14:34:15Z",
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "audios": []
+    },
+    {
+      "id": "1D8EAD0E-940C-4BCA-9771-C5844D28AB7F",
+      "title": "Pieds du golem",
+      "colorIndex": 21,
+      "text": "Bascket, bois, sangle, carton",
+      "kind": "point",
+      "points": [
+        [
+          -0.31355,
+          -1.22236,
+          -3.06963
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T14:32:34Z",
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "audios": []
+    },
+    {
+      "id": "F0906F62-862B-41C0-A2BA-A182C1DF9506",
+      "title": "Tête du golem",
+      "colorIndex": 22,
+      "text": "Carton /papier mousse polyuréthane",
+      "kind": "point",
+      "points": [
+        [
+          -0.81037,
+          0.08149,
+          -3.68249
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T14:31:27Z",
+      "images": [],
+      "videos": [],
+      "documents": [],
+      "audios": []
+    }
+  ]
+}
