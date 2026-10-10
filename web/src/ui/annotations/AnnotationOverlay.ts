@@ -13,6 +13,14 @@ const FOLLOW_RATE = 14;
 
 const MEDIA_LABEL = { image: "Agrandir l'image", video: "Agrandir la vidéo", pdf: "Ouvrir le document" } as const;
 
+const PLAY_ICON = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>`;
+
+/** 75 -> « 1:15 ». */
+export function formatDuration(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+}
+
 const PIN_ICON = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c-2.5 0-4.5 2-4.5 4.5 0 3.4 4.5 8.6 4.5 8.6s4.5-5.2 4.5-8.6c0-2.5-2-4.5-4.5-4.5zM8 4.1a1.95 1.95 0 1 0 0 3.9 1.95 1.95 0 0 0 0-3.9z" fill="currentColor" fill-rule="evenodd"/></svg>`;
 
 export interface Insets {
@@ -33,6 +41,8 @@ export interface AnnotationOverlayOptions {
   /** Marges à laisser libres (boutons, barre de lecture…). */
   insets: () => Insets;
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
+  /** Un audio d'annotation a été cliqué : le lecteur s'ouvre et l'écoute commence. */
+  onPlayAudio: (audio: Extract<MediaItem, { kind: "audio" }>, title: string) => void;
 }
 
 interface Pin {
@@ -227,7 +237,7 @@ export class AnnotationOverlay {
     };
     dot.addEventListener("click", togglePinned);
     label.addEventListener("click", (e) => {
-      if (!(e.target as HTMLElement).closest(".annotation-label__image")) togglePinned();
+      if (!(e.target as HTMLElement).closest(".annotation-label__image, .annotation-label__audio")) togglePinned();
     });
     label.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -253,16 +263,18 @@ export class AnnotationOverlay {
       inner.appendChild(text);
     }
     const media = annotationMedia(data);
-    if (media.length > 0) {
-      const items = media.map((m) => m.item);
+    const visual = media.filter((m) => m.item.kind !== "audio");
+    const audios = media.filter((m): m is typeof m & { item: Extract<MediaItem, { kind: "audio" }> } => m.item.kind === "audio");
+    if (visual.length > 0) {
+      const items = visual.map((m) => m.item);
       const gallery = document.createElement("div");
       gallery.className = "annotation-label__images";
-      gallery.dataset.count = String(Math.min(media.length, 3));
-      media.forEach(({ item, thumbnail }, index) => {
+      gallery.dataset.count = String(Math.min(visual.length, 3));
+      visual.forEach(({ item, thumbnail }, index) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = `annotation-label__image annotation-label__image--${item.kind}`;
-        button.setAttribute("aria-label", `${MEDIA_LABEL[item.kind]} ${index + 1} : ${data.title}`);
+        button.setAttribute("aria-label", `${MEDIA_LABEL[item.kind as keyof typeof MEDIA_LABEL]} ${index + 1} : ${data.title}`);
         if (item.kind === "video") {
           // Image d'attente (ou premier plan), puis lecture en boucle sans le son quand l'étiquette se déplie
           const video = document.createElement("video");
@@ -300,6 +312,28 @@ export class AnnotationOverlay {
         gallery.appendChild(button);
       });
       inner.appendChild(gallery);
+    }
+    if (audios.length > 0) {
+      const list = document.createElement("div");
+      list.className = "annotation-label__audios";
+      audios.forEach(({ item }, index) => {
+        const name = item.label || (audios.length > 1 ? `Audio ${index + 1}` : "Audio");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "annotation-label__audio";
+        button.setAttribute("aria-label", `Écouter : ${name} (${data.title})`);
+        button.innerHTML = `${PLAY_ICON}<span class="annotation-label__audio-name"></span>`;
+        button.querySelector(".annotation-label__audio-name")!.textContent = name;
+        if (item.duration) {
+          const time = document.createElement("span");
+          time.className = "annotation-label__audio-time";
+          time.textContent = formatDuration(item.duration);
+          button.appendChild(time);
+        }
+        button.addEventListener("click", () => this.options.onPlayAudio({ ...item, label: name }, data.title));
+        list.appendChild(button);
+      });
+      inner.appendChild(list);
     }
   }
 

@@ -100,6 +100,23 @@ def encode_web_video(video: Path, output: Path) -> tuple[int, int, float]:
     return int(stream["width"]), int(stream["height"]), float(info["format"]["duration"])
 
 
+def encode_web_audio(audio: Path, output: Path) -> float:
+    """Audio d'annotation : AAC mono 96 kb/s dans un .m4a lisible partout (voix, léger).
+
+    Retourne la durée en secondes.
+    """
+    subprocess.run(
+        [require_ffmpeg(), "-y", "-loglevel", "error", "-i", str(audio),
+         "-vn", "-map", "0:a:0", "-ac", "1", "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", str(output)],
+        check=True,
+    )
+    probe = subprocess.run(
+        [require_tool("ffprobe"), "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(output)],
+        check=True, capture_output=True, text=True,
+    )
+    return float(probe.stdout.strip())
+
+
 def extract_poster(video: Path, output: Path, at: float = 0.5, max_size: int = 800) -> tuple[int, int]:
     """Image d'attente d'une vidéo (JPEG)."""
     scale = f"scale='if(gt(iw,ih),min({max_size},iw),-2)':'if(gt(iw,ih),-2,min({max_size},ih))'"

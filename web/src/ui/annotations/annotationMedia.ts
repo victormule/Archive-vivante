@@ -21,5 +21,9 @@ export function annotationMedia(annotation: Annotation): AnnotationMediaEntry[] 
       item: { kind: "pdf", url: document.url, source: document.source, pages: document.pages },
       thumbnail: document.thumbnail ?? null,
     })),
+    ...(annotation.audios ?? []).map((audio): AnnotationMediaEntry => ({
+      item: { kind: "audio", url: audio.url, source: audio.source, duration: audio.duration, label: audio.label },
+      thumbnail: null,
+    })),
   ];
 }

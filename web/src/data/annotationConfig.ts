@@ -20,6 +20,10 @@ export type MediaConfigEntry =
       thumbnail?: string;
       /** PDF : nombre de pages (pastille). */
       pages?: number;
+      /** Audio : nom affiché (« Audio 1 » par défaut). */
+      label?: string;
+      /** Audio : durée en secondes (affichée avant l'écoute). */
+      duration?: number;
     };
 
 export interface AnnotationOverride {
@@ -47,6 +51,7 @@ export const EMPTY_CONFIG: AnnotationConfig = { sessions: {} };
 const IMAGE_EXT = new Set(["jpg", "jpeg", "png", "webp", "gif", "avif"]);
 const VIDEO_EXT = new Set(["mp4", "webm", "mov", "m4v"]);
 const DOCUMENT_EXT = new Set(["pdf"]);
+const AUDIO_EXT = new Set(["m4a", "mp3", "wav", "aac", "ogg", "opus", "flac"]);
 
 type Warn = (message: string) => void;
 
@@ -145,13 +150,17 @@ function resolveMedia(
   const result: AnnotationMediaEntry[] = [];
   for (const entry of entries) {
     const file = typeof entry === "string" ? entry : entry.file;
-    const options: { poster?: string; thumbnail?: string; pages?: number } = typeof entry === "string" ? {} : entry;
+    const options: { poster?: string; thumbnail?: string; pages?: number; label?: string; duration?: number } =
+      typeof entry === "string" ? {} : entry;
     const ext = extension(file);
     const url = resolveConfigUrl(file, base);
     // Média déjà publié par le pipeline : on garde ses dimensions, sa vignette et son nombre de pages
     const published = known.get(url);
     if (published && !options.poster && !options.thumbnail) {
-      result.push(published);
+      const named = published.item.kind === "audio" && (options.label || options.duration)
+        ? { ...published, item: { ...published.item, label: options.label ?? published.item.label, duration: options.duration ?? published.item.duration } }
+        : published;
+      result.push(named);
       continue;
     }
     const source = basename(file);
@@ -168,8 +177,10 @@ function resolveMedia(
       const preview = options.thumbnail ? resolveConfigUrl(options.thumbnail, base) : undefined;
       item = { kind: "pdf", url, source, pages: options.pages };
       thumbnail = preview ? thumbnailImage(preview, source) : null;
+    } else if (AUDIO_EXT.has(ext)) {
+      item = { kind: "audio", url, source, duration: options.duration, label: options.label };
     } else {
-      warn(`${where} : « ${file} » ignoré (formats : ${[...IMAGE_EXT, ...VIDEO_EXT, ...DOCUMENT_EXT].join(", ")})`);
+      warn(`${where} : « ${file} » ignoré (formats : ${[...IMAGE_EXT, ...VIDEO_EXT, ...DOCUMENT_EXT, ...AUDIO_EXT].join(", ")})`);
       continue;
     }
     result.push({ item, thumbnail });

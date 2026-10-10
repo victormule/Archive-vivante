@@ -12,6 +12,19 @@ describe("annotationMedia", () => {
     expect(annotationMedia(base)).toEqual([]);
   });
 
+  it("ajoute les audios après les documents, sans vignette", () => {
+    const entries = annotationMedia({
+      ...base,
+      images: [image("a-1")],
+      audios: [
+        { url: "annotations/a-a1.m4a", duration: 40.7, source: "voix1.m4a" },
+        { url: "annotations/a-a2.m4a", duration: 113.2, label: "Seconde prise", source: "voix2.m4a" },
+      ],
+    });
+    expect(entries.map((e) => e.item.kind)).toEqual(["image", "audio", "audio"]);
+    expect(entries[2]).toEqual({ item: { kind: "audio", url: "annotations/a-a2.m4a", source: "voix2.m4a", duration: 113.2, label: "Seconde prise" }, thumbnail: null });
+  });
+
   it("range les médias : images, vidéos, puis PDF", () => {
     const entries = annotationMedia({
       ...base,

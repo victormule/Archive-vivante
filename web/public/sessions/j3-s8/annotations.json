@@ -1,0 +1,23 @@
+{
+  "annotations": [
+    {
+      "id": "0FCE68E8-8C8A-40A8-8497-BFDF7F610948",
+      "title": "Commentaire dartist",
+      "colorIndex": 18,
+      "text": "Présentation du projet vidéo",
+      "kind": "point",
+      "points": [
+        [
+          0.82822,
+          -1.41985,
+          -4.76178
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T13:21:17Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    }
+  ]
+}

@@ -143,7 +143,7 @@ Voir [pipeline/README.md](pipeline/README.md) pour le détail du format et du re
 }
 ```
 
-- **Médias** : déposer les fichiers dans [web/public/media/](web/public/media) et les citer par leur nom. Une vidéo se lit en boucle, sans le son, au survol et au clic ; un PDF s'ouvre dans la visionneuse. Garder les fichiers légers (images ≲ 1 Mo, vidéos de quelques Mo).
+- **Médias** : déposer les fichiers dans [web/public/media/](web/public/media) et les citer par leur nom. Une vidéo se lit en boucle, sans le son, au survol et au clic ; un PDF s'ouvre dans la visionneuse ; un **audio** (`.m4a`, `.mp3`…) apparaît comme une rangée « ▶ Audio 1 » : au clic un petit lecteur s'ouvre et lit, met la vidéo de la session en pause, et se referme tout seul à la fin (`{ "file": "voix.m4a", "label": "Présentation", "duration": 40 }` pour le nommer). Garder les fichiers légers (images ≲ 1 Mo, vidéos de quelques Mo).
 - **Nouvelles annotations** posées dans dür.air : après le build du pipeline, `.venv/Scripts/python pipeline/sync_annotations_config.py` ajoute leurs entrées au fichier, sans toucher aux réglages existants.
 - **Erreurs** : une coquille (virgule, guillemet) ne casse pas le site, qui garde les valeurs d'origine ; la console du navigateur (F12) dit ce qui ne va pas, y compris une annotation introuvable ou un format de fichier inconnu.
 

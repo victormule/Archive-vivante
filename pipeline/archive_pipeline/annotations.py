@@ -11,7 +11,7 @@ Médias : les images d'une annotation sont associées par son titre, dans
 `media_dir` : `<titre>.<ext>` ou `<titre>-<n>.<ext>` (jpg, jpeg, png, webp).
 Quand les noms de fichiers ne suivent pas les titres, `media` les associe
 explicitement : {titre: [fichiers…]}. Chaque fichier est rangé selon son
-extension : image, vidéo (mp4, mov, m4v, webm) ou document PDF.
+extension : image, vidéo (mp4, mov, m4v, webm), document PDF ou audio (m4a, mp3, wav, aac, ogg, opus, flac, caf).
 
 Une même annotation peut être reposée dans plusieurs sessions (même titre,
 autre emplacement). Le contenu (texte) peut alors être repris d'un export de
@@ -34,6 +34,7 @@ from typing import Any, Iterator
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v", ".webm"}
 DOCUMENT_EXTENSIONS = {".pdf"}
+AUDIO_EXTENSIONS = {".m4a", ".mp3", ".wav", ".aac", ".ogg", ".opus", ".flac", ".caf"}
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,7 @@ class Annotation:
     images: list[Path] = field(default_factory=list)
     videos: list[Path] = field(default_factory=list)
     documents: list[Path] = field(default_factory=list)
+    audios: list[Path] = field(default_factory=list)
     # Fichiers cités par `media` mais absents du disque
     missing_media: list[str] = field(default_factory=list)
     # Vue caméra au moment de l'annotation (exports en dossier uniquement)
@@ -96,10 +98,10 @@ def find_images(media_dir: Path, title: str) -> list[Path]:
     return [p for _, p in sorted(found)]
 
 
-def split_media(files: list[Path]) -> tuple[list[Path], list[Path], list[Path]]:
-    """Fichiers -> (images, vidéos, documents), dans l'ordre donné."""
+def split_media(files: list[Path]) -> tuple[list[Path], list[Path], list[Path], list[Path]]:
+    """Fichiers -> (images, vidéos, documents, audios), dans l'ordre donné."""
     by_kind = lambda extensions: [f for f in files if f.suffix.lower() in extensions]
-    return by_kind(IMAGE_EXTENSIONS), by_kind(VIDEO_EXTENSIONS), by_kind(DOCUMENT_EXTENSIONS)
+    return by_kind(IMAGE_EXTENSIONS), by_kind(VIDEO_EXTENSIONS), by_kind(DOCUMENT_EXTENSIONS), by_kind(AUDIO_EXTENSIONS)
 
 
 def read_titles(source: Path, session_id: str | None = None) -> set[str]:
@@ -136,9 +138,9 @@ def read_annotations(
             names = explicit[title.casefold()]
             files = {name: _media_file(media_dir, name) for name in names}
             missing = [name for name, path in files.items() if path is None]
-            images, videos, documents = split_media([path for path in files.values() if path is not None])
+            images, videos, documents, audios = split_media([path for path in files.values() if path is not None])
         else:
-            images, videos, documents = (find_images(media_dir, title) if media_dir else []), [], []
+            images, videos, documents, audios = (find_images(media_dir, title) if media_dir else []), [], [], []
         result.append(Annotation(
             id=info["id"],
             title=title,
@@ -150,6 +152,7 @@ def read_annotations(
             images=images,
             videos=videos,
             documents=documents,
+            audios=audios,
             missing_media=missing,
             reference_image=_reference_image(folder, info),
         ))

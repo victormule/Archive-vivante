@@ -121,6 +121,24 @@ describe("applyAnnotationConfig", () => {
     expect(media[2].thumbnail).toMatchObject({ url: "/media/nouvelle.png", width: 0 });
   });
 
+  it("media : un fichier son devient un audio, avec nom et durée facultatifs", () => {
+    const out = applyAnnotationConfig("s1", list(), config({
+      s1: { Doc1: { media: ["voix1.m4a", { file: "dossier/voix2.mp3", label: "Seconde prise", duration: 113 }, "photo.jpg"] } },
+    }));
+    const media = out[0].media!;
+    expect(media.map((m) => m.item.kind)).toEqual(["audio", "audio", "image"]);
+    expect(media[0]).toEqual({ item: { kind: "audio", url: "/media/voix1.m4a", source: "voix1.m4a", duration: undefined, label: undefined }, thumbnail: null });
+    expect(media[1].item).toMatchObject({ url: "/dossier/voix2.mp3", label: "Seconde prise", duration: 113 });
+  });
+
+  it("un audio déjà publié repris tel quel garde sa durée, et le nom de la configuration prime", () => {
+    const original = annotation("Doc1", "6C48E8B6-0000", { audios: [{ url: "/sessions/s1/annotations/a-a1.m4a", duration: 40.7, source: "voix.m4a" }] });
+    const out = applyAnnotationConfig("s1", [original], config({
+      s1: { Doc1: { media: [{ file: "sessions/s1/annotations/a-a1.m4a", label: "Présentation" }] } },
+    }));
+    expect(out[0].media![0].item).toMatchObject({ kind: "audio", duration: 40.7, label: "Présentation" });
+  });
+
   it("prévient quand une entrée ne correspond à aucune annotation", () => {
     const warnings: string[] = [];
     applyAnnotationConfig("s1", list(), config({ s1: { "Doc9": { title: "?" } } }), "/", (m) => warnings.push(m));

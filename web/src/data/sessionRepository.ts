@@ -59,6 +59,7 @@ export async function loadAnnotations(manifest: SessionManifest): Promise<Annota
       video.url = resolve(video.url);
       if (video.poster) video.poster.url = resolve(video.poster.url);
     }
+    for (const audio of a.audios ?? []) audio.url = resolve(audio.url);
     for (const document of a.documents ?? []) {
       document.url = resolve(document.url);
       if (document.thumbnail) document.thumbnail.url = resolve(document.thumbnail.url);

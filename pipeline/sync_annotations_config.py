@@ -30,7 +30,7 @@ HELP = {
     "title": "Titre affiché.",
     "color": "Couleur CSS (\"#d99a35\", \"rgb(217,154,53)\", \"orange\") ou numéro de la palette ci-dessous.",
     "text": "Description : un texte, ou une liste de paragraphes.",
-    "media": "Remplace tous les médias, dans cet ordre ([] pour n'en afficher aucun). Image, vidéo (lue en boucle, sans le son) ou PDF. Un nom de fichier seul vient de web/public/media/ ; sinon, chemin depuis web/public/. Vidéo : { \"file\": \"a.mp4\", \"poster\": \"a.jpg\" } ajoute une image d'attente. PDF : { \"file\": \"a.pdf\", \"thumbnail\": \"a.jpg\", \"pages\": 5 } ajoute une vignette.",
+    "media": "Remplace tous les médias, dans cet ordre ([] pour n'en afficher aucun). Image, vidéo (lue en boucle, sans le son), PDF ou audio (m4a, mp3, wav… : une rangée « ▶ Audio 1 » à cliquer ; l'écoute ouvre un petit lecteur qui se ferme à la fin et met la vidéo en pause). Un nom de fichier seul vient de web/public/media/ ; sinon, chemin depuis web/public/. Vidéo : { \"file\": \"a.mp4\", \"poster\": \"a.jpg\" } ajoute une image d'attente. PDF : { \"file\": \"a.pdf\", \"thumbnail\": \"a.jpg\", \"pages\": 5 } ajoute une vignette. Audio : { \"file\": \"voix.m4a\", \"label\": \"Présentation\", \"duration\": 40 } nomme l'audio et affiche sa durée.",
     "hidden": "true : masque l'annotation.",
     "offset": "[x, y, z] : décale l'épingle (mètres, repère de la session, y vers le haut).",
 }
@@ -79,6 +79,11 @@ def media_entries(session_id: str, annotation: dict) -> list:
             entry["thumbnail"] = path(document["thumbnail"]["url"])
         if document.get("pages"):
             entry["pages"] = document["pages"]
+        media.append(entry)
+    for audio in annotation.get("audios", []):
+        entry = {"file": path(audio["url"])}
+        if audio.get("duration"):
+            entry["duration"] = audio["duration"]
         media.append(entry)
     return media
 

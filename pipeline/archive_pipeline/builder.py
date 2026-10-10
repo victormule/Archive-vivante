@@ -26,7 +26,7 @@ from .camera_path import build_camera_path
 from .annotations import read_annotations
 from .export_reader import PhotogrammetryAsset, SessionExport, resolve_dir, resolve_path
 from .gltf import write_glb
-from .media import encode_jpeg, encode_web_image, encode_web_video, extract_audio, extract_poster, render_pdf_thumbnail, transcode_spz
+from .media import encode_jpeg, encode_web_audio, encode_web_image, encode_web_video, extract_audio, extract_poster, render_pdf_thumbnail, transcode_spz
 from .obj import read_mtl_diffuse_map, read_obj
 from .ply import read_ply_vertices, xyz
 from .point_cloud import PointCloud, read_points_bin, read_points_bin_colors, voxel_downsample, write_points_bin
@@ -35,8 +35,8 @@ from .point_cloud import PointCloud, read_points_bin, read_points_bin_colors, vo
 STEPS = ("splat", "mesh", "pointCloud", "playback", "annotations", "registration")
 STEP_DEPENDENCIES = {"pointCloud": {"mesh"}, "playback": {"mesh"}}
 
-# Médias d'annotation produits par le build : <id>-<n>.jpg, <id>-v<n>.mp4/.jpg, <id>-d<n>.pdf/.jpg
-GENERATED_MEDIA = re.compile(r"^[0-9a-f]{8}-[vd]?\d+\.(?:jpg|mp4|pdf)$")
+# Médias d'annotation produits par le build : <id>-<n>.jpg, <id>-v<n>.mp4/.jpg, <id>-d<n>.pdf/.jpg, <id>-a<n>.m4a
+GENERATED_MEDIA = re.compile(r"^[0-9a-f]{8}-[vda]?\d+\.(?:jpg|mp4|pdf|m4a)$")
 
 IDENTITY = [1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1.0]
 
@@ -303,9 +303,9 @@ class SessionBuilder:
         items = []
         for a in annotations:
             published = previous.get(a.id)
-            has_media = bool(a.images or a.videos or a.documents or (cfg.get("reference_images") and a.reference_image))
+            has_media = bool(a.images or a.videos or a.documents or a.audios or (cfg.get("reference_images") and a.reference_image))
             kept = published and (a.missing_media or not has_media) and any(
-                published.get(k) for k in ("images", "videos", "documents")
+                published.get(k) for k in ("images", "videos", "documents", "audios")
             )
             if a.missing_media and not kept:
                 self.log(f"  ! {a.title} : médias absents du disque ({', '.join(a.missing_media)})")
@@ -337,6 +337,11 @@ class SessionBuilder:
                     "thumbnail": {"url": f"annotations/{stem}.jpg", "width": width, "height": height, "source": document.name},
                     "source": document.name,
                 })
+            audios = list(published.get("audios", [])) if kept else []
+            for n, audio in enumerate([] if kept else a.audios, start=1):
+                name = f"{a.id[:8].lower()}-a{n}.m4a"
+                duration = encode_web_audio(audio, media_out / name)
+                audios.append({"url": f"annotations/{name}", "duration": round(duration, 2), "source": audio.name})
             items.append({
                 "id": a.id,
                 "title": a.title,
@@ -351,10 +356,11 @@ class SessionBuilder:
                 "images": images,
                 "videos": videos,
                 "documents": documents,
+                "audios": audios,
             })
         # Ne retire que les fichiers qu'il a lui-même produits (et qui ne servent plus) : les médias
         # ajoutés à la main dans ce dossier (cités par annotations.config.json) restent en place.
-        referenced = {Path(u).name for i in items for m in (*i["images"], *i["videos"], *i["documents"]) for u in _media_urls(m)}
+        referenced = {Path(u).name for i in items for m in (*i["images"], *i["videos"], *i["documents"], *i["audios"]) for u in _media_urls(m)}
         own_ids = {a.id[:8].lower() for a in annotations}
         for file in media_out.iterdir():
             if GENERATED_MEDIA.match(file.name) and file.name[:8] in own_ids and file.name not in referenced:
@@ -363,7 +369,8 @@ class SessionBuilder:
         self.manifest["annotations"] = {"url": "annotations.json", "count": len(items)}
         self.log(
             f"  annotations {len(items)} ({sum(len(i['images']) for i in items)} images, "
-            f"{sum(len(i['videos']) for i in items)} vidéos, {sum(len(i['documents']) for i in items)} PDF)"
+            f"{sum(len(i['videos']) for i in items)} vidéos, {sum(len(i['documents']) for i in items)} PDF, "
+            f"{sum(len(i['audios']) for i in items)} audios)"
         )
 
     def arkit_link(self, session: str) -> tuple[np.ndarray, dict[str, Any]]:

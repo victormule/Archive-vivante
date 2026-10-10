@@ -25,6 +25,7 @@ export interface SessionSceneOptions {
   cameraSmoothing: number;
   insets: () => Insets;
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
+  onPlayAudio: (audio: Extract<MediaItem, { kind: "audio" }>, title: string) => void;
   /** Notifié à chaque changement d'état d'une couche (chargement, progression). */
   onLayerChange: (id: LayerId) => void;
 }
@@ -98,6 +99,7 @@ export class SessionScene {
           occluder: () => this.layerObject("mesh"),
           insets: options.insets,
           onOpenMedia: options.onOpenMedia,
+          onPlayAudio: options.onPlayAudio,
         });
         this.annotations.setOpacity(this.opacity);
         this.annotations.setVisible(this.annotationsVisible);

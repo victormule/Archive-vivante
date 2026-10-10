@@ -144,11 +144,22 @@ export interface AnnotationDocument {
   source: string;
 }
 
-/** Un média d'annotation tel que la visionneuse l'affiche. */
+/** Enregistrement audio d'annotation : écouté au clic, dans un petit lecteur. */
+export interface AnnotationAudio {
+  url: string;
+  /** Durée en secondes. */
+  duration?: number;
+  /** Nom affiché (« Audio 1 » par défaut). */
+  label?: string;
+  source: string;
+}
+
+/** Un média d'annotation tel que l'étiquette et la visionneuse l'affichent. */
 export type MediaItem =
   | { kind: "image"; url: string; source: string }
   | { kind: "video"; url: string; poster?: string; source: string }
-  | { kind: "pdf"; url: string; source: string; pages?: number };
+  | { kind: "pdf"; url: string; source: string; pages?: number }
+  | { kind: "audio"; url: string; source: string; duration?: number; label?: string };
 
 /** Un média d'annotation tel que la visionneuse l'affiche, avec sa vignette (absente : vignette de repli). */
 export interface AnnotationMediaEntry {
@@ -172,6 +183,7 @@ export interface Annotation {
   /** Absents des manifests construits avant l'ajout des vidéos et des PDF. */
   videos?: AnnotationVideo[];
   documents?: AnnotationDocument[];
+  audios?: AnnotationAudio[];
   /** Couleur CSS imposée (annotations.config.json). */
   color?: string;
   /** Médias dans l'ordre voulu (annotations.config.json) : prioritaires sur images / vidéos / documents. */

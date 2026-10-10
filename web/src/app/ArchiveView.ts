@@ -3,6 +3,7 @@ import { loadSessionManifest } from "@/data/sessionRepository";
 import type { CameraView, LayerId, SceneConfig, SessionSummary } from "@/data/types";
 import type { Insets } from "@/ui/annotations/AnnotationOverlay";
 import { formatDayAndTime } from "@/ui/formatTime";
+import { AudioPlayer } from "@/ui/AudioPlayer";
 import { MediaLightbox } from "@/ui/MediaLightbox";
 import { ANNOTATIONS_ITEM, LAYER_ITEMS, type LayerToggleItem, LayerToggles, type ToggleId } from "@/ui/LayerToggles";
 import { PlayerControls } from "@/ui/PlayerControls";
@@ -47,6 +48,7 @@ export class ArchiveView {
   private toggles: LayerToggles | null = null;
   private switcher: SessionSwitcher | null = null;
   private lightbox: MediaLightbox | null = null;
+  private audioPlayer: AudioPlayer | null = null;
   private controls: PlayerControls | null = null;
 
   private readonly scenes = new Map<string, Promise<SessionScene>>();
@@ -92,6 +94,8 @@ export class ArchiveView {
     const loaderBar = this.root.querySelector<HTMLElement>(".loader__bar span")!;
     this.viewer = new SceneViewer({ container: this.stage });
     this.lightbox = new MediaLightbox(this.root);
+    // Écouter un audio d'annotation met la vidéo (replay) en pause
+    this.audioPlayer = new AudioPlayer(this.root, { onStart: () => this.current?.playback?.pause() });
     this.setupSwitcher();
     this.disposers.push(this.viewer.onFrame(() => this.onFrame()));
 
@@ -233,6 +237,7 @@ export class ArchiveView {
     this.controls?.dispose();
     this.toggles?.dispose();
     this.lightbox?.dispose();
+    this.audioPlayer?.dispose();
     for (const p of this.scenes.values()) p.then((s) => s.dispose());
     this.viewer?.dispose();
     this.root.remove();
@@ -251,6 +256,7 @@ export class ArchiveView {
             cameraSmoothing: this.options.cameraSmoothing,
             insets: () => this.overlayInsets(),
             onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title),
+            onPlayAudio: (audio, title) => this.audioPlayer?.open(audio, title),
             onLayerChange: (layerId) => this.refreshToggle(layerId),
           }),
       );
@@ -284,6 +290,7 @@ export class ArchiveView {
 
     // La lecture appartient à la session : on l'arrête avant de partir
     previous.playback?.pause();
+    this.audioPlayer?.close();
     this.deactivate(previous);
     this.activate(next);
     await this.crossfade(next, duration);
@@ -409,6 +416,7 @@ export class ArchiveView {
   private async startPlayback(scene: SessionScene): Promise<void> {
     const playback = scene.playback;
     if (!playback || !this.controls) return;
+    this.audioPlayer?.close();
     const t = playback.state === "ended" ? 0 : playback.currentTime;
     const position = new THREE.Vector3();
     const quaternion = new THREE.Quaternion();
@@ -463,6 +471,7 @@ export class ArchiveView {
         this.viewer.isFlying ||
         this.viewer.mode === "replay" ||
         this.lightbox?.isOpen === true ||
+        this.audioPlayer?.isOpen === true ||
         this.current?.playback?.isPlaying === true,
       onIdle: () => this.startOrbit(),
       onActive: () => this.stopOrbit(),

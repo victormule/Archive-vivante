@@ -230,6 +230,28 @@
         "arkit_session": "4EFC311B",
         "media_dir": "."
       }
+    },
+    {
+      "id": "j3-s8",
+      "title": "Journée 3 — Session 8",
+      "day": 3,
+      "index": 8,
+      "export_dir": "Journee3-session8",
+      "arkit_session": "4B2D039A",
+      "world_transform": {
+        "$comment": "Placé le 2026-10-10 (scène en bande étroite, sans table de repère) : point visé par la vidéo posé sur l'axe de rotation, sol au niveau commun (-1,45 m), tourné de 44,4° pour filmer du côté de la vue d'arrivée.",
+        "matrix": [0.7139909, 0.0, -0.7001549, 0.0, 0.0, 1.0, 0.0, 0.0, 0.7001549, 0.0, 0.7139909, 0.0, 1.3541687, 0.629825, 0.3691527, 1.0]
+      },
+      "playback": {
+        "video_id": "483983F8",
+        "time_offset": 0.0
+      },
+      "annotations": {
+        "$comment": "Annotation « Commentaire dartist » : ses deux annotations vocales (40 s et 1 min 53, métadonnées dans l'export, fichiers son à fournir) s'y rattachent via `media`.",
+        "source": "Journee3-session8",
+        "arkit_session": "4B2D039A",
+        "media_dir": "."
+      }
     }
   ]
 }
