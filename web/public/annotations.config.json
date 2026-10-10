@@ -212,6 +212,32 @@
           "sessions/j3-s6/annotations/2d6bd352-2.jpg"
         ]
       }
+    },
+    "j3-s7": {
+      "14FDC0AF": {
+        "title": "Bon appétit",
+        "color": "#c25a87",
+        "text": "Présentation du protocol.\nPovoir expliquer",
+        "media": []
+      },
+      "4B2C779B": {
+        "title": "Bon appétit",
+        "color": "#c25a87",
+        "text": "",
+        "media": []
+      },
+      "C7693253": {
+        "title": "Bon appétit",
+        "color": "#c25a87",
+        "text": "Faire expérimenter les spectat",
+        "media": []
+      },
+      "Philosophie": {
+        "title": "Philosophie",
+        "color": "#7b5bb5",
+        "text": "",
+        "media": []
+      }
     }
   }
 }

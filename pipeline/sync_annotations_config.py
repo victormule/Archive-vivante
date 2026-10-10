@@ -87,6 +87,12 @@ def main() -> int:
     config = json.loads(CONFIG.read_text(encoding="utf-8")) if CONFIG.exists() else {}
     palette = config.get("palette") or DEFAULT_PALETTE
     sessions = config.setdefault("sessions", {})
+    # Une même annotation reposée dans une autre session garde sa couleur : on reprend celle déjà choisie pour le titre
+    known_colors = {
+        e["title"]: e["color"]
+        for entries in sessions.values() for e in entries.values()
+        if isinstance(e, dict) and e.get("title") and e.get("color")
+    }
 
     index = json.loads((SESSIONS / "index.json").read_text(encoding="utf-8"))["sessions"]
     added = 0
@@ -96,21 +102,27 @@ def main() -> int:
         if not path.exists():
             continue
         entries = sessions.setdefault(session_id, {})
-        for annotation in json.loads(path.read_text(encoding="utf-8"))["annotations"]:
+        published = json.loads(path.read_text(encoding="utf-8"))["annotations"]
+        titles = [a["title"] for a in published]
+        for annotation in published:
             title, short_id = annotation["title"], annotation["id"][:8]
-            if title in entries or any(k.lower() == short_id.lower() for k in entries):
+            # Plusieurs annotations de même titre (ou sans titre) : repérées par leur identifiant
+            key = title if title and titles.count(title) == 1 else short_id
+            if key in entries or any(k.lower() == short_id.lower() for k in entries):
                 continue
             color_index = annotation.get("colorIndex")
             entry = {"title": title}
-            if color_index is not None:
+            if title in known_colors:
+                entry["color"] = known_colors[title]
+            elif color_index is not None:
                 entry["color"] = palette[color_index % len(palette)]
             paragraphs = [p for p in annotation.get("text", "").split("\n\n") if p.strip()]
             # Un seul paragraphe : un simple texte ; plusieurs : une liste ; aucun : un texte vide à remplir
             entry["text"] = paragraphs[0] if len(paragraphs) == 1 else paragraphs or ""
             entry["media"] = media_entries(session_id, annotation)
-            entries[title or short_id] = entry
+            entries[key] = entry
             added += 1
-            print(f"  + {session_id} › {title or short_id}")
+            print(f"  + {session_id} › {key}" + (f"  ({title})" if key != title else ""))
 
     ordered = {"$aide": HELP, "palette": palette, "sessions": sessions}
     ordered.update({k: v for k, v in config.items() if k not in ordered and k != "$aide"})

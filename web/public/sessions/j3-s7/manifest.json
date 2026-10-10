@@ -1,0 +1,141 @@
+{
+  "id": "j3-s7",
+  "title": "Journée 3 — Session 7",
+  "day": 3,
+  "index": 7,
+  "sessionId": "4EFC311B-BAED-42C4-BB0E-43896BB622FE",
+  "startDate": "2026-10-08T14:19:11Z",
+  "endDate": "2026-10-08T14:31:17Z",
+  "author": "Victor Mulé",
+  "layers": {
+    "splat": {
+      "url": "splat.spz",
+      "bytes": 3458748,
+      "count": 150109,
+      "shDegree": 3
+    },
+    "mesh": {
+      "url": "mesh.glb",
+      "bytes": 1381048,
+      "triangles": 24999
+    },
+    "pointCloud": {
+      "url": "points.bin",
+      "bytes": 13303053,
+      "count": 1478117,
+      "voxelSize": 0.01,
+      "boundsMin": [
+        -4.558915964234712,
+        -1.5766085756545403,
+        -8.146755183067599
+      ],
+      "boundsMax": [
+        4.964354841587781,
+        1.4876684454819686,
+        1.7251685385390896
+      ]
+    }
+  },
+  "annotations": {
+    "url": "annotations.json",
+    "count": 4
+  },
+  "alignment": {
+    "reference": "splat",
+    "mesh": {
+      "method": "dür.air alignment matrix",
+      "scale": 2.8211126,
+      "avgErrorToArkit": 0.06749297
+    },
+    "pointCloud": {
+      "method": "icp-point-to-plane",
+      "target": "mesh",
+      "medianResidualBefore": 0.2582,
+      "medianResidualAfter": 0.1824,
+      "inlierRatio": 0.275,
+      "transform": [
+        0.999098,
+        -0.042244,
+        0.004299,
+        0.0,
+        0.042219,
+        0.999092,
+        0.005714,
+        0.0,
+        -0.004537,
+        -0.005528,
+        0.999974,
+        0.0,
+        0.00997,
+        0.178329,
+        -0.004617,
+        1.0
+      ]
+    },
+    "camera": {
+      "method": "robust-pose-pairs",
+      "pairs": 89,
+      "inliers": 84,
+      "medianResidual": 0.0486,
+      "transform": [
+        0.999833,
+        0.01823,
+        -0.001459,
+        0.0,
+        -0.01823,
+        0.999834,
+        0.000367,
+        0.0,
+        0.001466,
+        -0.000341,
+        0.999999,
+        0.0,
+        0.008728,
+        -0.010887,
+        -0.000144,
+        1.0
+      ]
+    },
+    "world": {
+      "reference": null,
+      "method": "calibrated",
+      "note": "Placé le 2026-10-10 : la table ovale de j3-s7 (centre 0,57 ; -3,50 dans son repère) est posée sur la table de j2-s3 (centre 0,19 ; -2,95), plateau à -0,71 m, après une rotation de -60° autour de la verticale (recouvrement des plateaux maximal entre -80° et -50°)."
+    }
+  },
+  "worldTransform": [
+    0.5,
+    0.0,
+    -0.8660254,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.8660254,
+    0.0,
+    0.5,
+    0.0,
+    2.933181,
+    -0.01,
+    -0.6984382,
+    1.0
+  ],
+  "playback": {
+    "audioUrl": "audio.m4a",
+    "cameraPathUrl": "camera_path.json",
+    "duration": 501.7334749698639,
+    "recordedAt": "2026-10-08T14:22:17Z"
+  },
+  "bounds": {
+    "min": [
+      -2.976853,
+      -1.5056062,
+      -7.089676
+    ],
+    "max": [
+      4.361636,
+      0.89682424,
+      0.36218405
+    ]
+  }
+}

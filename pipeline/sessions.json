@@ -207,6 +207,29 @@
           "Element 2": ["element2.jpg", "element2-bis.jpg"]
         }
       }
+    },
+    {
+      "id": "j3-s7",
+      "title": "Journée 3 — Session 7",
+      "day": 3,
+      "index": 7,
+      "export_dir": "Journée 3-session7",
+      "arkit_session": "4EFC311B",
+      "world_transform": {
+        "$comment": "Placé le 2026-10-10 : la table ovale de j3-s7 (centre 0,57 ; -3,50 dans son repère) est posée sur la table de j2-s3 (centre 0,19 ; -2,95), plateau à -0,71 m, après une rotation de -60° autour de la verticale (recouvrement des plateaux maximal entre -80° et -50°).",
+        "matrix": [0.5, 0.0, -0.8660254, 0.0, 0.0, 1.0, 0.0, 0.0, 0.8660254, 0.0, 0.5, 0.0, 2.933181, -0.01, -0.6984382, 1.0]
+      },
+      "playback": {
+        "$comment": "Deux vidéos dans l'export : E12BFA67 (8 min 21, enregistrement principal) et C9107E38 (clip de 5 s, ignoré).",
+        "video_id": "E12BFA67",
+        "time_offset": 0.0
+      },
+      "annotations": {
+        "$comment": "Annotations contenues dans l'export de la session. Trois portent le titre « Bon appétit » : repérées par leur identifiant dans annotations.config.json.",
+        "source": "Journée 3-session7",
+        "arkit_session": "4EFC311B",
+        "media_dir": "."
+      }
     }
   ]
 }

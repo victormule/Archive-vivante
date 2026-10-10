@@ -1,0 +1,80 @@
+{
+  "annotations": [
+    {
+      "id": "14FDC0AF-7956-4F85-A674-5CBF83F78B67",
+      "title": "Bon appétit",
+      "colorIndex": 5,
+      "text": "Présentation du protocol.\nPovoir expliquer",
+      "kind": "point",
+      "points": [
+        [
+          0.89724,
+          -0.65764,
+          -4.46343
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:35:32Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "4B2C779B-F5AD-4E63-932D-18A1D8E62D4F",
+      "title": "Bon appétit",
+      "colorIndex": 5,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          0.27664,
+          -0.70155,
+          -2.70681
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:43:46Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "C7693253-1DE9-4A2C-AFFA-CD7B2B6963D5",
+      "title": "Bon appétit",
+      "colorIndex": 5,
+      "text": "Faire expérimenter les spectat",
+      "kind": "point",
+      "points": [
+        [
+          1.20873,
+          -0.67077,
+          -3.38227
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:39:23Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "7DF376C3-F45F-4153-86EA-860EB85C732C",
+      "title": "Philosophie",
+      "colorIndex": 17,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          0.4414,
+          -0.69892,
+          -3.60027
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-10T11:44:45Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    }
+  ]
+}
