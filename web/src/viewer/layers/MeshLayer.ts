@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from "three-mesh-bvh";
 import type { Layer, ProgressCallback } from "./Layer";
 import { progressRatio } from "./Layer";
 
@@ -15,6 +16,13 @@ export class MeshLayer implements Layer {
 
   async load(onProgress?: ProgressCallback): Promise<void> {
     const gltf = await new GLTFLoader().loadAsync(this.url, progressRatio(onProgress));
+    // Les annotations testent leur occlusion contre ce maillage plusieurs fois par seconde :
+    // un BVH rend chaque lancer de rayon quasi instantané (au lieu de parcourir tous les triangles)
+    gltf.scene.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+      computeBoundsTree.call(o.geometry);
+      o.raycast = acceleratedRaycast;
+    });
     this.object.add(gltf.scene);
     this.setOpacity(this.opacity);
   }
@@ -37,6 +45,7 @@ export class MeshLayer implements Layer {
   dispose(): void {
     this.object.traverse((o) => {
       if (o instanceof THREE.Mesh) {
+        disposeBoundsTree.call(o.geometry);
         o.geometry.dispose();
         const materials = Array.isArray(o.material) ? o.material : [o.material];
         materials.forEach((m: THREE.MeshBasicMaterial) => {

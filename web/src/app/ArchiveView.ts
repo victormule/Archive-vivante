@@ -28,6 +28,10 @@ export interface ArchiveViewOptions {
 
 /** Taille supposée d'une couche dont le manifest n'indique pas le poids. */
 const DEFAULT_LAYER_BYTES = 4e6;
+/** Part de la barre de chargement couverte par les couches ; le reste est la préparation GPU. */
+const LOAD_SHARE = 0.9;
+/** Dans une couche, part du téléchargement ; le décodage (splat, glTF, BVH) complète la couche. */
+const DOWNLOAD_SHARE = 0.9;
 
 const easeInOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
 
@@ -64,6 +68,8 @@ export class ArchiveView {
   private readonly sessionDisposers: Array<() => void> = [];
   private idle: IdleWatcher | null = null;
   private orbit: AutoOrbit | null = null;
+  /** Couches chargées : l'audio de la session courante peut alors être mis en mémoire. */
+  private loaded = false;
 
   constructor(
     container: HTMLElement,
@@ -94,7 +100,18 @@ export class ArchiveView {
 
   async start(initialId: string): Promise<void> {
     const loaderBar = this.root.querySelector<HTMLElement>(".loader__bar span")!;
+    // La barre n'avance jamais à reculons et n'atteint 100 % qu'une fois la scène prête
+    let shown = 0;
+    const setProgress = (ratio: number) => {
+      shown = Math.max(shown, Math.min(1, ratio));
+      loaderBar.style.width = `${(shown * 100).toFixed(1)}%`;
+    };
     this.viewer = new SceneViewer({ container: this.stage });
+    // Scène cachée par l'écran de chargement jusqu'à « is-ready »
+    this.viewer.setSuspended(true);
+    this.viewer.renderer.domElement.addEventListener("webglcontextlost", () => {
+      this.showFatal("L'affichage 3D a été interrompu (mémoire graphique saturée). Rechargez la page.");
+    });
     this.lightbox = new MediaLightbox(this.root);
     // Écouter un audio d'annotation met la vidéo (replay) en pause
     this.audioPlayer = new AudioPlayer(this.root, { onStart: () => this.current?.playback?.pause() });
@@ -115,15 +132,19 @@ export class ArchiveView {
     // Toutes les couches de toutes les sessions, puis préparation GPU :
     // aucune attente ni saccade ensuite, dès le premier changement de session
     try {
-      await this.loadEverything(scenes, scene, (r) => (loaderBar.style.width = `${Math.round(r * 100)}%`));
+      await this.loadEverything(scenes, scene, (r) => setProgress(r * LOAD_SHARE));
+      // Modèles prêts : l'audio de la session courante n'est plus en concurrence avec eux
+      this.loaded = true;
+      this.current?.playback?.preload();
       this.root.querySelector(".loader__label")!.textContent = "Préparation de l'affichage…";
-      await this.warmUp(scenes, scene);
+      await this.warmUp(scenes, scene, (r) => setProgress(LOAD_SHARE + r * (1 - LOAD_SHARE)));
     } catch (err) {
       this.root.querySelector(".loader__label")!.textContent = "Erreur de chargement";
       throw err;
     }
     // Tout est prêt : l'écran d'accueil attend un clic, qui passe aussi en plein écran
     if (!this.options.skipEntry) await this.waitForEntry();
+    this.viewer.setSuspended(false);
     this.root.classList.add("is-ready");
     window.addEventListener("keydown", this.onKeyDown);
     this.disposers.push(() => window.removeEventListener("keydown", this.onKeyDown));
@@ -148,7 +169,12 @@ export class ArchiveView {
     });
   }
 
-  /** Charge toutes les couches ; progression pondérée par le poids des fichiers. */
+  /**
+   * Charge toutes les couches ; progression pondérée par le poids des fichiers.
+   * Une couche n'est comptée entière qu'une fois décodée. Un échec est retenté
+   * une fois ; seul le splat de la session d'arrivée est alors indispensable,
+   * ailleurs le bouton de la couche signale l'erreur.
+   */
   private async loadEverything(scenes: SessionScene[], first: SessionScene, onProgress: (ratio: number) => void): Promise<void> {
     const jobs = [first, ...scenes.filter((s) => s !== first)].flatMap((scene) =>
       LAYER_ITEMS.filter(({ id }) => scene.hasLayer(id)).map(({ id }) => ({
@@ -160,19 +186,24 @@ export class ArchiveView {
     );
     const total = jobs.reduce((sum, j) => sum + j.bytes, 0);
     const report = () => onProgress(jobs.reduce((sum, j) => sum + j.bytes * j.ratio, 0) / total);
-    await Promise.all(
-      jobs.map((job) =>
-        job.scene
-          .loadLayer(job.id, (r) => {
-            job.ratio = r;
-            report();
-          })
-          .then(() => {
-            job.ratio = 1;
-            report();
-          }),
-      ),
-    );
+    const run = async (job: (typeof jobs)[number]) => {
+      const progress = (r: number) => {
+        job.ratio = Math.min(1, r) * DOWNLOAD_SHARE;
+        report();
+      };
+      try {
+        await job.scene.loadLayer(job.id, progress).catch((err) => {
+          console.warn(`Couche ${job.id} de ${job.scene.id} : nouvel essai`, err);
+          return job.scene.loadLayer(job.id, progress);
+        });
+      } catch (err) {
+        if (job.scene === first && job.id === "splat") throw err;
+        console.error(err);
+      }
+      job.ratio = 1;
+      report();
+    };
+    await Promise.all(jobs.map(run));
   }
 
   /**
@@ -181,7 +212,7 @@ export class ArchiveView {
    * superposées) puis opaque. Shaders compilés, textures envoyées, tampons
    * Spark dimensionnés : le premier fondu est aussi fluide que les suivants.
    */
-  private async warmUp(scenes: SessionScene[], current: SessionScene): Promise<void> {
+  private async warmUp(scenes: SessionScene[], current: SessionScene, onProgress: (ratio: number) => void): Promise<void> {
     const show = (scene: SessionScene, opacity: number) => {
       for (const { id } of LAYER_ITEMS) scene.setLayerVisible(id, true);
       scene.setOpacity(opacity);
@@ -196,10 +227,12 @@ export class ArchiveView {
       show(scene, 1);
       await this.viewer.settle();
       scene.setOpacity(0);
+      onProgress((i + 1) / (scenes.length + 1));
     }
     scenes.forEach((s) => this.applyLayerState(s));
     current.setOpacity(1);
     await this.viewer.settle();
+    onProgress(1);
   }
 
   /** Shift+V : copie la vue courante (à coller dans `days.<n>.initial_view` de sessions.json). */
@@ -212,6 +245,15 @@ export class ArchiveView {
       () => this.toast("Vue affichée dans la console"),
     );
   };
+
+  /** Erreur bloquante, affichée par-dessus la scène. */
+  private showFatal(message: string): void {
+    if (this.root.querySelector(".app-error")) return;
+    const el = document.createElement("div");
+    el.className = "app-error";
+    el.textContent = message;
+    this.root.appendChild(el);
+  }
 
   private toast(message: string): void {
     const el = document.createElement("div");
@@ -337,6 +379,7 @@ export class ArchiveView {
     this.root.querySelector(".session__meta")!.textContent = formatDayAndTime(manifest.startDate);
     for (const s of this.sessions) this.switcher?.setState(s.id, s.id === scene.id ? "active" : "idle");
     scene.setAnnotationsVisible(this.annotationsVisible);
+    if (this.loaded) scene.playback?.preload();
     this.setupPlayback(scene);
     LAYER_ITEMS.forEach(({ id }) => this.refreshToggle(id));
 

@@ -15,10 +15,13 @@ export class SplatLayer implements Layer {
   }
 
   async load(onProgress?: ProgressCallback): Promise<void> {
+    // Nouvel essai après un échec : l'ancien splat est libéré
+    this.dispose();
     const mesh = new SplatMesh({ url: this.url, onProgress: progressRatio(onProgress) });
     mesh.opacity = this.opacity;
     this.mesh = mesh;
     this.object.add(mesh);
+    // `initialized` couvre téléchargement et décodage (worker)
     await mesh.initialized;
     onProgress?.(1);
   }
@@ -29,6 +32,9 @@ export class SplatLayer implements Layer {
   }
 
   dispose(): void {
-    this.mesh?.dispose();
+    if (!this.mesh) return;
+    this.object.remove(this.mesh);
+    this.mesh.dispose();
+    this.mesh = null;
   }
 }

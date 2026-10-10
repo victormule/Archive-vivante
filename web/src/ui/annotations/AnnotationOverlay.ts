@@ -79,9 +79,14 @@ export class AnnotationOverlay {
   private readonly pins: Pin[];
   private readonly raycaster = new THREE.Raycaster();
   private readonly projected = new THREE.Vector3();
+  private readonly rayOrigin = new THREE.Vector3();
+  private readonly rayDirection = new THREE.Vector3();
+  private readonly hits: THREE.Intersection[] = [];
   private lastOcclusion = 0;
+  private viewBox = "";
   private _visible = true;
   private inert = false;
+  private opacity = 1;
 
   constructor(private readonly options: AnnotationOverlayOptions) {
     this.element = document.createElement("div");
@@ -90,6 +95,8 @@ export class AnnotationOverlay {
     this.svg.classList.add("annotations__leaders");
     this.svg.setAttribute("aria-hidden", "true");
     this.element.appendChild(this.svg);
+    // Le maillage occultant a un BVH (MeshLayer) : seul le premier impact compte
+    this.raycaster.firstHitOnly = true;
 
     this.pins = options.annotations
       .filter((a) => a.points.length > 0)
@@ -109,6 +116,12 @@ export class AnnotationOverlay {
 
   /** Opacité globale (fondus entre sessions) ; inactif à 0. */
   setOpacity(opacity: number): void {
+    // Réapparition : les étiquettes se replacent d'emblée, l'occlusion est retestée
+    if (this.opacity === 0 && opacity > 0) {
+      for (const pin of this.pins) pin.placed = false;
+      this.lastOcclusion = 0;
+    }
+    this.opacity = opacity;
     this.element.style.setProperty("--session-opacity", String(opacity));
     const inert = opacity < 0.5;
     this.element.classList.toggle("is-inert", inert);
@@ -121,29 +134,33 @@ export class AnnotationOverlay {
 
   /** À appeler à chaque frame, une fois la caméra à jour. */
   update(dt: number): void {
-    if (!this._visible || this.pins.length === 0) return;
+    // Session éteinte (hors fondu) : rien à afficher, aucun calcul
+    if (!this._visible || this.opacity === 0 || this.pins.length === 0) return;
     const { container, camera } = this.options;
     const width = container.clientWidth;
     const height = container.clientHeight;
     if (width === 0 || height === 0) return;
 
-    this.svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    const viewBox = `0 0 ${width} ${height}`;
+    if (viewBox !== this.viewBox) this.svg.setAttribute("viewBox", (this.viewBox = viewBox));
     this.projectAnchors(width, height);
     this.updateOcclusion(camera);
 
+    // Toutes les lectures de mise en page d'abord, les écritures ensuite (pas de reflow par étiquette)
     const insets = this.options.insets();
     const bounds: LayoutBounds = { width, height, ...insets, gap: 8, hysteresis: 0.12 };
     const visible = this.pins.filter((p) => p.visible);
+    const sizes = new Map(visible.map((p) => [p, { width: p.label.offsetWidth, height: p.label.offsetHeight }]));
 
     for (const pin of visible) {
-      if (!pin.hovered && !pin.pinned) pin.collapsedHeight = pin.label.offsetHeight;
+      if (!pin.hovered && !pin.pinned) pin.collapsedHeight = sizes.get(pin)!.height;
     }
     const placements = layoutLabels(
       visible.map((p) => ({
         id: p.data.id,
         anchorX: p.ax,
         anchorY: p.ay,
-        width: p.label.offsetWidth,
+        width: sizes.get(p)!.width,
         height: p.collapsedHeight,
         previousSide: p.side,
       })),
@@ -154,7 +171,7 @@ export class AnnotationOverlay {
     for (const placement of placements) {
       const pin = visible.find((p) => p.data.id === placement.id)!;
       const expanded = pin.hovered || pin.pinned;
-      const labelHeight = pin.label.offsetHeight;
+      const { width: labelWidth, height: labelHeight } = sizes.get(pin)!;
       // Une étiquette dépliée reste entièrement à l'écran
       let targetY = placement.y;
       if (expanded) targetY = Math.max(insets.top, Math.min(targetY, height - insets.bottom - labelHeight));
@@ -172,7 +189,7 @@ export class AnnotationOverlay {
       pin.label.style.transform = `translate3d(${pin.x.toFixed(1)}px, ${pin.y.toFixed(1)}px, 0)`;
 
       // Le fil rejoint le milieu de la ligne de titre, côté intérieur
-      const lx = placement.side === "left" ? pin.x + pin.label.offsetWidth : pin.x;
+      const lx = placement.side === "left" ? pin.x + labelWidth : pin.x;
       const ly = pin.y + Math.min(pin.collapsedHeight, labelHeight) / 2;
       pin.leader.setAttribute("d", leaderPath(pin.ax, pin.ay, lx, ly));
     }
@@ -393,15 +410,16 @@ export class AnnotationOverlay {
     this.lastOcclusion = now;
 
     const occluder = this.options.occluder();
-    const origin = camera.getWorldPosition(new THREE.Vector3());
+    const origin = camera.getWorldPosition(this.rayOrigin);
     for (const pin of this.pins) {
       let occluded = false;
       if (occluder && pin.visible) {
-        const direction = pin.anchor.clone().sub(origin);
+        const direction = this.rayDirection.subVectors(pin.anchor, origin);
         const distance = direction.length();
         this.raycaster.set(origin, direction.normalize());
         this.raycaster.far = distance - 0.05;
-        occluded = this.raycaster.intersectObject(occluder, true).length > 0;
+        this.hits.length = 0;
+        occluded = this.raycaster.intersectObject(occluder, true, this.hits).length > 0;
       }
       if (occluded !== pin.occluded) {
         pin.occluded = occluded;

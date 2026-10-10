@@ -48,6 +48,9 @@ export class App {
   }
 
   private showError(message: string): void {
+    // L'écran de chargement (centré lui aussi) s'efface devant le message ; le rendu s'arrête
+    this.view?.dispose();
+    this.view = null;
     const el = document.createElement("div");
     el.className = "app-error";
     el.textContent = message;

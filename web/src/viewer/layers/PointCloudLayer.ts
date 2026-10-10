@@ -63,22 +63,22 @@ export class PointCloudLayer implements Layer {
 async function fetchWithProgress(url: string, onProgress?: ProgressCallback): Promise<ArrayBuffer> {
   const res = await fetch(url);
   if (!res.ok || !res.body) throw new Error(`Chargement impossible : ${url} (${res.status})`);
-  const total = Number(res.headers.get("Content-Length")) || 0;
+  // Taille connue (fichier non compressé) : écriture directe dans le tampon final, sans copie
+  const total = res.headers.has("Content-Encoding") ? 0 : Number(res.headers.get("Content-Length")) || 0;
   const reader = res.body.getReader();
-  const chunks: Uint8Array[] = [];
+  let buffer = new Uint8Array(total || 1 << 20);
   let loaded = 0;
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
-    chunks.push(value);
+    if (loaded + value.length > buffer.length) {
+      const grown = new Uint8Array(Math.max(buffer.length * 2, loaded + value.length));
+      grown.set(buffer.subarray(0, loaded));
+      buffer = grown;
+    }
+    buffer.set(value, loaded);
     loaded += value.length;
-    if (total) onProgress?.(loaded / total);
+    if (total) onProgress?.(Math.min(1, loaded / total));
   }
-  const out = new Uint8Array(loaded);
-  let offset = 0;
-  for (const c of chunks) {
-    out.set(c, offset);
-    offset += c.length;
-  }
-  return out.buffer;
+  return loaded === buffer.length ? buffer.buffer : buffer.slice(0, loaded).buffer;
 }

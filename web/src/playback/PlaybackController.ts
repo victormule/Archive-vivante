@@ -20,7 +20,8 @@ export class PlaybackController {
 
   constructor(src: string, readonly duration: number) {
     this.audio = new Audio(src);
-    this.audio.preload = "auto";
+    // Métadonnées seulement : l'audio complet n'est chargé que pour la session affichée (preload)
+    this.audio.preload = "metadata";
 
     this.audio.addEventListener("play", () => this.setState("playing"));
     this.audio.addEventListener("pause", () => {
@@ -48,6 +49,11 @@ export class PlaybackController {
       this.anchorMediaTime + ((performance.now() - this.anchorWallTime) / 1000) * this.audio.playbackRate;
     // L'extrapolation ne doit jamais s'éloigner de l'audio réel
     return Math.min(Math.max(extrapolated, media), media + 0.3, this.duration);
+  }
+
+  /** Met l'audio en mémoire à l'avance (session affichée). */
+  preload(): void {
+    this.audio.preload = "auto";
   }
 
   async play(): Promise<void> {

@@ -38,6 +38,9 @@ export class SceneViewer {
   /** Contenu splat modifié : mises à jour Spark forcées jusqu'à ce que l'affichage suive. */
   private splatsDirty = false;
   private splatUpdatePending = false;
+  /** Scène masquée (écran de chargement) : seules les attentes de `settle()` font rendre. */
+  private suspended = false;
+  private readonly settleWaiters = new Set<(rendered: boolean) => void>();
 
   private readonly container: HTMLElement;
   private readonly resizeObserver: ResizeObserver;
@@ -88,6 +91,14 @@ export class SceneViewer {
 
   get mode(): CameraMode {
     return this._mode;
+  }
+
+  /**
+   * Suspend le rendu tant que la scène est cachée : chaque image rendue pour
+   * rien (millions de points) prend le GPU au tri Spark et aux compilations.
+   */
+  setSuspended(suspended: boolean): void {
+    this.suspended = suspended;
   }
 
   /** Place la caméra sur une pose monde ; l'orbite la reprendra à la prochaine interaction. */
@@ -211,14 +222,15 @@ export class SceneViewer {
     return new Promise((resolve) => {
       let frames = 0;
       const start = performance.now();
-      const off = this.onCameraUpdated(() => {
-        frames += 1;
+      const check = (rendered: boolean) => {
+        if (rendered) frames += 1;
         const stable = !this.splatsDirty && !this.spark.sorting;
         if (frames > minFrames && (stable || performance.now() - start > timeout)) {
-          off();
+          this.settleWaiters.delete(check);
           resolve();
         }
-      });
+      };
+      this.settleWaiters.add(check);
     });
   }
 
@@ -252,6 +264,11 @@ export class SceneViewer {
     if (this._mode === "free" && this.orbitSynced && !this.flight) this.controls.update();
     this.camera.updateMatrixWorld();
     this.cameraCallbacks.forEach((cb) => cb(dt));
+    // Scène cachée : on ne rend que pour une préparation en cours, et pas pendant un tri Spark
+    if (this.suspended && (this.settleWaiters.size === 0 || this.splatUpdatePending)) {
+      this.settleWaiters.forEach((check) => check(false));
+      return;
+    }
     if (this.splatsDirty && !this.splatUpdatePending) {
       this.splatUpdatePending = true;
       this.spark
@@ -263,6 +280,7 @@ export class SceneViewer {
         .finally(() => (this.splatUpdatePending = false));
     }
     this.renderer.render(this.scene, this.camera);
+    this.settleWaiters.forEach((check) => check(true));
   }
 
   /** L'affichage Spark montre-t-il exactement les SplatMesh visibles ? (champs internes de Spark) */
