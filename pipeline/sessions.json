@@ -303,7 +303,7 @@
         "export_dir": "Event/Journee4-event-9-video",
         "skip_videos": ["73A1CAA5"],
         "camera_smoothing": 2.0,
-        "$corrections": "Décalages (m, repère de l'Event) du trajet aux instants t (s de la bande son), interpolés : les poses temps réel d'ARKit ont dérivé par rapport à la carte LiDAR finale. Mesurés le 2026-10-10 en comparant des images de la vidéo aux rendus de la photogrammétrie (planches de décalages) : capture 1 (0-13 min) juste ; capture 5, cour extérieure (14-29 min) : 0,75 m / 1,1 m ; capture 4, salle des costumes (32-48 min) : 0,25 m. Hauteur (2026-10-11) : de 44:50 à 45:10, la caméra remonte de 0,5 m et y reste jusqu'à la fin, sinon elle filme à 25-65 cm du sol.",
+        "$corrections": "Décalages (m, repère de l'Event) du trajet aux instants t (s de la bande son), interpolés : les poses temps réel d'ARKit ont dérivé par rapport à la carte LiDAR finale. Mesurés le 2026-10-10 en comparant des images de la vidéo aux rendus de la photogrammétrie (planches de décalages) : capture 1 (0-13 min) juste ; capture 5, cour extérieure (14-29 min) : 0,75 m / 1,1 m ; capture 4, salle des costumes (32-48 min) : 0,25 m. Hauteur (2026-10-11) : de 44:50 à 45:10, la caméra remonte de 0,8 m (0,5 m, puis 30 cm de plus à la demande) et y reste jusqu'à la fin, sinon elle filme à 25-65 cm du sol.",
         "corrections": [
           { "t": 0, "offset": [0.0, 0.0, 0.0] },
           { "t": 792, "offset": [0.0, 0.0, 0.0] },
@@ -311,8 +311,8 @@
           { "t": 1746, "offset": [-0.75, 0.0, -1.1] },
           { "t": 1938, "offset": [-0.25, 0.0, 0.0] },
           { "t": 2690, "offset": [-0.25, 0.0, 0.0] },
-          { "t": 2710, "offset": [-0.25, 0.5, 0.0] },
-          { "t": 2930, "offset": [-0.25, 0.5, 0.0] }
+          { "t": 2710, "offset": [-0.25, 0.8, 0.0] },
+          { "t": 2930, "offset": [-0.25, 0.8, 0.0] }
         ]
       }
     }
