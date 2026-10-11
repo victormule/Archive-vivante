@@ -7,50 +7,59 @@
     "text": "Description : un texte, ou une liste de paragraphes.",
     "media": "Remplace tous les médias, dans cet ordre ([] pour n'en afficher aucun). Image, vidéo (lue en boucle, sans le son), PDF ou audio (m4a, mp3, wav… : une rangée « ▶ Audio 1 » à cliquer ; l'écoute ouvre un petit lecteur qui se ferme à la fin et met la vidéo en pause). Un nom de fichier seul vient de web/public/media/ ; sinon, chemin depuis web/public/. Vidéo : { \"file\": \"a.mp4\", \"poster\": \"a.jpg\" } ajoute une image d'attente. PDF : { \"file\": \"a.pdf\", \"thumbnail\": \"a.jpg\", \"pages\": 5 } ajoute une vignette. Audio : { \"file\": \"voix.m4a\", \"label\": \"Présentation\", \"duration\": 40 } nomme l'audio et affiche sa durée.",
     "hidden": "true : masque l'annotation.",
-    "offset": "[x, y, z] : décale l'épingle (mètres, repère de la session, y vers le haut)."
+    "offset": "[x, y, z] : décale l'épingle (mètres, repère de la session, y vers le haut).",
+    "numerotation": "Le numéro précède le titre (« 12 · Premiers essais »). Il suit l’ordre des sessions ; un même document présent dans deux sessions (j1-s1 et j1-s2) garde le même numéro."
   },
-  "palette": ["#4f9066", "#d99a35", "#3f74b5", "#7b5bb5", "#c25a87", "#3e8f93", "#b8613a"],
+  "palette": [
+    "#4f9066",
+    "#d99a35",
+    "#3f74b5",
+    "#7b5bb5",
+    "#c25a87",
+    "#3e8f93",
+    "#b8613a"
+  ],
   "sessions": {
     "j1-s1": {
       "Doc1": {
-        "title": "Doc1",
+        "title": "1 · Groupes de travail",
         "color": "#4f9066",
-        "text": "Création de groupes de travail.",
+        "text": "Constitution des groupes de travail.",
         "media": [
           "sessions/j1-s1/annotations/6c48e8b6-1.jpg"
         ]
       },
       "Doc2": {
-        "title": "Doc2",
+        "title": "2 · Carte mentale",
         "color": "#d99a35",
-        "text": "Carte mentale.\nAxe de travail pour la réalisation du happening. Premières idées clefs.",
+        "text": "Carte mentale définissant l’axe de travail pour la réalisation du happening, avec les premières idées clés.",
         "media": [
           "sessions/j1-s1/annotations/103ebf36-1.jpg"
         ]
       },
       "Doc3": {
-        "title": "Doc3",
+        "title": "3 · Travail textile, groupe A",
         "color": "#3f74b5",
-        "text": "Ébauche du travail de textile, groupe A.\nFormes et couleurs.",
+        "text": "Ébauche du travail textile du groupe A : formes et couleurs.",
         "media": [
           "sessions/j1-s1/annotations/fcbeae2e-1.jpg"
         ]
       },
       "Doc4": {
-        "title": "Doc4",
+        "title": "4 · Documentation du workshop",
         "color": "#7b5bb5",
-        "text": "Documentation générale du workshop. Listing des projets. Organisation.",
+        "text": "Documentation générale du workshop : liste des projets et organisation.",
         "media": [
           "sessions/j1-s1/annotations/8dc3fea8-1.jpg",
           "sessions/j1-s1/annotations/8dc3fea8-2.jpg"
         ]
       },
       "Doc5": {
-        "title": "Doc5",
+        "title": "5 · Projet du groupe B",
         "color": "#c25a87",
         "text": [
-          "Élaboration du projet - groupe B.",
-          "Utilisation du papier craft / café / photographie"
+          "Élaboration du projet du groupe B.",
+          "Matériaux utilisés : papier kraft, café et photographie."
         ],
         "media": [
           "sessions/j1-s1/annotations/be9c133f-1.jpg"
@@ -59,44 +68,44 @@
     },
     "j1-s2": {
       "Doc1": {
-        "title": "Doc1",
+        "title": "1 · Groupes de travail",
         "color": "#4f9066",
-        "text": "Création de groupes de travail.",
+        "text": "Constitution des groupes de travail.",
         "media": [
           "sessions/j1-s2/annotations/cc715a63-1.jpg"
         ]
       },
       "Doc2": {
-        "title": "Doc2",
+        "title": "2 · Carte mentale",
         "color": "#d99a35",
-        "text": "Carte mentale.\nAxe de travail pour la réalisation du happening. Premières idées clefs.",
+        "text": "Carte mentale définissant l’axe de travail pour la réalisation du happening, avec les premières idées clés.",
         "media": [
           "sessions/j1-s2/annotations/c5ef1735-1.jpg"
         ]
       },
       "Doc3": {
-        "title": "Doc3",
+        "title": "3 · Travail textile, groupe A",
         "color": "#3f74b5",
-        "text": "Ébauche du travail de textile, groupe A.\nFormes et couleurs.",
+        "text": "Ébauche du travail textile du groupe A : formes et couleurs.",
         "media": [
           "sessions/j1-s2/annotations/725137db-1.jpg"
         ]
       },
       "Doc4": {
-        "title": "Doc4",
+        "title": "4 · Documentation du workshop",
         "color": "#7b5bb5",
-        "text": "Documentation générale du workshop. Listing des projets. Organisation.",
+        "text": "Documentation générale du workshop : liste des projets et organisation.",
         "media": [
           "sessions/j1-s2/annotations/f2f0da75-1.jpg",
           "sessions/j1-s2/annotations/f2f0da75-2.jpg"
         ]
       },
       "Doc5": {
-        "title": "Doc5",
+        "title": "5 · Projet du groupe B",
         "color": "#c25a87",
         "text": [
-          "Élaboration du projet - groupe B.",
-          "Utilisation du papier craft / café / photographie"
+          "Élaboration du projet du groupe B.",
+          "Matériaux utilisés : papier kraft, café et photographie."
         ],
         "media": [
           "sessions/j1-s2/annotations/bcf07cb5-1.jpg"
@@ -105,36 +114,33 @@
     },
     "j2-s3": {
       "Bon appétit": {
-        "title": "Bon appétit",
+        "title": "6 · Bon appétit",
         "color": "#c25a87",
-        "text": "Papier craft et café sur grand format",
+        "text": "Papier kraft et café, sur grand format.",
         "media": [
           "sessions/j2-s3/annotations/81799646-1.jpg"
         ]
       },
       "Le golem": {
-        "title": "Le golem",
+        "title": "7 · Le golem",
         "color": "#b8613a",
-        "text": [
-          "Préparation de la structure porteuse. Bois/branchage",
-          "Préparation de la structure porteuse. Bois/branchage"
-        ],
+        "text": "Préparation de la structure porteuse, en bois et en branchages.",
         "media": [
           "sessions/j2-s3/annotations/71fa26a8-1.jpg"
         ]
       },
       "Tissage": {
-        "title": "Tissage",
+        "title": "8 · Tissage",
         "color": "#3f74b5",
-        "text": "Au début, toile en préparation. Dimension du lieu par rapport au processus.",
+        "text": "Toile en préparation au début de la session. Question de la dimension du lieu par rapport au processus.",
         "media": [
           "sessions/j2-s3/annotations/03fec37d-1.jpg"
         ]
       },
       "À la prochaine": {
-        "title": "À la prochaine",
+        "title": "9 · À la prochaine",
         "color": "#d99a35",
-        "text": "Archive poetiqué, inhumation de l’archive",
+        "text": "Archive poétique : inhumation de l’archive.",
         "media": [
           "sessions/j2-s3/annotations/815463ca-1.jpg"
         ]
@@ -142,7 +148,7 @@
     },
     "j2-s4": {
       "Doc1-carnet de recherche": {
-        "title": "Bon appétit - Carnet de recherche",
+        "title": "10 · Bon appétit, carnet de recherche",
         "color": "#c25a87",
         "text": "",
         "media": [
@@ -152,25 +158,32 @@
         ]
       },
       "Experimentation": {
-        "title": "Experimentation",
+        "title": "11 · Expérimentation",
         "color": "#c25a87",
-        "text": "Teste pour une utilisation du café et du savon sur papier - élaboration d’un protocole.",
+        "text": "Tests d’utilisation du café et du savon sur papier ; élaboration d’un protocole.",
         "media": [
-          { "file": "sessions/j2-s4/annotations/37580959-v1.mp4", "poster": "sessions/j2-s4/annotations/37580959-v1.jpg" }
+          {
+            "file": "sessions/j2-s4/annotations/37580959-v1.mp4",
+            "poster": "sessions/j2-s4/annotations/37580959-v1.jpg"
+          }
         ]
       },
       "Premiers essais": {
-        "title": "Premiers essais",
+        "title": "12 · Premiers essais",
         "color": "#c25a87",
-        "text": "Papier craft ou papier blanc?",
+        "text": "Papier kraft ou papier blanc ?",
         "media": [
-          { "file": "sessions/j2-s4/annotations/frame_0061.jpg", "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg", "pages": 5 }
+          {
+            "file": "sessions/j2-s4/annotations/frame_0061.jpg",
+            "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg",
+            "pages": 5
+          }
         ]
       }
     },
     "j2-s5": {
       "Résultat de la deuxième journée": {
-        "title": "Résultat de la deuxième journée",
+        "title": "13 · Résultat de la deuxième journée",
         "color": "#c25a87",
         "text": "",
         "media": [
@@ -178,35 +191,39 @@
         ]
       },
       "Rédaction du projet": {
-        "title": "Rédaction du projet",
+        "title": "14 · Rédaction du projet",
         "color": "#c25a87",
-        "text": "Rédaction d’un protocol de recherche.\nSimulation /preparation en vue de la présentation.",
+        "text": "Rédaction d’un protocole de recherche.\nSimulation et préparation en vue de la présentation.",
         "media": [
-          { "file": "sessions/j2-s5/annotations/2b83b87e-d1.pdf", "thumbnail": "sessions/j2-s5/annotations/2b83b87e-d1.jpg", "pages": 5 }
+          {
+            "file": "sessions/j2-s5/annotations/2b83b87e-d1.pdf",
+            "thumbnail": "sessions/j2-s5/annotations/2b83b87e-d1.jpg",
+            "pages": 5
+          }
         ]
       }
     },
     "j3-s6": {
       "Element 1": {
-        "title": "Element 1",
+        "title": "15 · Élément 1",
         "color": "#4f9066",
-        "text": "Maille tricote",
+        "text": "Maille tricotée.",
         "media": [
           "sessions/j3-s6/annotations/d955242a-1.jpg"
         ]
       },
       "Element 2": {
-        "title": "Element 2",
+        "title": "16 · Élément 2",
         "color": "#d99a35",
-        "text": "Maille tricote",
+        "text": "Maille tricotée.",
         "media": [
           "sessions/j3-s6/annotations/f8338aa7-1.jpg"
         ]
       },
       "Technique": {
-        "title": "Technique",
+        "title": "17 · Technique de tricot",
         "color": "#3f74b5",
-        "text": "Tricot de maille avec une grosse laine",
+        "text": "Tricot en mailles, avec une grosse laine.",
         "media": [
           "sessions/j3-s6/annotations/2d6bd352-1.jpg",
           "sessions/j3-s6/annotations/2d6bd352-2.jpg"
@@ -215,25 +232,25 @@
     },
     "j3-s7": {
       "14FDC0AF": {
-        "title": "Bon appétit",
+        "title": "18 · Bon appétit",
         "color": "#c25a87",
-        "text": "Présentation du protocol.\nPovoir expliquer",
+        "text": "Présentation du protocole.\nPouvoir l’expliquer.",
         "media": []
       },
       "4B2C779B": {
-        "title": "Bon appétit",
+        "title": "19 · Bon appétit",
         "color": "#c25a87",
         "text": "",
         "media": []
       },
       "C7693253": {
-        "title": "Bon appétit",
+        "title": "20 · Bon appétit",
         "color": "#c25a87",
-        "text": "Faire expérimenter les spectat",
+        "text": "Faire expérimenter les spectateurs.",
         "media": []
       },
       "Philosophie": {
-        "title": "Philosophie",
+        "title": "21 · Philosophie",
         "color": "#7b5bb5",
         "text": "",
         "media": []
@@ -241,35 +258,35 @@
     },
     "j3-s8": {
       "Commentaire dartist": {
-        "title": "Commentaire dartist",
+        "title": "22 · Commentaire d’artiste",
         "color": "#c25a87",
-        "text": "Présentation du projet vidéo",
+        "text": "Présentation du projet vidéo.",
         "media": []
       }
     },
     "j3-s9": {
       "Corps du golem": {
-        "title": "Corps du golem",
+        "title": "23 · Corps du golem",
         "color": "#3e8f93",
-        "text": "Modélisation en carton papier, ruban adhésif",
+        "text": "Modélisation en carton, papier et ruban adhésif.",
         "media": []
       },
       "Jambe du golem": {
-        "title": "Jambe du golem",
+        "title": "24 · Jambe du golem",
         "color": "#b8613a",
-        "text": "Carton, ruban adhésif",
+        "text": "Carton et ruban adhésif.",
         "media": []
       },
       "Pieds du golem": {
-        "title": "Pieds du golem",
+        "title": "25 · Pieds du golem",
         "color": "#4f9066",
-        "text": "Bascket, bois, sangle, carton",
+        "text": "Basket, bois, sangle et carton.",
         "media": []
       },
       "Tête du golem": {
-        "title": "Tête du golem",
+        "title": "26 · Tête du golem",
         "color": "#d99a35",
-        "text": "Carton /papier mousse polyuréthane",
+        "text": "Carton, papier et mousse polyuréthane.",
         "media": []
       }
     }
