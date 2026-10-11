@@ -24,11 +24,7 @@ interface Flight {
   resolve: (completed: boolean) => void;
 }
 
-/**
- * Viewer three.js + Spark partagé par toutes les sessions : rendu, caméra,
- * navigation libre (OrbitControls) et mode replay piloté de l'extérieur.
- * Le contenu (couches de chaque session) est ajouté à `scene` par les sessions.
- */
+/** Viewer three.js + Spark partagé par toutes les sessions, qui ajoutent leur contenu à `scene`. */
 export class SceneViewer {
   readonly scene = new THREE.Scene();
   readonly camera: THREE.PerspectiveCamera;
@@ -101,7 +97,6 @@ export class SceneViewer {
     this.suspended = suspended;
   }
 
-  /** Place la caméra sur une pose monde ; l'orbite la reprendra à la prochaine interaction. */
   setPose(position: THREE.Vector3, quaternion: THREE.Quaternion): void {
     this.camera.position.copy(position);
     this.camera.quaternion.copy(quaternion);
@@ -109,7 +104,6 @@ export class SceneViewer {
     this.pendingTarget = null;
   }
 
-  /** Applique une vue enregistrée (pose exacte + pivot de l'orbite). */
   setView(view: CameraView): void {
     if (view.fovY) this.setFov(view.fovY);
     this.camera.position.set(...view.position);
@@ -134,10 +128,7 @@ export class SceneViewer {
     };
   }
 
-  /**
-   * Vol de caméra vers une pose (mouvement lent, accéléré puis freiné).
-   * Résout `true` à l'arrivée, `false` s'il est interrompu.
-   */
+  /** `duration` en secondes. Résout `true` à l'arrivée, `false` si le vol est interrompu. */
   flyTo(position: THREE.Vector3, quaternion: THREE.Quaternion, duration: number): Promise<boolean> {
     this.cancelFlight();
     return new Promise((resolve) => {
@@ -161,7 +152,7 @@ export class SceneViewer {
     flight?.resolve(false);
   }
 
-  /** Durée de vol (s) adaptée à la distance et à la rotation à parcourir. */
+  /** Secondes, selon la distance et la rotation à parcourir. */
   flightDuration(position: THREE.Vector3, quaternion: THREE.Quaternion): number {
     const distance = this.camera.position.distanceTo(position);
     const angle = this.camera.quaternion.angleTo(quaternion);
@@ -183,14 +174,13 @@ export class SceneViewer {
    * Place le pivot de l'orbite devant la caméra, sans la déplacer.
    * OrbitControls impose le "up" monde : le roulis éventuel est annulé.
    */
-  retargetOrbit(): void {
+  private retargetOrbit(): void {
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
     this.controls.target.copy(this.camera.position).addScaledVector(forward, ORBIT_TARGET_DISTANCE);
     this.controls.update();
     this.orbitSynced = true;
   }
 
-  /** Cadre une boîte englobante (vue par défaut sans replay). */
   frameBox(box: THREE.Box3): void {
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3()).length();

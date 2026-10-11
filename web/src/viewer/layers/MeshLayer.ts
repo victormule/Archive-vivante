@@ -4,7 +4,6 @@ import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from "three-
 import type { Layer, ProgressCallback } from "./Layer";
 import { progressRatio } from "./Layer";
 
-/** Maillage photogrammétrique texturé (glTF, matériau unlit). */
 export class MeshLayer implements Layer {
   readonly id = "mesh" as const;
   readonly object = new THREE.Group();

@@ -3,9 +3,7 @@ import { ContributionSource } from "@/contrib/live";
 import type { Contribution } from "@/contrib/types";
 import type { MediaItem } from "@/data/types";
 
-/** Contributions chargées d'un coup (puis « Plus anciennes »). */
 const PAGE = 30;
-/** Choix ouvert / fermé du visiteur, conservé d'une visite à l'autre. */
 const OPEN_KEY = "archive.feed.open";
 /** Sans choix enregistré, le volet s'ouvre sur grand écran seulement. */
 const WIDE_SCREEN = "(min-width: 900px)";
@@ -16,11 +14,7 @@ export interface ContributionFeedOptions {
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
 }
 
-/**
- * Volet rétractable, à droite : les contributions du public (formulaire
- * /participer/), de la plus récente à la plus ancienne, mises à jour en
- * temps réel. N'existe que sur l'Event ; ailleurs l'abonnement est coupé.
- */
+/** Contributions du public, en temps réel ; sur l'Event seulement, ailleurs l'abonnement est coupé. */
 export class ContributionFeed {
   readonly element: HTMLElement;
   private readonly body: HTMLElement;
@@ -78,7 +72,6 @@ export class ContributionFeed {
     return this.available && this.open;
   }
 
-  /** Volet présent (Event) ou non : l'abonnement temps réel ne vit que pendant sa présence. */
   setAvailable(available: boolean): void {
     if (available === this.available) return;
     this.available = available;
@@ -305,10 +298,8 @@ export class ContributionFeed {
 const HOVER_DELAY = 150;
 
 /**
- * Vidéo lue en boucle, muette, sur sa vignette tant qu'elle est survolée (ou
- * qu'elle a le focus clavier). L'élément vidéo n'existe que pendant la lecture :
- * il est retiré au départ de la souris, ce qui coupe aussi le téléchargement.
- * Au toucher, il n'y a pas de survol : un appui ouvre la visionneuse.
+ * L'élément vidéo n'existe que pendant le survol (ou le focus clavier) : le retirer coupe aussi le
+ * téléchargement. Au toucher, pas de survol : un appui ouvre la visionneuse.
  */
 function attachHoverPlayback(button: HTMLElement, url: string): void {
   let video: HTMLVideoElement | null = null;
@@ -354,7 +345,6 @@ function attachHoverPlayback(button: HTMLElement, url: string): void {
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
-/** « à l'instant », « il y a 5 min », « il y a 2 h », puis la date. */
 export function relativeTime(iso: string, now = Date.now()): string {
   const seconds = Math.max(0, (now - Date.parse(iso)) / 1000);
   if (seconds < 60) return "à l'instant";

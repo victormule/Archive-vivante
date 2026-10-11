@@ -11,11 +11,9 @@ export interface Contribution {
   media_height: number | null;
 }
 
-/** Média prêt à l'envoi, déjà compressé. */
 export interface PreparedMedia {
   kind: "image" | "video";
   blob: Blob;
-  /** Extension du fichier principal (webp, jpg, mp4, webm). */
   ext: string;
   thumb: Blob;
   thumbExt: string;

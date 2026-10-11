@@ -1,26 +1,15 @@
 import { annotationMedia } from "@/ui/annotations/annotationMedia";
 import type { Annotation, AnnotationImage, AnnotationMediaEntry, MediaItem, Vec3 } from "./types";
 
-/**
- * Configuration éditoriale des annotations : `public/annotations.config.json`.
- *
- * Lue par le site au chargement, par-dessus les annotations produites par le
- * pipeline (qui restent intactes). Tout est optionnel : une annotation absente
- * du fichier, ou un champ absent, garde sa valeur d'origine.
- */
+/** `public/annotations.config.json` : réglages éditoriaux lus au chargement, par-dessus les annotations du pipeline. Tout est optionnel. */
 
-/** Un média : un nom de fichier, ou un objet quand on veut préciser la vignette. */
 export type MediaConfigEntry =
   | string
   | {
       file: string;
-      /** Vidéo : image d'attente. */
       poster?: string;
-      /** PDF : image de la première page. */
       thumbnail?: string;
-      /** PDF : nombre de pages (pastille). */
       pages?: number;
-      /** Audio : nom affiché (« Audio 1 » par défaut). */
       label?: string;
       /** Audio : durée en secondes (affichée avant l'écoute). */
       duration?: number;
@@ -40,7 +29,6 @@ export interface AnnotationOverride {
 }
 
 export interface AnnotationConfig {
-  /** Couleurs numérotées (le numéro est celui des annotations, par titre). */
   palette?: string[];
   /** session -> (titre d'origine de l'annotation, ou 8 premiers caractères de son id) -> réglages. */
   sessions: Record<string, Record<string, AnnotationOverride>>;
@@ -188,10 +176,6 @@ function resolveMedia(
   return result;
 }
 
-/**
- * Applique la configuration d'une session à ses annotations (sans modifier les originales).
- * `base` : préfixe des URLs du site (`import.meta.env.BASE_URL`).
- */
 export function applyAnnotationConfig(
   sessionId: string,
   annotations: Annotation[],
@@ -243,7 +227,6 @@ export function applyAnnotationConfig(
   return result;
 }
 
-/** Palette personnalisée : la couleur numérotée de l'annotation (les couleurs par défaut sinon). */
 function applyPalette(annotation: Annotation, config: AnnotationConfig): Annotation {
   const { palette } = config;
   if (!palette || palette.length === 0 || annotation.color || annotation.colorIndex == null) return annotation;

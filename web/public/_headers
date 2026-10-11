@@ -1,3 +1,17 @@
-# Cloudflare Pages : assets de session volumineux, revalidés toutes les heures
+# En-têtes lus par Netlify comme par Cloudflare Pages
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Fichiers au nom haché par le build : jamais revalidés
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Assets de session volumineux, revalidés toutes les heures
 /sessions/*
   Cache-Control: public, max-age=3600, must-revalidate
+
+# Formulaire accessible par le QR code imprimé seulement : hors des moteurs de recherche
+/participer/*
+  X-Robots-Tag: noindex, nofollow

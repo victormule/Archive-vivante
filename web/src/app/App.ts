@@ -3,9 +3,7 @@ import { ArchiveView, FULL_VIEW_ID } from "./ArchiveView";
 
 /** Écart-type par défaut (s) du lissage du trajet caméra. */
 const DEFAULT_CAMERA_SMOOTHING = 0.7;
-/** Durée (ms) du fondu enchaîné entre sessions. */
 const CROSSFADE_DURATION = 1600;
-/** Durée (ms) du fondu pendant la rotation automatique. */
 const IDLE_CROSSFADE_DURATION = 5000;
 
 /**
@@ -30,8 +28,9 @@ export class App {
       const id = known ? requested! : sessions[0]?.id;
       if (!id) throw new Error("Aucune session disponible. Lancer `python pipeline/build_sessions.py`.");
 
-      // Toutes les sessions partagent la scène (repère commun calé sur la table) et se succèdent en fondu
       const sceneConfig = { initialView: scene?.initialView ?? null, orbit: params.get("idle") === "0" ? null : scene?.orbit ?? null };
+      // L'écran de chargement statique d'index.html laisse place à celui de la vue
+      this.container.replaceChildren();
       this.view = new ArchiveView(this.container, sessions, sceneConfig, {
         cameraSmoothing: Number.isFinite(smoothing) ? Math.max(0, smoothing) : DEFAULT_CAMERA_SMOOTHING,
         cameraSmoothingForced: params.has("smoothing"),
@@ -39,8 +38,6 @@ export class App {
         idleCrossfadeDuration: IDLE_CROSSFADE_DURATION,
         skipEntry: params.get("enter") === "0",
       });
-      // Outils de développement (console, tests automatisés) : jamais en production
-      if (import.meta.env.DEV) Object.assign(window, { __archive: this.view });
       await this.view.start(id);
     } catch (err) {
       console.error(err);
@@ -49,12 +46,11 @@ export class App {
   }
 
   private showError(message: string): void {
-    // L'écran de chargement (centré lui aussi) s'efface devant le message ; le rendu s'arrête
     this.view?.dispose();
     this.view = null;
     const el = document.createElement("div");
     el.className = "app-error";
     el.textContent = message;
-    this.container.appendChild(el);
+    this.container.replaceChildren(el);
   }
 }

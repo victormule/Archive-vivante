@@ -1,4 +1,3 @@
-/** Évènements qui comptent comme une présence de l'utilisateur. */
 const ACTIVITY_EVENTS = ["pointerdown", "pointermove", "wheel", "keydown", "touchstart"] as const;
 
 export interface IdleWatcherOptions {
@@ -7,11 +6,9 @@ export interface IdleWatcherOptions {
   /** Vrai tant que l'inactivité ne doit pas compter (lecture en cours…). */
   isBusy: () => boolean;
   onIdle: () => void;
-  /** Première activité après `onIdle`. */
   onActive: () => void;
 }
 
-/** Détecte l'inactivité de l'utilisateur (souris, clavier, toucher). */
 export class IdleWatcher {
   private last = performance.now();
   private idle = false;
@@ -20,10 +17,6 @@ export class IdleWatcher {
   constructor(private readonly options: IdleWatcherOptions) {
     for (const type of ACTIVITY_EVENTS) window.addEventListener(type, this.onActivity, { passive: true, capture: true });
     this.timer = window.setInterval(() => this.check(), 500);
-  }
-
-  get isIdle(): boolean {
-    return this.idle;
   }
 
   dispose(): void {

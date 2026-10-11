@@ -1,9 +1,6 @@
 import type { MediaItem } from "@/data/types";
 
-/**
- * Visionneuse plein écran : images, vidéos (en boucle, sans le son) et PDF.
- * Échap / clic hors média : fermer ; ← → : naviguer.
- */
+/** Échap ou clic hors média : fermer ; ← → : naviguer. */
 export class MediaLightbox {
   readonly element: HTMLElement;
   private readonly img: HTMLImageElement;
@@ -78,7 +75,6 @@ export class MediaLightbox {
     this.element.remove();
   }
 
-  /** Arrête la vidéo et vide le document : rien ne tourne derrière la visionneuse fermée. */
   private reset(): void {
     this.video.pause();
     this.video.removeAttribute("src");

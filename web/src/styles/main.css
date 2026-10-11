@@ -12,13 +12,21 @@ html, body, #app {
   -webkit-font-smoothing: antialiased;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ---------- Session ---------- */
 
 .session { position: relative; height: 100%; }
 
 .session__stage { position: absolute; inset: 0; transition: opacity 1.4s ease; }
 .session__stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-/* Apparition de la scène une fois tout chargé */
 .session:not(.is-ready) .session__stage { opacity: 0; }
 
 .session__header,
@@ -47,7 +55,6 @@ html, body, #app {
 .session__footer { bottom: var(--gutter); display: flex; justify-content: center; }
 .session__footer > * { pointer-events: auto; }
 
-/* En replay, l'interface s'efface pour laisser place à l'image */
 .session.is-replay .session__header { opacity: 0.35; }
 
 /* ---------- Loader ---------- */
@@ -68,7 +75,6 @@ html, body, #app {
 .loader__bar span { display: block; width: 0; height: 100%; background: var(--accent); transition: width 0.2s; }
 .loader__label { margin: 0; font-size: 12px; color: var(--fg-muted); letter-spacing: 0.04em; }
 
-/* Tout est chargé : la jauge laisse place au bouton « Entrer » */
 .session.is-waiting .loader__bar,
 .session.is-waiting .loader__label { display: none; }
 .loader__enter {
@@ -224,7 +230,6 @@ html, body, #app {
 }
 .layers__toggle[data-state="error"] { color: #e0705a; }
 
-/* Chargement : jauge discrète en bas du bouton */
 .layers__toggle[data-state="loading"] { color: var(--fg); }
 .layers__toggle[data-state="loading"]::after {
   content: "";
@@ -358,7 +363,6 @@ html, body, #app {
 }
 .annotation-label__head svg { flex: none; width: 13px; height: 13px; opacity: 0.9; }
 .annotation-label__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* Vue d'ensemble : session d'origine de l'annotation */
 .annotation-label__tag {
   flex: none;
   padding: 1px 5px;
@@ -445,7 +449,6 @@ html, body, #app {
 .annotation-label__image:hover :is(img, video) { transform: scale(1.04); }
 /* Vignette de PDF : le haut de la page (le titre) reste visible quand elle est rognée */
 .annotation-label__image--pdf img { object-position: top; }
-/* PDF sans vignette : carte portrait avec le nom du fichier */
 .annotation-label__card {
   display: grid;
   place-items: center;
@@ -460,7 +463,6 @@ html, body, #app {
   text-align: center;
   overflow-wrap: anywhere;
 }
-/* Pastille « PDF · n p. » sur la vignette de la première page */
 .annotation-label__badge {
   position: absolute;
   left: 6px;
@@ -475,7 +477,6 @@ html, body, #app {
 }
 .annotation-label__image:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
 
-/* Hors champ / masquées par la scène */
 .annotation-dot.is-offscreen,
 .annotation-label.is-offscreen,
 .annotation-leader.is-offscreen { opacity: 0; pointer-events: none; }
@@ -483,7 +484,6 @@ html, body, #app {
 .annotation-label.is-occluded:not(.is-expanded) { opacity: 0.55; }
 .annotation-leader.is-occluded:not(.is-active) { opacity: 0.3; }
 
-/* Audios d'une annotation : une rangée par enregistrement, écoutée dans le lecteur flottant */
 .annotation-label__audios { display: grid; gap: 4px; padding: 0 6px 6px; }
 .annotation-label__audio {
   display: flex;
@@ -668,7 +668,6 @@ html, body, #app {
 
 /* ---------- Sélecteur de session ---------- */
 
-/* Barre des sessions : alignées de gauche à droite en haut de l'écran */
 .session__topbar {
   position: absolute;
   top: var(--gutter);
@@ -720,7 +719,6 @@ html, body, #app {
 .sessions__item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sessions__item[data-state="active"] { color: var(--bg); background: var(--fg); cursor: default; }
 
-/* Chargement de la session demandée */
 .sessions__item[data-state="loading"] { color: var(--fg); }
 .sessions__item[data-state="loading"]::after {
   content: "";
@@ -736,18 +734,15 @@ html, body, #app {
   transition: transform 0.2s ease;
 }
 
-/* Sans enregistrement vidéo : pas de lecteur */
 .session:not(.has-playback) .session__footer { display: none; }
 .session:not(.has-playback) .session__hint { bottom: var(--gutter); }
 
-/* Pendant le chargement initial : seule la jauge est visible */
 .session:not(.is-ready) .session__footer,
 .session:not(.is-ready) .session__topbar,
 .session:not(.is-ready) .session__header,
 .session:not(.is-ready) .session__hint { opacity: 0; visibility: hidden; }
 .session__footer, .session__header { transition: opacity 0.5s ease, visibility 0.5s; }
 
-/* Vol de caméra avant lecture */
 .player.is-pending .player__toggle { animation: player-pending 1.2s ease-in-out infinite; }
 @keyframes player-pending { 50% { box-shadow: 0 0 0 6px rgba(242, 239, 233, 0.18); } }
 
@@ -768,7 +763,6 @@ html, body, #app {
 }
 @keyframes toast { 0% { opacity: 0; translate: -50% 6px; } 12%, 80% { opacity: 1; translate: -50% 0; } 100% { opacity: 0; } }
 
-/* Repère de journée dans la barre des sessions */
 .sessions__day {
   flex: none;
   align-self: center;
@@ -781,12 +775,10 @@ html, body, #app {
 }
 .sessions__day:not(:first-child) { margin-left: 6px; border-left: 1px solid var(--panel-border); padding-left: 14px; }
 
-/* Event : il conclut les sessions et s'en démarque (couleur d'accent) */
 .sessions__item--event { color: var(--accent); box-shadow: inset 0 0 0 1px rgba(232, 176, 74, 0.35); }
 .sessions__item--event:hover { color: var(--accent); background: rgba(232, 176, 74, 0.1); }
 .sessions__item--event[data-state="active"] { color: var(--bg); background: var(--accent); box-shadow: none; }
 
-/* Vue d'ensemble : bouton détaché, à droite de la barre des sessions */
 .sessions-full {
   flex: none;
   display: grid;
@@ -809,7 +801,6 @@ html, body, #app {
 .sessions-full:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .sessions-full[data-state="active"] { color: var(--bg); background: var(--fg); border-color: var(--fg); cursor: default; }
 
-/* Vue d'ensemble : bouton de lecture au départ de chaque trajet enregistré */
 .path-starts { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.4s ease; }
 .path-starts.is-hidden,
 .session:not(.is-ready) .path-starts { display: none; }
@@ -856,7 +847,6 @@ html, body, #app {
 }
 .path-start__play svg { width: 10px; height: 10px; margin-left: 1px; }
 
-/* Rotation automatique (inactivité) : l'interface s'efface, l'image reste */
 .session.is-idle .layers,
 .session.is-idle .session__footer,
 .session.is-idle .session__hint { opacity: 0 !important; transition: opacity 2.5s ease; }
@@ -902,7 +892,6 @@ html, body, #app {
 .feed__tab svg { width: 20px; height: 20px; fill: currentColor; }
 .feed__tab:hover { color: var(--fg); }
 .feed__tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* Ouvert : le bouton se pose dans le coin du panneau, à la place d'une croix */
 .feed.is-open .feed__tab {
   transform: translate(-6px, 6px);
   color: var(--accent);
@@ -943,7 +932,6 @@ html, body, #app {
 }
 .feed.is-open .feed__body { transform: none; visibility: visible; transition-delay: 0s; }
 
-/* À droite, de la place pour le bouton bulle qui occupe le coin */
 .feed__header {
   display: flex;
   align-items: center;
@@ -969,7 +957,6 @@ html, body, #app {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.035);
 }
-/* Nouvelle impression : elle se glisse en haut, liseré doré qui s'efface */
 .feed__item.is-new { animation: feed-in 2.4s ease-out; }
 
 .feed__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
@@ -1005,7 +992,6 @@ html, body, #app {
   cursor: zoom-in;
 }
 .feed__media img { display: block; width: 100%; height: 100%; max-height: 300px; object-fit: cover; }
-/* Lecture au survol : la vidéo recouvre la vignette dès sa première image */
 .feed__preview {
   position: absolute;
   inset: 0;
@@ -1058,7 +1044,6 @@ html, body, #app {
   50% { box-shadow: 0 0 0 4px rgba(232, 176, 74, 0.25); }
 }
 
-/* Téléphone : le volet couvre la largeur */
 @media (max-width: 640px) {
   .feed { width: calc(100vw - 2 * var(--gutter)); }
 }

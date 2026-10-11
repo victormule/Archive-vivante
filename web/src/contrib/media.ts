@@ -9,27 +9,20 @@ import {
 } from "./config";
 import type { PreparedMedia } from "./types";
 
-/**
- * Compression dans le navigateur, avant tout envoi : photos en WebP (JPEG à
- * défaut) de 1920 px au plus, vidéos réencodées en 720p, muettes et limitées
- * à 30 s. Repasser par un canvas retire aussi les métadonnées (position GPS).
- */
+/** Compression dans le navigateur avant envoi ; repasser par un canvas retire aussi les métadonnées (position GPS). */
 
-/** Dimensions entières réduites pour tenir dans `maxW` × `maxH` (jamais agrandies). */
 export function fitSize(width: number, height: number, maxW: number, maxH: number, even = false): { width: number; height: number } {
   const scale = Math.min(1, maxW / width, maxH / height);
   const round = (v: number) => (even ? Math.max(2, Math.round(v / 2) * 2) : Math.max(1, Math.round(v)));
   return { width: round(width * scale), height: round(height * scale) };
 }
 
-/** Cadre d'une vidéo : 720p au plus, en paysage comme en portrait. */
 export function fitVideo(width: number, height: number): { width: number; height: number } {
   return width >= height
     ? fitSize(width, height, VIDEO_MAX_LONG, VIDEO_MAX_SHORT, true)
     : fitSize(width, height, VIDEO_MAX_SHORT, VIDEO_MAX_LONG, true);
 }
 
-/** Débit vidéo (bit/s) pour tenir la taille cible sur la durée gardée. */
 export function videoBitrate(seconds: number): number {
   const ideal = (VIDEO_TARGET_BYTES * 8) / Math.max(1, seconds);
   return Math.round(Math.min(4_000_000, Math.max(400_000, ideal)));
@@ -80,7 +73,6 @@ async function decodeImage(file: File): Promise<DecodedImage> {
   }
 }
 
-/** Encode en WebP (JPEG si le navigateur ne sait pas), qualité décroissante jusqu'à passer sous la limite. */
 async function encodeImage(
   source: CanvasImageSource,
   width: number,
@@ -133,13 +125,10 @@ function pickVideoType(): string | null {
   return VIDEO_TYPES.find((t) => MediaRecorder.isTypeSupported(t)) ?? null;
 }
 
-
 /**
- * Réencode la vidéo en la lisant dans `preview` (élément visible : sur iOS, une
- * vidéo hors de la page n'est pas décodée) et en enregistrant un canvas : le
- * flux n'a pas de piste audio, la vidéo devient muette. Dure le temps de la
- * lecture (30 s au plus). La taille est surveillée : l'enregistrement s'arrête
- * avant la limite si le débit réel dépasse la cible.
+ * Réencode la vidéo en la lisant dans `preview` (élément visible : sur iOS, une vidéo hors de la page n'est
+ * pas décodée) et en enregistrant un canvas, sans piste audio. L'enregistrement s'arrête avant la limite de
+ * taille si le débit réel dépasse la cible.
  */
 export async function prepareVideo(
   file: File,
@@ -191,7 +180,6 @@ export async function prepareVideo(
     await preview.play().catch(() => {
       throw new Error("La lecture de la vidéo a été bloquée. Réessayez.");
     });
-    // Première image : vignette, puis enregistrement
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     if (signal.aborted) {
       preview.pause();

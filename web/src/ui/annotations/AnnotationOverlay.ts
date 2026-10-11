@@ -3,7 +3,6 @@ import type { Annotation, MediaItem } from "@/data/types";
 import { annotationMedia } from "./annotationMedia";
 import { layoutLabels, leaderPath, type LayoutBounds, type Side } from "./labelLayout";
 
-/** Couleurs des étiquettes, attribuées dans l'ordre des annotations. */
 const PALETTE = ["#4f9066", "#d99a35", "#3f74b5", "#7b5bb5", "#c25a87", "#3e8f93", "#b8613a"];
 
 /** Intervalle (ms) entre deux tests d'occlusion. */
@@ -15,8 +14,7 @@ const MEDIA_LABEL = { image: "Agrandir l'image", video: "Agrandir la vidéo", pd
 
 const PLAY_ICON = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>`;
 
-/** 75 -> « 1:15 ». */
-export function formatDuration(seconds: number): string {
+function formatDuration(seconds: number): string {
   const total = Math.max(0, Math.round(seconds));
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
 }
@@ -38,10 +36,8 @@ export interface AnnotationOverlayOptions {
   worldMatrix?: THREE.Matrix4;
   /** Géométrie servant aux tests d'occlusion (null si indisponible). */
   occluder: () => THREE.Object3D | null;
-  /** Marges à laisser libres (boutons, barre de lecture…). */
   insets: () => Insets;
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
-  /** Un audio d'annotation a été cliqué : le lecteur s'ouvre et l'écoute commence. */
   onPlayAudio: (audio: Extract<MediaItem, { kind: "audio" }>, title: string) => void;
 }
 
@@ -64,15 +60,10 @@ interface Pin {
   occluded: boolean;
   hovered: boolean;
   pinned: boolean;
-  /** Vidéos de l'étiquette : lues en boucle, sans le son, tant qu'elle est dépliée. */
   videos: HTMLVideoElement[];
 }
 
-/**
- * Annotations spatialisées : un point sur la scène, une étiquette rangée en
- * bord d'écran et un fil qui les relie. Au survol (ou au clic), l'étiquette
- * se déplie : texte et images.
- */
+/** Un point sur la scène, une étiquette rangée en bord d'écran et un fil qui les relie ; l'étiquette se déplie au survol ou au clic. */
 export class AnnotationOverlay {
   readonly element: HTMLElement;
   private readonly svg: SVGSVGElement;
@@ -104,17 +95,12 @@ export class AnnotationOverlay {
     options.container.appendChild(this.element);
   }
 
-  get visible(): boolean {
-    return this._visible;
-  }
-
   setVisible(visible: boolean): void {
     this._visible = visible;
     this.element.classList.toggle("is-hidden", !visible);
     this.syncVideos();
   }
 
-  /** Opacité globale (fondus entre sessions) ; inactif à 0. */
   setOpacity(opacity: number): void {
     // Réapparition : les étiquettes se replacent d'emblée, l'occlusion est retestée
     if (this.opacity === 0 && opacity > 0) {
@@ -132,9 +118,7 @@ export class AnnotationOverlay {
     }
   }
 
-  /** À appeler à chaque frame, une fois la caméra à jour. */
   update(dt: number): void {
-    // Session éteinte (hors fondu) : rien à afficher, aucun calcul
     if (!this._visible || this.opacity === 0 || this.pins.length === 0) return;
     const { container, camera } = this.options;
     const width = container.clientWidth;
@@ -185,7 +169,6 @@ export class AnnotationOverlay {
         pin.y += (targetY - pin.y) * follow;
       }
       pin.side = placement.side;
-      pin.label.dataset.side = placement.side;
       pin.label.style.transform = `translate3d(${pin.x.toFixed(1)}px, ${pin.y.toFixed(1)}px, 0)`;
 
       // Le fil rejoint le milieu de la ligne de titre, côté intérieur
@@ -319,7 +302,6 @@ export class AnnotationOverlay {
           setSize(img, thumbnail);
           button.appendChild(img);
         } else {
-          // PDF sans vignette : une carte avec le nom du fichier
           const card = document.createElement("span");
           card.className = "annotation-label__card";
           card.textContent = item.source;
@@ -370,7 +352,6 @@ export class AnnotationOverlay {
     this.syncVideo(pin);
   }
 
-  /** Les vidéos tournent en boucle, sans le son, tant que l'étiquette est dépliée et visible. */
   private syncVideo(pin: Pin): void {
     const play = (pin.hovered || pin.pinned) && this._visible && !this.inert;
     for (const video of pin.videos) {

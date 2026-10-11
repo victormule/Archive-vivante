@@ -16,11 +16,8 @@ export interface SessionSummary {
   kind?: "event";
 }
 
-/** Réglages communs à toutes les sessions (repère commun du projet). */
 export interface SceneConfig {
-  /** Vue d'arrivée. */
   initialView: CameraView | null;
-  /** Rotation automatique après inactivité, autour d'un axe vertical. */
   orbit: OrbitConfig | null;
 }
 
@@ -117,7 +114,6 @@ export interface CameraView {
   position: Vec3;
   /** Quaternion [x, y, z, w], caméra -> monde. */
   quaternion: Quat;
-  /** Pivot de l'orbite. */
   target: Vec3;
   fovY?: number;
 }
@@ -144,22 +140,18 @@ export interface AnnotationImage {
   url: string;
   width: number;
   height: number;
-  /** Nom du fichier d'origine. */
   source: string;
 }
 
-/** Vidéo d'annotation : lue en boucle, sans le son. */
 export interface AnnotationVideo {
   url: string;
   width: number;
   height: number;
   duration?: number;
-  /** Image d'attente (premier plan de la vidéo). */
   poster?: AnnotationImage;
   source: string;
 }
 
-/** Document PDF d'annotation, illustré par sa première page. */
 export interface AnnotationDocument {
   url: string;
   pages?: number;
@@ -167,24 +159,20 @@ export interface AnnotationDocument {
   source: string;
 }
 
-/** Enregistrement audio d'annotation : écouté au clic, dans un petit lecteur. */
 export interface AnnotationAudio {
   url: string;
   /** Durée en secondes. */
   duration?: number;
-  /** Nom affiché (« Audio 1 » par défaut). */
   label?: string;
   source: string;
 }
 
-/** Un média d'annotation tel que l'étiquette et la visionneuse l'affichent. */
 export type MediaItem =
   | { kind: "image"; url: string; source: string }
   | { kind: "video"; url: string; poster?: string; source: string }
   | { kind: "pdf"; url: string; source: string; pages?: number }
   | { kind: "audio"; url: string; source: string; duration?: number; label?: string };
 
-/** Un média d'annotation tel que la visionneuse l'affiche, avec sa vignette (absente : vignette de repli). */
 export interface AnnotationMediaEntry {
   item: MediaItem;
   thumbnail: AnnotationImage | null;

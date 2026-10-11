@@ -2,19 +2,13 @@ import * as THREE from "three";
 
 export interface PathStart {
   id: string;
-  /** « Session 3 », « Événement ». */
   label: string;
-  /** Départ du trajet enregistré, dans le lieu commun. */
   position: THREE.Vector3;
 }
 
 const PLAY_ICON = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>`;
 
-/**
- * Vue d'ensemble : un bouton « ▶ Session n » au départ de chaque trajet
- * enregistré. Un clic lance la lecture de cette session (son et caméra), au
- * milieu de toutes les autres.
- */
+/** Vue d'ensemble : un bouton de lecture au départ de chaque trajet enregistré. */
 export class PathStarts {
   readonly element: HTMLElement;
   private readonly markers: Array<{ start: PathStart; button: HTMLButtonElement }>;
@@ -52,12 +46,10 @@ export class PathStarts {
     this.element.classList.toggle("is-hidden", !visible);
   }
 
-  /** Session en cours d'écoute (bouton mis en avant). */
   setActive(id: string | null): void {
     for (const { start, button } of this.markers) button.classList.toggle("is-active", start.id === id);
   }
 
-  /** À appeler à chaque frame, une fois la caméra à jour. */
   update(): void {
     if (!this.visible) return;
     const width = this.container.clientWidth;

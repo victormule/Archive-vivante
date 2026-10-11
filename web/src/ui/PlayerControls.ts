@@ -5,13 +5,10 @@ const ICON_PLAY = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v1
 const ICON_PAUSE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>`;
 
 export interface PlayerActions {
-  /** Démarrer la lecture (ex. après un vol de caméra vers la pose de départ). */
   play: () => void;
-  /** Interrompre une lecture en préparation (vol en cours). */
   cancel: () => void;
 }
 
-/** Barre de lecture : play/pause, timeline, temps. Raccourci : Espace. */
 export class PlayerControls {
   readonly element: HTMLElement;
   private readonly button: HTMLButtonElement;
@@ -48,7 +45,6 @@ export class PlayerControls {
     this.render();
   }
 
-  /** À appeler à chaque frame pour suivre la tête de lecture. */
   update(time: number): void {
     if (!this.scrubbing) this.scrubber.value = String(time);
     this.scrubber.style.setProperty("--progress", `${(time / this.playback.duration) * 100}%`);
@@ -61,7 +57,6 @@ export class PlayerControls {
     this.element.remove();
   }
 
-  /** Affiche l'état « en préparation » (bouton pause actif pendant le vol). */
   setPending(pending: boolean): void {
     this.pending = pending;
     this.element.classList.toggle("is-pending", pending);
@@ -78,9 +73,7 @@ export class PlayerControls {
   private render(): void {
     const playing = this.playback.isPlaying || this.pending;
     this.button.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
-    this.button.setAttribute("aria-label", playing ? "Pause" : "Lecture");
-    this.element.classList.toggle("is-playing", playing);
-  }
+    this.button.setAttribute("aria-label", playing ? "Pause" : "Lecture");  }
 
   private readonly onKeyDown = (e: KeyboardEvent): void => {
     // Un bouton focalisé gère déjà Espace nativement

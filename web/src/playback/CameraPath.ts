@@ -9,7 +9,7 @@ export interface CameraPathOptions {
   smoothing?: number;
 }
 
-/** Fréquence du ré-échantillonnage dense utilisé pour le lissage. */
+/** Hz : ré-échantillonnage dense utilisé pour le lissage. */
 const SAMPLE_RATE = 30;
 
 /**
@@ -58,7 +58,6 @@ export class CameraPath {
     }
   }
 
-  /** Échantillonne la pose au temps t (secondes), bornée aux extrémités. */
   sample(t: number, outPosition: THREE.Vector3, outQuaternion: THREE.Quaternion): void {
     const x = Math.min(Math.max(t, 0), this.duration) * SAMPLE_RATE;
     const i = Math.min(Math.floor(x), this.count - 2);
@@ -76,7 +75,6 @@ export class CameraPath {
     outQuaternion.slerp(tmpQuat, u);
   }
 
-  /** Points échantillonnés régulièrement, pour la visualisation du trajet. */
   polyline(step = 0.1): THREE.Vector3[] {
     const pts: THREE.Vector3[] = [];
     const q = new THREE.Quaternion();
@@ -119,7 +117,6 @@ function gaussianSmooth(values: Float64Array, stride: number, sigma: number): Fl
   return out;
 }
 
-/** Interpolation directe entre keyframes (trajet brut). */
 class KeyframeInterpolator {
   private readonly times: Float64Array;
   private readonly positions: THREE.Vector3[];
@@ -171,7 +168,6 @@ class KeyframeInterpolator {
     const dt = times[i + 1] - t0;
     const u = dt > 0 ? (t - t0) / dt : 0;
 
-    // Bases d'Hermite
     const u2 = u * u;
     const u3 = u2 * u;
     outPosition
@@ -183,7 +179,6 @@ class KeyframeInterpolator {
     outQuaternion.slerpQuaternions(rotations[i], rotations[i + 1], u);
   }
 
-  /** Recherche dichotomique du segment [i, i+1] contenant t. */
   private segmentIndex(t: number): number {
     let lo = 0;
     let hi = this.times.length - 1;

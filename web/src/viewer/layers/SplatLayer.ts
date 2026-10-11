@@ -11,16 +11,12 @@ export interface SplatSource {
   transform?: number[];
 }
 
-/**
- * Gaussian splat, éventuellement fait de plusieurs fichiers placés chacun par
- * sa matrice (Event). Le téléchargement ne démarre qu'au premier `load()`.
- */
+/** Un ou plusieurs fichiers, placés chacun par sa matrice (Event). */
 export class SplatLayer implements Layer {
   readonly id = "splat" as const;
   readonly object = new THREE.Group();
   private meshes: SplatMesh[] = [];
   private opacity = 1;
-  /** Vue d'ensemble : les splats s'effacent loin du centre de la session. */
   private readonly fade = new RadialFade();
 
   constructor(private readonly sources: SplatSource[]) {
@@ -61,7 +57,6 @@ export class SplatLayer implements Layer {
     for (const mesh of this.meshes) mesh.opacity = opacity;
   }
 
-  /** Atténuation radiale (repère monde) ; `strength` 0 la coupe. */
   setRadialFade(center: THREE.Vector3, inner: number, outer: number, strength: number): void {
     if (!this.fade.set(center, inner, outer, strength)) return;
     for (const mesh of this.meshes) mesh.updateVersion();

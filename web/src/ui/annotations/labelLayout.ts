@@ -1,16 +1,12 @@
 /**
- * Placement des étiquettes d'annotation en deux colonnes (gauche / droite).
- *
- * Chaque étiquette rejoint le bord le plus proche de son point d'ancrage,
- * puis les étiquettes d'une même colonne sont empilées au plus près de la
- * hauteur de leur point, sans chevauchement.
+ * Étiquettes en deux colonnes : chacune rejoint le bord le plus proche de son point d'ancrage, puis chaque
+ * colonne est empilée au plus près de la hauteur des points, sans chevauchement.
  */
 
 export type Side = "left" | "right";
 
 export interface LayoutItem {
   id: string;
-  /** Point d'ancrage projeté, en pixels écran. */
   anchorX: number;
   anchorY: number;
   width: number;
@@ -81,7 +77,6 @@ export function layoutLabels(items: LayoutItem[], bounds: LayoutBounds): LabelPl
   return result;
 }
 
-/** Fil courbe (Bézier cubique, départ et arrivée horizontaux) entre le point et l'étiquette. */
 export function leaderPath(ax: number, ay: number, lx: number, ly: number): string {
   const mx = ax + (lx - ax) * 0.55;
   return `M ${ax.toFixed(1)} ${ay.toFixed(1)} C ${mx.toFixed(1)} ${ay.toFixed(1)}, ${mx.toFixed(1)} ${ly.toFixed(1)}, ${lx.toFixed(1)} ${ly.toFixed(1)}`;

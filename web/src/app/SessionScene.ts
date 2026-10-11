@@ -24,23 +24,16 @@ export interface SessionSceneOptions {
   overlayContainer: HTMLElement;
   /** Lissage par défaut du trajet caméra (s). */
   cameraSmoothing: number;
-  /** Le lissage a été imposé (URL) : il prime sur celui d'une session. */
   cameraSmoothingForced: boolean;
   /** Emplacement de la session sur le plan du bâtiment (`plan.config.json`), appliqué après sa `worldTransform`. */
   placement?: THREE.Matrix4;
   insets: () => Insets;
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
   onPlayAudio: (audio: Extract<MediaItem, { kind: "audio" }>, title: string) => void;
-  /** Notifié à chaque changement d'état d'une couche (chargement, progression). */
   onLayerChange: (id: LayerId) => void;
 }
 
-/**
- * Contenu d'une session dans la scène partagée : couches, annotations, trajet
- * et lecture. Tout est placé dans le repère commun du projet par la
- * `worldTransform` du manifest, puis à son endroit du bâtiment par son
- * placement sur le plan ; l'opacité globale sert aux fondus enchaînés.
- */
+/** Contenu d'une session dans la scène partagée, placé par la `worldTransform` du manifest puis par son emplacement sur le plan. */
 export class SessionScene {
   readonly group = new THREE.Group();
   /** Repère de la session -> lieu commun (placement sur le plan compris). */
@@ -50,7 +43,6 @@ export class SessionScene {
   path: CameraPath | null = null;
   playback: PlaybackController | null = null;
   annotations: AnnotationOverlay | null = null;
-  /** Annotations de la session (repère de la session), pour la vue d'ensemble. */
   annotationList: Annotation[] = [];
 
   private readonly slots = new Map<LayerId, LayerSlot>();
@@ -96,7 +88,6 @@ export class SessionScene {
     return this.manifest.id;
   }
 
-  /** Métadonnées légères : trajet caméra, lecture, annotations (une seule fois). */
   prepare(): Promise<void> {
     this.prepared ??= (async () => {
       const { manifest, options } = this;
@@ -180,7 +171,6 @@ export class SessionScene {
     return slot.loading;
   }
 
-  /** Charge toutes les couches demandées ; la progression est la moyenne. */
   loadLayers(ids: LayerId[], onProgress?: ProgressCallback): Promise<void> {
     const present = ids.filter((id) => this.slots.has(id));
     const report = () => onProgress?.(present.reduce((s, id) => s + this.layerProgress(id), 0) / Math.max(1, present.length));
@@ -199,7 +189,6 @@ export class SessionScene {
     return this.opacity;
   }
 
-  /** Opacité globale de la session (couches, annotations, trajet). */
   setOpacity(opacity: number): void {
     this.opacity = opacity;
     // Spark suit seul les changements d'opacité ; seule une apparition ou une
@@ -247,7 +236,6 @@ export class SessionScene {
     this.applySplatFade();
   }
 
-  /** Pose caméra du trajet enregistré, dans le repère commun. */
   samplePose(t: number, position: THREE.Vector3, quaternion: THREE.Quaternion): boolean {
     if (!this.path) return false;
     this.path.sample(t, position, quaternion);
@@ -256,7 +244,6 @@ export class SessionScene {
     return true;
   }
 
-  /** Annotations ramenées dans le lieu commun (vue d'ensemble : une seule mise en page pour toutes les sessions). */
   worldAnnotations(): Annotation[] {
     const p = new THREE.Vector3();
     return this.annotationList.map((a) => ({
@@ -265,13 +252,11 @@ export class SessionScene {
     }));
   }
 
-  /** Point de départ du trajet enregistré (début de la vidéo), dans le lieu commun. */
   startPosition(): THREE.Vector3 | null {
     const position = new THREE.Vector3();
     return this.samplePose(0, position, new THREE.Quaternion()) ? position : null;
   }
 
-  /** Boîte englobante du splat, dans le repère commun. */
   bounds(): THREE.Box3 | null {
     const { min, max } = this.manifest.bounds;
     if (!min || !max) return null;

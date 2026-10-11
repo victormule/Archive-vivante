@@ -1,4 +1,5 @@
 import type { MediaItem } from "@/data/types";
+import { formatTime } from "./formatTime";
 
 export type AudioItem = Extract<MediaItem, { kind: "audio" }>;
 
@@ -7,17 +8,7 @@ export interface AudioPlayerOptions {
   onStart: () => void;
 }
 
-/** 75 -> « 1:15 ». */
-function clock(seconds: number): string {
-  const total = Math.max(0, Math.floor(seconds));
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
-}
-
-/**
- * Petit lecteur flottant d'un audio d'annotation : il s'ouvre au clic, lit
- * tout de suite, et se referme tout seul à la fin de l'enregistrement.
- * Un seul audio à la fois ; un clic sur un autre audio remplace le premier.
- */
+/** Lecteur flottant d'un audio d'annotation : un seul à la fois, refermé de lui-même à la fin. */
 export class AudioPlayer {
   readonly element: HTMLElement;
   private readonly toggle: HTMLButtonElement;
@@ -67,11 +58,7 @@ export class AudioPlayer {
     return !this.element.hidden;
   }
 
-  get isPlaying(): boolean {
-    return !!this.audio && !this.audio.paused;
-  }
-
-  /** Ouvre le lecteur et lance l'écoute. Un second clic sur le même audio le met en pause / le reprend. */
+  /** Un second clic sur le même audio le met en pause ou le reprend. */
   open(item: AudioItem, title: string): void {
     if (this.current?.url === item.url && this.audio) return void this.togglePlay();
     this.stop();
@@ -99,7 +86,6 @@ export class AudioPlayer {
     void audio.play().catch(() => this.close());
   }
 
-  /** Ferme le lecteur et arrête l'audio (fin de l'enregistrement, ×, Échap, changement de session). */
   close(): void {
     if (!this.isOpen) return;
     this.stop();
@@ -145,7 +131,7 @@ export class AudioPlayer {
     const now = audio?.currentTime ?? 0;
     if (!this.seeking && total > 0) this.seek.value = String(Math.round((now / total) * 1000));
     this.seek.style.setProperty("--progress", `${total > 0 ? (now / total) * 100 : 0}%`);
-    this.time.textContent = total > 0 ? `${clock(now)} / ${clock(total)}` : clock(now);
+    this.time.textContent = total > 0 ? `${formatTime(now)} / ${formatTime(total)}` : formatTime(now);
   }
 
   private readonly onKeyDown = (e: KeyboardEvent): void => {

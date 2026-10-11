@@ -494,7 +494,7 @@ class EventBuilder:
                 {"t": round(float(ti), 3), "position": [round(float(v), 4) for v in pi], "quaternion": [round(float(v), 5) for v in qi]}
                 for ti, pi, qi in zip(t, p, q)
             ],
-        })
+        }, compact=True)
         self.manifest["playback"] = {
             "audioUrl": "audio.m4a",
             "cameraPathUrl": "camera_path.json",

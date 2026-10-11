@@ -10,24 +10,21 @@ async function fetchJson<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/** Résout une URL relative d'un manifest vers une URL absolue servie. */
 export function sessionAssetUrl(sessionId: string, relative: string): string {
   return `${SESSIONS_ROOT}/${sessionId}/${relative}`;
 }
 
+const warnAnnotations = (message: string) => console.warn(`[annotations.config.json] ${message}`);
+
 let annotationConfig: Promise<AnnotationConfig> | null = null;
 
-/**
- * Configuration éditoriale des annotations (`annotations.config.json`), lue une fois.
- * Fichier absent ou illisible : les annotations gardent leurs valeurs d'origine.
- */
-export function loadAnnotationConfig(): Promise<AnnotationConfig> {
+/** Lue une fois. Fichier absent ou illisible : les annotations gardent leurs valeurs d'origine. */
+function loadAnnotationConfig(): Promise<AnnotationConfig> {
   annotationConfig ??= (async () => {
-    const warn = (message: string) => console.warn(`[annotations.config.json] ${message}`);
     try {
       const res = await fetch(`${import.meta.env.BASE_URL}annotations.config.json`, { cache: "no-cache" });
       if (!res.ok) return EMPTY_CONFIG;
-      return parseAnnotationConfig(await res.json(), warn);
+      return parseAnnotationConfig(await res.json(), warnAnnotations);
     } catch (err) {
       console.error("[annotations.config.json] fichier illisible (virgule, guillemet ou accolade manquants ?), valeurs d'origine conservées :", err);
       return EMPTY_CONFIG;
@@ -38,7 +35,7 @@ export function loadAnnotationConfig(): Promise<AnnotationConfig> {
 
 let planConfig: Promise<PlanConfig | null> | null = null;
 
-/** Plan du bâtiment (`plan.config.json`), lu une fois ; absent ou illisible : pas de plan. */
+/** Lu une fois ; absent ou illisible : pas de plan. */
 export function loadPlanConfig(): Promise<PlanConfig | null> {
   planConfig ??= (async () => {
     try {
@@ -84,6 +81,5 @@ export async function loadAnnotations(manifest: SessionManifest): Promise<Annota
     }
   }
   const config = await loadAnnotationConfig();
-  const warn = (message: string) => console.warn(`[annotations.config.json] ${message}`);
-  return { annotations: applyAnnotationConfig(manifest.id, data.annotations, config, import.meta.env.BASE_URL, warn) };
+  return { annotations: applyAnnotationConfig(manifest.id, data.annotations, config, import.meta.env.BASE_URL, warnAnnotations) };
 }

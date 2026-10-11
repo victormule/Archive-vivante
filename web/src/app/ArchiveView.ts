@@ -23,15 +23,14 @@ export interface ArchiveViewOptions {
   cameraSmoothing: number;
   /** Lissage imposé (paramètre d'URL) : prime sur celui que fixe une session. */
   cameraSmoothingForced?: boolean;
-  /** Durée (ms) du fondu enchaîné entre deux sessions. */
+  /** ms */
   crossfadeDuration: number;
-  /** Durée (ms) du fondu pendant la rotation automatique (plus lent, contemplatif). */
+  /** ms */
   idleCrossfadeDuration: number;
   /** Ouvre directement la scène, sans bouton « Entrer » ni plein écran (outils, captures). */
   skipEntry?: boolean;
 }
 
-/** Taille supposée d'une couche dont le manifest n'indique pas le poids. */
 const DEFAULT_LAYER_BYTES = 4e6;
 /** Part de la barre de chargement couverte par les couches ; le reste est la préparation GPU. */
 const LOAD_SHARE = 0.9;
@@ -40,24 +39,12 @@ const DOWNLOAD_SHARE = 0.9;
 
 const easeInOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
 
-/** Identifiant (URL, sélecteur) de la vue d'ensemble : toutes les sessions à la fois. */
 export const FULL_VIEW_ID = "full";
 /** Vue d'ensemble : recul horizontal et hauteur (m) de la caméra par rapport au centre du plan. */
 const OVERVIEW_DISTANCE = 34;
 const OVERVIEW_HEIGHT = 30;
 
-/**
- * Vue d'archive : une scène partagée où les sessions se succèdent en fondu
- * enchaîné, dans un repère commun (la caméra ne bouge pas au changement).
- *
- * Les couches (splat, photogrammétrie, nuage) et les annotations se cumulent
- * indépendamment ; le choix est conservé d'une session à l'autre.
- *
- * Tout est chargé et préparé sur le GPU avant l'affichage : changer de session
- * est ensuite instantané. Après une période d'inactivité, la caméra tourne
- * lentement autour de l'axe de la scène et les sessions se succèdent, une
- * par tour.
- */
+/** Scène partagée où les sessions se succèdent en fondu ; tout est chargé et préparé sur le GPU avant l'affichage. */
 export class ArchiveView {
   private readonly root: HTMLElement;
   private readonly stage: HTMLElement;
@@ -67,7 +54,6 @@ export class ArchiveView {
   private lightbox: MediaLightbox | null = null;
   private audioPlayer: AudioPlayer | null = null;
   private controls: PlayerControls | null = null;
-  /** Traces du public : volet de droite, sur l'Event seulement. */
   private feed: ContributionFeed | null = null;
 
   private readonly scenes = new Map<string, Promise<SessionScene>>();
@@ -77,17 +63,12 @@ export class ArchiveView {
 
   private readonly layerVisible: Record<LayerId, boolean> = { splat: true, mesh: false, pointCloud: false };
   private annotationsVisible = true;
-  /** Plan du bâtiment et emplacement des sessions (`plan.config.json`). */
   private planConfig: PlanConfig | null = null;
-  /** Plan du bâtiment au sol, fixe : option, allumée à l'arrivée. */
   private planFloor: PlanFloor | null = null;
   private planVisible = true;
-  /** Vue d'ensemble : toutes les sessions et leurs annotations à la fois. */
   private full = false;
   private fullButton: HTMLButtonElement | null = null;
-  /** Annotations de toutes les sessions, en une seule mise en page (vue d'ensemble). */
   private fullAnnotations: AnnotationOverlay | null = null;
-  /** Départs des trajets enregistrés (vue d'ensemble). */
   private pathStarts: PathStarts | null = null;
   /** Fondu en cours : un nouveau fondu prend la main sur le précédent. */
   private fadeToken = 0;
@@ -134,13 +115,11 @@ export class ArchiveView {
       loaderBar.style.width = `${(shown * 100).toFixed(1)}%`;
     };
     this.viewer = new SceneViewer({ container: this.stage });
-    // Scène cachée par l'écran de chargement jusqu'à « is-ready »
     this.viewer.setSuspended(true);
     this.viewer.renderer.domElement.addEventListener("webglcontextlost", () => {
       this.showFatal("L'affichage 3D a été interrompu (mémoire graphique saturée). Rechargez la page.");
     });
     this.lightbox = new MediaLightbox(this.root);
-    // Écouter un audio d'annotation met la vidéo (replay) en pause
     this.audioPlayer = new AudioPlayer(this.root, { onStart: () => this.current?.playback?.pause() });
     if (this.sessions.some((s) => s.kind === "event")) {
       this.feed = new ContributionFeed(this.root, { onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title) });
@@ -148,7 +127,6 @@ export class ArchiveView {
     this.setupSwitcher();
     this.disposers.push(this.viewer.onFrame(() => this.onFrame()));
 
-    // Emplacement de chaque session dans le bâtiment, puis toutes les sessions (manifestes, trajets, annotations)
     this.planConfig = await loadPlanConfig();
     const scenes = await Promise.all(this.sessions.map((s) => this.scene(s.id)));
     const scene = scenes.find((s) => s.id === initialId) ?? scenes[0];
@@ -161,8 +139,6 @@ export class ArchiveView {
     this.activate(scene);
     this.setupFullView(scenes);
 
-    // Toutes les couches de toutes les sessions, puis préparation GPU :
-    // aucune attente ni saccade ensuite, dès le premier changement de session
     try {
       await this.loadEverything(scenes, scene, (r) => setProgress(r * LOAD_SHARE));
       // Modèles prêts : l'audio de la session courante n'est plus en concurrence avec eux
@@ -174,7 +150,6 @@ export class ArchiveView {
       this.root.querySelector(".loader__label")!.textContent = "Erreur de chargement";
       throw err;
     }
-    // Tout est prêt : l'écran d'accueil attend un clic, qui passe aussi en plein écran
     if (!this.options.skipEntry) await this.waitForEntry();
     this.viewer.setSuspended(false);
     this.root.classList.add("is-ready");
@@ -186,7 +161,6 @@ export class ArchiveView {
     if (initialId === FULL_VIEW_ID) await this.enterFull();
   }
 
-  /** Plan du bâtiment au sol, fixe : les sessions y sont posées à leur endroit. */
   private async setupPlan(): Promise<void> {
     const config = this.planConfig;
     if (!config) return;
@@ -220,12 +194,7 @@ export class ArchiveView {
     });
   }
 
-  /**
-   * Charge toutes les couches ; progression pondérée par le poids des fichiers.
-   * Une couche n'est comptée entière qu'une fois décodée. Un échec est retenté
-   * une fois ; seul le splat de la session d'arrivée est alors indispensable,
-   * ailleurs le bouton de la couche signale l'erreur.
-   */
+  /** Progression pondérée par le poids des fichiers. Un échec est retenté une fois ; seul le splat de la session d'arrivée est indispensable. */
   private async loadEverything(scenes: SessionScene[], first: SessionScene, onProgress: (ratio: number) => void): Promise<void> {
     const jobs = [first, ...scenes.filter((s) => s !== first)].flatMap((scene) =>
       LAYER_ITEMS.filter(({ id }) => scene.hasLayer(id)).map(({ id }) => ({
@@ -258,10 +227,8 @@ export class ArchiveView {
   }
 
   /**
-   * Préparation GPU, derrière l'écran de chargement : chaque couche de chaque
-   * session est rendue en fondu (matériaux transparents, deux sessions
-   * superposées) puis opaque. Shaders compilés, textures envoyées, tampons
-   * Spark dimensionnés : le premier fondu est aussi fluide que les suivants.
+   * Chaque couche de chaque session est rendue une fois derrière l'écran de chargement (en fondu puis opaque) :
+   * shaders compilés, textures envoyées, tampons Spark dimensionnés.
    */
   private async warmUp(scenes: SessionScene[], current: SessionScene, onProgress: (ratio: number) => void): Promise<void> {
     const show = (scene: SessionScene, opacity: number) => {
@@ -305,7 +272,6 @@ export class ArchiveView {
     );
   };
 
-  /** Erreur bloquante, affichée par-dessus la scène. */
   private showFatal(message: string): void {
     if (this.root.querySelector(".app-error")) return;
     const el = document.createElement("div");
@@ -320,17 +286,6 @@ export class ArchiveView {
     el.textContent = message;
     this.root.appendChild(el);
     setTimeout(() => el.remove(), 2200);
-  }
-
-  /** Applique une vue (outil de développement / tests). */
-  setView(view: CameraView): void {
-    this.viewer.cancelFlight();
-    this.viewer.setView(view);
-  }
-
-  /** Change de session (outil de développement / tests). */
-  showSession(id: string): Promise<void> {
-    return this.switchTo(id);
   }
 
   dispose(): void {
@@ -373,30 +328,23 @@ export class ArchiveView {
     return promise;
   }
 
-  /** Emplacement d'une session sur le plan du bâtiment ; à défaut, elle reste où la met sa `worldTransform`. */
   private placementOf(id: string): THREE.Matrix4 | undefined {
     const config = this.planConfig;
     const placement = config?.sessions[id];
     return config && placement ? placementMatrix(placement, config.plan.floor) : undefined;
   }
 
-  /** Vue d'arrivée d'une session (la sienne pour l'Event), à son endroit du bâtiment. */
   private siteView(scene: SessionScene): CameraView | null {
     const view = scene.manifest.view ?? this.sceneConfig.initialView;
     return view ? transformView(view, scene.placement) : null;
   }
 
-  /** Axe de la rotation automatique d'une session, à son endroit du bâtiment. */
   private orbitCenter(scene: SessionScene): THREE.Vector3 | null {
     const config = scene.manifest.orbit ?? this.sceneConfig.orbit;
     return config ? new THREE.Vector3(...config.center).applyMatrix4(scene.placement) : null;
   }
 
-  /**
-   * Chaque session a son lieu : pendant le fondu, la caméra s'y rend (ou
-   * l'axe de la rotation automatique s'y déplace). Renvoie la durée du fondu,
-   * allongée s'il le faut pour couvrir le trajet.
-   */
+  /** Renvoie la durée du fondu, allongée s'il le faut pour couvrir le trajet de la caméra. */
   private travel(from: SessionScene, to: SessionScene, duration: number): number {
     if (this.orbit) {
       const center = this.orbitCenter(to);
@@ -411,7 +359,6 @@ export class ArchiveView {
     return this.travelTo(view, duration);
   }
 
-  /** Vol vers `view` ; renvoie la durée du fondu, allongée s'il le faut pour couvrir le trajet. */
   private travelTo(view: CameraView | null, duration: number): number {
     if (!view) return duration;
     const position = new THREE.Vector3(...view.position);
@@ -425,11 +372,6 @@ export class ArchiveView {
 
   // --- Vue d'ensemble -------------------------------------------------------------
 
-  /**
-   * Vue d'ensemble : un bouton à droite de la barre des sessions, une mise en
-   * page commune des annotations de toutes les sessions, et un bouton de
-   * lecture au départ de chaque trajet enregistré.
-   */
   private setupFullView(scenes: SessionScene[]): void {
     if (scenes.length < 2) return;
     const button = document.createElement("button");
@@ -444,8 +386,6 @@ export class ArchiveView {
     this.root.querySelector(".session__topbar")!.appendChild(button);
     this.fullButton = button;
 
-    // Une seule mise en page pour toutes les annotations : les étiquettes ne se chevauchent pas ;
-    // chacune porte sa session d'origine
     const annotations = scenes.flatMap((s) => s.worldAnnotations().map((a) => ({ ...a, tag: sessionTag(s.manifest) })));
     if (annotations.length > 0) {
       const occluder = new MultiOccluder(() => scenes.map((s) => s.layerObject("mesh")).filter((o): o is THREE.Object3D => o !== null));
@@ -480,7 +420,6 @@ export class ArchiveView {
       );
       this.disposers.push(() => this.pathStarts?.dispose());
     }
-    // Splats des sessions effacés loin de leur centre : moins de bruit là où tout se croise (l'Event reste entier)
     const fade = this.planConfig?.fullFade;
     if (fade) {
       for (const s of scenes) {
@@ -494,7 +433,6 @@ export class ArchiveView {
     }));
   }
 
-  /** Toutes les sessions apparaissent ensemble ; la caméra prend du recul sur le bâtiment. */
   private async enterFull(): Promise<void> {
     const previous = this.current;
     if (!previous || this.full || !this.fullButton) return;
@@ -513,11 +451,9 @@ export class ArchiveView {
     await this.fade(() => 1, duration);
   }
 
-  /** Entrée ou sortie de la vue d'ensemble : interface, annotations, départs des trajets. */
   private setFull(full: boolean): void {
     if (full === this.full) return;
     this.full = full;
-    this.root.classList.toggle("is-full", full);
     if (this.fullButton) {
       this.fullButton.dataset.state = full ? "active" : "idle";
       this.fullButton.setAttribute("aria-current", String(full));
@@ -543,7 +479,6 @@ export class ArchiveView {
     document.title = "Toutes les sessions · Performance Archive";
   }
 
-  /** Vue d'ensemble : lecture d'une session (son et caméra) depuis le départ de son trajet. */
   private async playFromFull(id: string): Promise<void> {
     if (!this.full) return;
     const scene = await this.scene(id);
@@ -560,14 +495,12 @@ export class ArchiveView {
     await this.startPlayback(scene);
   }
 
-  /** Centre de la vue d'ensemble : celui du plan, au sol ; à défaut, l'axe de la session courante. */
   private overviewCenter(): THREE.Vector3 {
     const plan = this.planConfig?.plan;
     if (plan) return new THREE.Vector3(plan.center[0], plan.floor, plan.center[1]);
     return (this.current && this.orbitCenter(this.current)) ?? new THREE.Vector3();
   }
 
-  /** Vue d'ensemble : de haut, du côté de la vue d'arrivée. */
   private overviewView(): CameraView {
     const center = this.overviewCenter();
     const initial = this.sceneConfig.initialView;
@@ -584,12 +517,10 @@ export class ArchiveView {
     };
   }
 
-  /** Annotations d'une session : les siennes hors vue d'ensemble, la mise en page commune sinon. */
   private applyAnnotationVisibility(scene: SessionScene): void {
     scene.setAnnotationsVisible(this.annotationsVisible && !this.full);
   }
 
-  /** Préchargement à l'intention (survol du sélecteur). */
   private async prefetch(id: string): Promise<void> {
     if (id === this.current?.id) return;
     const scene = await this.scene(id);
@@ -611,11 +542,9 @@ export class ArchiveView {
     });
     if (this.requested !== id) return; // une autre session a été demandée entre-temps
 
-    // La lecture appartient à la session : on l'arrête avant de partir
     previous.playback?.pause();
     this.audioPlayer?.close();
     this.deactivate(previous);
-    // Depuis la vue d'ensemble, la caméra rejoint la vue d'arrivée de la session
     const fromFull = this.full;
     this.setFull(false);
     this.activate(next);
@@ -624,7 +553,6 @@ export class ArchiveView {
     await this.crossfade(next, duration);
   }
 
-  /** Vol vers une vue enregistrée ; à l'arrivée, l'orbite reprend son pivot. */
   private async flyToView(view: CameraView, duration?: number): Promise<void> {
     this.stopOrbit();
     const position = new THREE.Vector3(...view.position);
@@ -632,24 +560,18 @@ export class ArchiveView {
     if (await this.viewer.flyTo(position, quaternion, duration ?? this.viewer.flightDuration(position, quaternion))) this.viewer.setView(view);
   }
 
-  /**
-   * Fondu enchaîné vers `to` : chaque autre session s'éteint depuis son
-   * opacité courante (un fondu interrompu repart d'où il en était).
-   */
+  /** Un fondu interrompu repart de l'opacité courante. */
   private crossfade(to: SessionScene, duration: number): Promise<void> {
     return this.fade((scene) => (scene === to ? 1 : 0), duration);
   }
 
-  /** Fondu de chaque session vers son opacité cible ; une nouvelle demande prend la main. */
   private async fade(target: (scene: SessionScene) => number, duration: number): Promise<void> {
     const token = ++this.fadeToken;
     const scenes = await Promise.all(this.scenes.values());
     const starts = new Map(scenes.map((s) => [s, s.currentOpacity]));
     const fadeStarts = new Map(scenes.map((s) => [s, s.splatFadeStrength]));
-    // Vue d'ensemble : l'atténuation des splats suit le fondu
     const fadeTarget = (s: SessionScene) => (this.full && s.manifest.kind !== "event" ? 1 : 0);
     const start = performance.now();
-    this.root.classList.add("is-transitioning");
     return new Promise((resolve) => {
       const step = () => {
         if (token !== this.fadeToken) return resolve();
@@ -661,16 +583,12 @@ export class ArchiveView {
           scene.setSplatFadeStrength(fadeFrom + (fadeTarget(scene) - fadeFrom) * e);
         }
         if (x < 1) requestAnimationFrame(step);
-        else {
-          this.root.classList.remove("is-transitioning");
-          resolve();
-        }
+        else resolve();
       };
       requestAnimationFrame(step);
     });
   }
 
-  /** La session devient courante : en-tête, lecture, boutons, URL. */
   private activate(scene: SessionScene): void {
     this.current = scene;
     const { manifest } = scene;
@@ -747,7 +665,6 @@ export class ArchiveView {
     this.root.querySelector(".session__footer")!.appendChild(controls.element);
     this.root.classList.add("has-playback");
 
-    // Lecture => replay ; pause => navigation libre depuis la pose courante
     this.sessionDisposers.push(playback.onChange(() => {
       const replay = playback.isPlaying;
       scene.setPathVisible(!replay);
@@ -764,10 +681,7 @@ export class ArchiveView {
     this.sessionDisposers.push(() => scrubber.removeEventListener("input", onScrub));
   }
 
-  /**
-   * Lecture précédée d'un vol lent vers la pose enregistrée à l'instant de
-   * reprise (début de la vidéo, ou position de la tête de lecture).
-   */
+  /** La lecture est précédée d'un vol vers la pose enregistrée à l'instant de reprise. */
   private async startPlayback(scene: SessionScene): Promise<void> {
     const playback = scene.playback;
     if (!playback || !this.controls) return;
@@ -837,7 +751,6 @@ export class ArchiveView {
   private startOrbit(): void {
     const base = this.sceneConfig.orbit;
     if (!base || this.orbit || !this.current) return;
-    // L'Event tourne autour de son propre centre, à son échelle ; la vue d'ensemble, autour du bâtiment
     const config = this.current.manifest.orbit ?? base;
     this.orbit = new AutoOrbit(
       this.viewer.camera,
@@ -878,7 +791,6 @@ export class ArchiveView {
     this.root.classList.remove("is-idle");
   }
 
-  /** Chaque étape de l'orbite (`switch_degrees`) : session suivante, en fondu lent. */
   private nextSessionOnTurn(): void {
     // L'Event se contemple seul, la vue d'ensemble aussi ; les sessions se succèdent entre elles
     if (!this.current || this.full || this.current.manifest.kind === "event") return;
@@ -906,7 +818,6 @@ export class ArchiveView {
     const items: LayerToggleItem[] = LAYER_ITEMS.filter((item) => scenes.some((s) => s.hasLayer(item.id)));
     const hasAnnotations = scenes.some((s) => s.annotations);
     if (hasAnnotations) items.push(ANNOTATIONS_ITEM);
-    // Sous les annotations, dans le même groupe (séparateur au-dessus s'il n'y a pas d'annotations)
     if (this.planFloor) items.push({ ...PLAN_ITEM, groupStart: !hasAnnotations });
     this.toggles = new LayerToggles(items, (id) => this.toggle(id));
     this.root.appendChild(this.toggles.element);
@@ -943,7 +854,6 @@ export class ArchiveView {
     this.toggles.setState(id, state, scene.layerProgress(id));
   }
 
-  /** Zones de l'écran réservées à l'interface (titre, boutons, lecteur). */
   private overlayInsets(): Insets {
     const box = this.stage.getBoundingClientRect();
     const rect = (selector: string) => this.root.querySelector(selector)?.getBoundingClientRect();
@@ -961,12 +871,10 @@ export class ArchiveView {
   }
 }
 
-/** Étiquette courte de la session d'une annotation (vue d'ensemble) : « S3 », « Év ». */
 function sessionTag(session: { kind?: string; index: number }): string {
   return session.kind === "event" ? "Év" : `S${session.index}`;
 }
 
-/** Vue transformée par une matrice (placement d'une session : déplacement, rotation, échelle). */
 function transformView(view: CameraView, matrix: THREE.Matrix4): CameraView {
   const rotation = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().extractRotation(matrix));
   return {
@@ -977,10 +885,7 @@ function transformView(view: CameraView, matrix: THREE.Matrix4): CameraView {
   };
 }
 
-/**
- * Occultation des annotations par la photogrammétrie de plusieurs sessions
- * (vue d'ensemble) : chaque maillage est testé à son tour, sans être déplacé.
- */
+/** Occultation par les maillages de plusieurs sessions, testés chacun à son tour. */
 class MultiOccluder extends THREE.Object3D {
   constructor(private readonly parts: () => THREE.Object3D[]) {
     super();

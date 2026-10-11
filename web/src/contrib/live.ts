@@ -11,10 +11,7 @@ export interface LiveHandlers {
 
 const COLUMNS = "id,created_at,author,message,media_kind,media_path,thumb_path,media_width,media_height";
 
-/**
- * Contributions : lecture paginée et abonnement temps réel. La bibliothèque
- * Supabase n'est chargée qu'au premier usage (le volet n'existe que sur l'Event).
- */
+/** La bibliothèque Supabase n'est chargée qu'au premier usage (le volet n'existe que sur l'Event). */
 export class ContributionSource {
   private client: Promise<SupabaseClient> | null = null;
   private channel: RealtimeChannel | null = null;

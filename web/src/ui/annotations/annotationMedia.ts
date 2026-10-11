@@ -1,11 +1,6 @@
 import type { Annotation, AnnotationMediaEntry } from "@/data/types";
 
-export type { AnnotationMediaEntry };
-
-/**
- * Médias d'une annotation. Si la configuration en impose la liste, elle est suivie
- * telle quelle ; sinon : images, vidéos, puis documents PDF (sortie du pipeline).
- */
+/** La liste imposée par la configuration prime ; sinon : images, vidéos, PDF, audios (sortie du pipeline). */
 export function annotationMedia(annotation: Annotation): AnnotationMediaEntry[] {
   if (annotation.media) return annotation.media;
   return [

@@ -4,11 +4,6 @@ export function formatTime(seconds: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-/** ISO -> "5 octobre 2026, 15:51" (heure locale) */
-export function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short" }).format(new Date(iso));
-}
-
 /** ISO -> "lundi 5 octobre 2026 · 15:51" (heure locale) */
 export function formatDayAndTime(iso: string): string {
   const date = new Date(iso);

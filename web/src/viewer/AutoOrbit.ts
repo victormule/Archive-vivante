@@ -27,14 +27,8 @@ const smoothstep = (x: number) => {
 };
 
 /**
- * Rotation lente de la caméra autour d'un axe vertical.
- *
- * Le mouvement part exactement de la pose courante : la vitesse monte
- * progressivement, le regard glisse vers l'axe, le rayon et la hauteur
- * rejoignent une orbite confortable. Une légère respiration (rayon, hauteur)
- * accompagne chaque tour. `onStep` est appelé tous les `stepDegrees` parcourus.
- * L'axe peut glisser vers un autre lieu (`moveCenter`) : la caméra le suit
- * sans interrompre sa rotation.
+ * Rotation lente autour d'un axe vertical, à partir de la pose courante : la vitesse monte progressivement,
+ * le regard glisse vers l'axe, rayon et hauteur rejoignent l'orbite. `onStep` est appelé tous les `stepDegrees`.
  */
 export class AutoOrbit {
   private readonly startQuaternion = new THREE.Quaternion();
@@ -42,7 +36,6 @@ export class AutoOrbit {
   private readonly matrix = new THREE.Matrix4();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private readonly lookAt = new THREE.Vector3();
-  /** Axe courant (il se déplace avec `moveCenter`). */
   private readonly center: THREE.Vector3;
   private move: { from: THREE.Vector3; to: THREE.Vector3; elapsed: number; duration: number } | null = null;
   private readonly startAngle: number;
@@ -100,7 +93,6 @@ export class AutoOrbit {
     const { center } = this;
     this.camera.position.set(center.x + radius * Math.sin(angle), center.y + height, center.z + radius * Math.cos(angle));
 
-    // Le regard glisse de l'orientation de départ vers l'axe
     this.lookAt.copy(center);
     this.matrix.lookAt(this.camera.position, this.lookAt, this.up);
     this.lookQuaternion.setFromRotationMatrix(this.matrix);

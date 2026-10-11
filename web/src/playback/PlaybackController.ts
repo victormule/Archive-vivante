@@ -39,7 +39,6 @@ export class PlaybackController {
     return this._state === "playing";
   }
 
-  /** Temps courant lissé, en secondes. */
   get currentTime(): number {
     const media = this.audio.currentTime;
     if (!this.isPlaying) return media;
@@ -51,7 +50,6 @@ export class PlaybackController {
     return Math.min(Math.max(extrapolated, media), media + 0.3, this.duration);
   }
 
-  /** Met l'audio en mémoire à l'avance (session affichée). */
   preload(): void {
     this.audio.preload = "auto";
   }
@@ -64,10 +62,6 @@ export class PlaybackController {
 
   pause(): void {
     this.audio.pause();
-  }
-
-  toggle(): Promise<void> | void {
-    return this.isPlaying ? this.pause() : this.play();
   }
 
   seek(time: number): void {

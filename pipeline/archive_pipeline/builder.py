@@ -47,8 +47,10 @@ LINK_SAMPLE_POINTS = 3_000_000
 LINK_VOXEL = 0.03
 
 
-def write_json(path: Path, data: Any) -> None:
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+def write_json(path: Path, data: Any, compact: bool = False) -> None:
+    """`compact` : sans indentation, pour les gros fichiers lus par le site seulement (trajets caméra)."""
+    text = json.dumps(data, ensure_ascii=False, separators=(",", ":")) if compact else json.dumps(data, ensure_ascii=False, indent=2)
+    path.write_text(text, encoding="utf-8")
 
 
 def _media_urls(media: dict[str, Any]) -> list[str]:
@@ -264,7 +266,7 @@ class SessionBuilder:
             transform = transform @ link
             report = {**(report or {}), "arkitLink": link_report}
         path = build_camera_path(video, playback.get("time_offset", 0.0), transform)
-        write_json(self.out / "camera_path.json", path)
+        write_json(self.out / "camera_path.json", path, compact=True)
         self.manifest["alignment"]["camera"] = report
         self.manifest["playback"] = {
             "audioUrl": "audio.m4a",

@@ -4,15 +4,11 @@ export type SessionButtonState = "idle" | "loading" | "active";
 
 const timeFormat = new Intl.DateTimeFormat("fr-FR", { timeStyle: "short" });
 
-/** « Session 3 », ou « Événement » pour l'Event qui conclut les sessions. */
 export function sessionLabel(session: Pick<SessionSummary, "kind" | "index">): string {
   return session.kind === "event" ? "Événement" : `Session ${session.index}`;
 }
 
-/**
- * Barre des sessions, de gauche à droite, regroupées par journée. Le survol
- * annonce l'intention : la session peut être préchargée avant le clic.
- */
+/** Le survol annonce l'intention : la session peut être préchargée avant le clic. */
 export class SessionSwitcher {
   readonly element: HTMLElement;
   private readonly buttons = new Map<string, HTMLButtonElement>();
@@ -25,7 +21,6 @@ export class SessionSwitcher {
     const days = new Set(sessions.map((s) => s.day));
     let day: number | null = null;
     for (const session of sessions) {
-      // Repère de journée devant la première session de chaque jour
       if (days.size > 1 && session.day !== day) {
         day = session.day;
         const label = document.createElement("span");
@@ -59,7 +54,6 @@ export class SessionSwitcher {
     button.style.setProperty("--progress", String(progress));
   }
 
-  /** Fait défiler la barre (si elle déborde) pour montrer la session. */
   reveal(id: string): void {
     this.buttons.get(id)?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   }

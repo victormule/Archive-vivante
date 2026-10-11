@@ -1,11 +1,7 @@
 import { BUCKET, SUPABASE_KEY, SUPABASE_URL, TABLE } from "./config";
 import type { PreparedMedia } from "./types";
 
-/**
- * Envoi d'une contribution par les API REST de Supabase (sans la bibliothèque
- * cliente : le formulaire reste léger sur téléphone). Le média part d'abord,
- * puis la ligne qui le référence.
- */
+/** API REST de Supabase, sans la bibliothèque cliente : le formulaire reste léger sur téléphone. */
 
 export interface ContributionDraft {
   author: string;
@@ -22,7 +18,6 @@ export async function submitContribution(draft: ContributionDraft, onProgress: (
     const id = uuid();
     const mediaPath = `${id}.${ext}`;
     const thumbPath = `${id}-thumb.${thumbExt}`;
-    // Progression pondérée par la taille ; la vignette (petite) part en premier
     const total = blob.size + thumb.size;
     await uploadFile(thumbPath, thumb, (loaded) => onProgress((loaded / total) * 0.95));
     await uploadFile(mediaPath, blob, (loaded) => onProgress(((thumb.size + loaded) / total) * 0.95));
@@ -42,7 +37,7 @@ export async function submitContribution(draft: ContributionDraft, onProgress: (
   onProgress(1);
 }
 
-/** Dépôt d'un fichier, avec progression (XHR : fetch ne la donne pas à l'envoi). */
+/** XHR : fetch ne donne pas la progression à l'envoi. */
 function uploadFile(path: string, blob: Blob, onProgress: (loaded: number) => void): Promise<void> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();

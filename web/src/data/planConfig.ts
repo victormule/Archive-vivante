@@ -2,13 +2,8 @@ import * as THREE from "three";
 import type { Vec3 } from "./types";
 
 /**
- * Plan du bâtiment et emplacement des sessions : `public/plan.config.json`.
- *
- * Le plan (un SVG) est fixe : il définit le lieu commun. Chaque session,
- * captée à un endroit différent du bâtiment, y est posée au bon endroit,
- * sol à niveau : un point de son modèle (`anchor`, au sol) est amené en
- * `position`, tourné de `rotation` et mis à l'échelle de `scale` autour de ce
- * point. Le placement s'ajoute à la `worldTransform` du manifest.
+ * `public/plan.config.json`. Le plan (SVG) est fixe ; chaque session y est posée : son point `anchor` (au sol)
+ * est amené en `position`, tourné de `rotation` et mis à l'échelle de `scale` autour de lui.
  */
 
 export interface PlanPose {
@@ -27,18 +22,14 @@ export interface SessionPlacement {
   position: [number, number];
   /** Rotation du modèle autour de la verticale (degrés). */
   rotation: number;
-  /** Échelle du modèle, autour de `anchor`. */
   scale: number;
 }
 
 export interface PlanConfig {
   /** Fichier du plan, depuis la racine du site. */
   svg: string;
-  /** Mètres par unité du SVG. */
   metersPerUnit: number;
-  /** Couleur des traits. */
   color: string;
-  /** Opacité des traits [0, 1]. */
   opacity: number;
   plan: PlanPose;
   /** Emplacement de chaque session (`{ "sameAs": "j1-s1" }` reprend celui d'une autre, `scale` en plus). */
@@ -124,10 +115,6 @@ function parsePlacement(raw: unknown): SessionPlacement | null {
   return { anchor: [anchor[0], anchor[1], anchor[2]], position: [position[0], position[1]], rotation, scale };
 }
 
-/**
- * Matrice de placement d'une session (repère de la `worldTransform` -> lieu
- * commun) : `anchor` amené en (`position`, `floor`), tourné et mis à l'échelle autour de lui.
- */
 export function placementMatrix(placement: SessionPlacement, floor: number): THREE.Matrix4 {
   const [ax, ay, az] = placement.anchor;
   return new THREE.Matrix4()

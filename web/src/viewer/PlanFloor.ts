@@ -13,10 +13,7 @@ export interface PlanImage {
   height: number;
 }
 
-/**
- * Rastérise le SVG du plan en une texture de traits blancs sur fond
- * transparent (la couleur vient du matériau). Partagée par toutes les sessions.
- */
+/** Rastérise le SVG en traits blancs sur fond transparent (la couleur vient du matériau). */
 export async function loadPlanImage(url: string, maxAnisotropy: number): Promise<PlanImage> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Plan introuvable : ${url} (${res.status})`);
@@ -55,10 +52,6 @@ export async function loadPlanImage(url: string, maxAnisotropy: number): Promise
   }
 }
 
-/**
- * Le plan posé au sol, fixe : à plat, au niveau du sol des modèles, dessiné
- * avant eux (sans écrire la profondeur), en traits fins et translucides.
- */
 export class PlanFloor {
   readonly object: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
 

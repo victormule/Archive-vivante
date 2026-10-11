@@ -5,11 +5,7 @@ import { MAX_AUTHOR, MAX_MESSAGE, MAX_VIDEO_SECONDS } from "@/contrib/config";
 import { isVideoFile, prepareImage, prepareVideo } from "@/contrib/media";
 import type { PreparedMedia } from "@/contrib/types";
 
-/**
- * Formulaire de contribution (QR code affiché à l'école) : nom, commentaire,
- * une photo ou une vidéo. Le média est compressé dès qu'il est choisi, pendant
- * que le visiteur écrit ; l'envoi attend la fin de la compression.
- */
+/** Le média est compressé dès qu'il est choisi, pendant que le visiteur écrit ; l'envoi attend la fin de la compression. */
 
 const AUTHOR_KEY = "archive.contribution.author";
 const EVENT_URL = "/?session=j4-event";
@@ -160,7 +156,6 @@ function selectMedia(file: File): void {
   prepared.then(
     (result) => {
       if (media !== state) return;
-      // Aperçu : le fichier tel qu'il sera envoyé
       state.url = URL.createObjectURL(result.blob);
       if (result.kind === "video") {
         previewVideo.loop = true;

@@ -92,7 +92,7 @@ Projet Cloudflare Pages relié au dépôt GitHub : chaque push sur `main` redép
 | Build command | `npm run build` |
 | Build output directory | `dist` |
 
-La version de Node vient de [web/.nvmrc](web/.nvmrc), les en-têtes de cache de [web/public/_headers](web/public/_headers). Les assets de `web/public/sessions/` sont versionnés et copiés tels quels dans le build : après un passage du pipeline, commiter et pousser met le site à jour. Limite Cloudflare : 25 Mo par fichier (l'audio de j2-s3 en fait 22).
+La version de Node vient de [web/.nvmrc](web/.nvmrc), les en-têtes (cache, hors-index du formulaire) de [web/public/_headers](web/public/_headers), lu par Cloudflare Pages comme par Netlify. L'adresse publique du site (`VITE_SITE_URL` dans `web/.env`) sert à l'URL canonique, aux balises de partage, à `robots.txt` et à `sitemap.xml`, générés au build ; l'image de partage est [web/public/og.jpg](web/public/og.jpg) (1200 × 630). Les assets de `web/public/sessions/` sont versionnés et copiés tels quels dans le build : après un passage du pipeline, commiter et pousser met le site à jour. Limite Cloudflare : 25 Mo par fichier (l'audio de j2-s3 en fait 22).
 
 ## Utilisation
 
