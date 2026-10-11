@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Laissez une trace — affiche</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    width: 210mm; height: 297mm;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 22mm 20mm; text-align: center;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif; color: #0b0b0c; background: #fff;
+  }
+  .kicker { margin: 0; font-size: 13pt; letter-spacing: 0.08em; text-transform: uppercase; color: #b07c16; }
+  h1 { margin: 6mm 0 0; font-size: 46pt; font-weight: 600; letter-spacing: -0.02em; }
+  .lead { max-width: 150mm; margin: 6mm 0 0; font-size: 16pt; line-height: 1.4; color: #3a3a3c; }
+  .qr { width: 115mm; height: 115mm; margin: 14mm 0 8mm; }
+  .scan { margin: 0; font-size: 15pt; font-weight: 600; }
+  .url { margin: 3mm 0 0; font-size: 13pt; color: #3a3a3c; }
+  .rule { width: 30mm; height: 1.2mm; margin-top: 12mm; border-radius: 1mm; background: #e8b04a; }
+</style>
+</head>
+<body>
+  <p class="kicker">Performance Archive · Journée 4</p>
+  <h1>Laissez une trace</h1>
+  <p class="lead">Un mot, une photo ou une courte vidéo : votre contribution apparaît en direct sur l'archive de l'Événement.</p>
+  <img class="qr" src="participer-qr.svg" alt="QR code vers le formulaire de contribution" />
+  <p class="scan">Flashez avec l'appareil photo de votre téléphone</p>
+  <p class="url">impressiondarchive.netlify.app/participer</p>
+  <div class="rule"></div>
+</body>
+</html>

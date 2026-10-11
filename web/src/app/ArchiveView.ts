@@ -4,6 +4,7 @@ import type { CameraView, LayerId, SceneConfig, SessionSummary } from "@/data/ty
 import type { Insets } from "@/ui/annotations/AnnotationOverlay";
 import { formatDayAndTime } from "@/ui/formatTime";
 import { AudioPlayer } from "@/ui/AudioPlayer";
+import { ContributionFeed } from "@/ui/ContributionFeed";
 import { MediaLightbox } from "@/ui/MediaLightbox";
 import { ANNOTATIONS_ITEM, LAYER_ITEMS, type LayerToggleItem, LayerToggles, type ToggleId } from "@/ui/LayerToggles";
 import { PlayerControls } from "@/ui/PlayerControls";
@@ -56,6 +57,8 @@ export class ArchiveView {
   private lightbox: MediaLightbox | null = null;
   private audioPlayer: AudioPlayer | null = null;
   private controls: PlayerControls | null = null;
+  /** Traces du public : volet de droite, sur l'Event seulement. */
+  private feed: ContributionFeed | null = null;
 
   private readonly scenes = new Map<string, Promise<SessionScene>>();
   private current: SessionScene | null = null;
@@ -115,6 +118,9 @@ export class ArchiveView {
     this.lightbox = new MediaLightbox(this.root);
     // Écouter un audio d'annotation met la vidéo (replay) en pause
     this.audioPlayer = new AudioPlayer(this.root, { onStart: () => this.current?.playback?.pause() });
+    if (this.sessions.some((s) => s.kind === "event")) {
+      this.feed = new ContributionFeed(this.root, { onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title) });
+    }
     this.setupSwitcher();
     this.disposers.push(this.viewer.onFrame(() => this.onFrame()));
 
@@ -146,6 +152,8 @@ export class ArchiveView {
     if (!this.options.skipEntry) await this.waitForEntry();
     this.viewer.setSuspended(false);
     this.root.classList.add("is-ready");
+    // Le volet ne se connecte qu'une fois la scène prête : rien ne concurrence le chargement
+    this.updateFeed();
     window.addEventListener("keydown", this.onKeyDown);
     this.disposers.push(() => window.removeEventListener("keydown", this.onKeyDown));
     this.setupIdleOrbit();
@@ -282,6 +290,7 @@ export class ArchiveView {
     this.toggles?.dispose();
     this.lightbox?.dispose();
     this.audioPlayer?.dispose();
+    this.feed?.dispose();
     for (const p of this.scenes.values()) p.then((s) => s.dispose());
     this.viewer?.dispose();
     this.root.remove();
@@ -393,11 +402,18 @@ export class ArchiveView {
     if (this.loaded) scene.playback?.preload();
     this.setupPlayback(scene);
     LAYER_ITEMS.forEach(({ id }) => this.refreshToggle(id));
+    this.updateFeed();
 
     const url = new URL(location.href);
     url.searchParams.set("session", scene.id);
     history.replaceState(null, "", url);
     document.title = `${manifest.title} · Performance Archive`;
+  }
+
+  private updateFeed(): void {
+    const scene = this.current;
+    const isEvent = scene !== null && this.sessions.find((s) => s.id === scene.id)?.kind === "event";
+    this.feed?.setAvailable(isEvent && this.root.classList.contains("is-ready"));
   }
 
   private deactivate(scene: SessionScene): void {
@@ -635,11 +651,12 @@ export class ArchiveView {
     const header = rect(".session__header");
     const layers = rect(".layers");
     const footer = this.root.classList.contains("has-playback") ? rect(".session__footer") : undefined;
+    const feed = this.feed?.isOpen ? this.feed.element.getBoundingClientRect() : undefined;
     const margin = 14;
     return {
       top: header ? header.bottom - box.top + margin : margin,
       left: layers ? layers.right - box.left + margin : margin,
-      right: margin + 6,
+      right: Math.max(margin + 6, feed ? box.right - feed.left + margin : 0),
       bottom: footer ? box.bottom - footer.top + margin : margin + 10,
     };
   }

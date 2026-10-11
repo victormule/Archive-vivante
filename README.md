@@ -121,6 +121,15 @@ L'Event conclut les sessions et s'en démarque : il a son propre lieu (environ 3
 
 Exports bruts : `Event/*.zip`, extraits dans `Event/<nom du zip>/` (non versionnés). Reconstruction : `.venv/Scripts/python pipeline/build_sessions.py j4-event` (étapes `parts`, `pointCloud`, `playback`). Détail dans [pipeline/README.md](pipeline/README.md#event).
 
+## Traces du public (Event)
+
+Sur l'Event, un volet rétractable à droite affiche les contributions du public, de la plus récente à la plus ancienne, mises à jour en temps réel. On contribue depuis le formulaire **`/participer/`** (page légère, sans scène 3D), où mène le QR code imprimé : nom ou pseudonyme, commentaire, une photo ou une vidéo.
+
+- **Compression avant envoi**, dans le téléphone : photos en WebP (JPEG sur Safari), 1920 px au plus ; vidéos réencodées en 720p, **muettes**, **30 s au plus** (seul le début est gardé). Aucun fichier ne dépasse 10 Mo (contrôlé aussi par le serveur).
+- **Publication immédiate, sans modération.** Retirer une contribution : Supabase → Table Editor → `contributions` → supprimer la ligne ; elle disparaît en direct des écrans. Ses fichiers restent dans le bucket `contributions` (Storage), à supprimer à la main si besoin.
+- **Serveur : Supabase** (base, stockage, temps réel). Le schéma, les droits (le public ajoute et lit, rien d'autre) et une limite de 30 contributions par minute sont dans [supabase/contributions.sql](supabase/contributions.sql), à coller dans l'éditeur SQL de Supabase (rejouable). L'URL du projet et sa clé *publishable* (publique par nature) sont dans `web/.env`.
+- **QR code** : `print/affiche-participer.pdf` (A4) et `print/participer-qr.svg` ; celui du volet est `web/public/participer-qr.svg`. Les régénérer : `node web/scripts/qr.mjs`. L'adresse `https://impressiondarchive.netlify.app/participer/` est imprimée : elle ne doit pas changer.
+
 ## Ajouter une session
 
 1. Déposer l'export dür.air à la racine (ex. `Journée2-session1/`).
