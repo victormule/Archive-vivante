@@ -19,8 +19,8 @@ app.innerHTML = `
   <main class="page">
     <header class="intro">
       <p class="intro__kicker">Performance Archive · Journée 4</p>
-      <h1 class="intro__title">Laisser une trace</h1>
-      <p class="intro__lead">Un mot, une photo ou une courte vidéo : votre contribution apparaît en direct sur le site, à côté de l'Événement.</p>
+      <h1 class="intro__title">Laisser une impression</h1>
+      <p class="intro__lead">Un mot, une photo ou une courte vidéo : votre impression apparaît en direct sur le site, à côté de l'Événement.</p>
     </header>
 
     <form class="form" novalidate>
@@ -56,7 +56,7 @@ app.innerHTML = `
 
       <label class="consent">
         <input type="checkbox" name="consent" />
-        <span>J'accepte que ma contribution soit publiée sur le site, et les personnes visibles sur ma photo ou ma vidéo sont d'accord.</span>
+        <span>J'accepte que mon impression soit publiée sur le site, et les personnes visibles sur ma photo ou ma vidéo sont d'accord.</span>
       </label>
 
       <p class="form__error" role="alert" hidden></p>
@@ -69,8 +69,8 @@ app.innerHTML = `
 
     <section class="done" hidden>
       <h2 class="done__title">Merci !</h2>
-      <p class="done__text">Votre trace est en ligne.</p>
-      <button class="button done__again" type="button">Laisser une autre trace</button>
+      <p class="done__text">Votre impression est en ligne.</p>
+      <button class="button done__again" type="button">Laisser une autre impression</button>
       <a class="button button--ghost" href="${EVENT_URL}">Voir l'archive</a>
     </section>
   </main>

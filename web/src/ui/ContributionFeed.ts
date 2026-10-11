@@ -1,4 +1,4 @@
-import { PARTICIPATE_PATH, publicMediaUrl } from "@/contrib/config";
+import { publicMediaUrl } from "@/contrib/config";
 import { ContributionSource } from "@/contrib/live";
 import type { Contribution } from "@/contrib/types";
 import type { MediaItem } from "@/data/types";
@@ -39,30 +39,24 @@ export class ContributionFeed {
   private clock: number | null = null;
 
   constructor(container: HTMLElement, private readonly options: ContributionFeedOptions) {
-    const link = `${location.host}${PARTICIPATE_PATH}`.replace(/\/$/, "");
     this.element = document.createElement("aside");
     this.element.className = "feed";
     this.element.hidden = true;
-    this.element.setAttribute("aria-label", "Traces du public");
+    this.element.setAttribute("aria-label", "Impressions du public");
     this.element.innerHTML = `
-      <button class="feed__tab" type="button" aria-expanded="false" aria-controls="feed-body" title="Traces du public">
+      <button class="feed__tab" type="button" aria-expanded="false" aria-controls="feed-body">
         ${ICON}<span class="feed__badge" hidden></span>
       </button>
       <div class="feed__body" id="feed-body">
         <header class="feed__header">
-          <h2 class="feed__title">Traces du public</h2>
-          <button class="feed__close" type="button" aria-label="Fermer le volet">×</button>
+          <h2 class="feed__title">Impressions du public</h2>
         </header>
         <div class="feed__scroll">
-          <p class="feed__empty" hidden>Aucune trace pour l'instant. Soyez le premier ou la première à en laisser une.</p>
+          <p class="feed__empty" hidden>Aucune impression pour l'instant.</p>
           <ol class="feed__list"></ol>
           <button class="feed__more" type="button" hidden>Plus anciennes</button>
           <p class="feed__status" role="status" hidden></p>
         </div>
-        <footer class="feed__footer">
-          <img class="feed__qr" src="/participer-qr.svg" alt="" width="64" height="64" />
-          <p class="feed__invite">Laissez une trace :<br /><a href="${PARTICIPATE_PATH}" target="_blank" rel="noopener">${link}</a></p>
-        </footer>
       </div>
     `;
     this.body = this.element.querySelector(".feed__body")!;
@@ -74,7 +68,6 @@ export class ContributionFeed {
     this.status = this.element.querySelector(".feed__status")!;
 
     this.tab.addEventListener("click", () => this.setOpen(!this.open, true));
-    this.element.querySelector(".feed__close")!.addEventListener("click", () => this.setOpen(false, true));
     this.more.addEventListener("click", () => void this.loadOlder());
     document.addEventListener("visibilitychange", this.onVisibility);
     this.setOpen(false, false);
@@ -131,6 +124,7 @@ export class ContributionFeed {
     this.open = open;
     this.element.classList.toggle("is-open", open);
     this.tab.setAttribute("aria-expanded", String(open));
+    this.tab.title = this.tab.ariaLabel = open ? "Masquer les impressions du public" : "Afficher les impressions du public";
     this.body.inert = !open;
     if (remember) {
       try {
@@ -164,7 +158,7 @@ export class ContributionFeed {
       this.setStatus(null);
     } catch (err) {
       console.error(err);
-      this.setStatus("Les traces ne peuvent pas être chargées pour l'instant.");
+      this.setStatus("Les impressions ne peuvent pas être chargées pour l'instant.");
     }
     this.refreshEmpty();
   }
@@ -284,6 +278,7 @@ export class ContributionFeed {
       img.loading = "lazy";
       img.decoding = "async";
       button.append(img);
+      if (row.media_kind === "video") attachHoverPlayback(button, url);
       button.addEventListener("click", () => this.options.onOpenMedia([media], 0, row.author));
       item.append(button);
     }
@@ -304,6 +299,57 @@ export class ContributionFeed {
     if (this.clock !== null) window.clearInterval(this.clock);
     this.clock = null;
   }
+}
+
+/** Délai (ms) de survol avant de lancer la vidéo : un passage de souris en défilant ne télécharge rien. */
+const HOVER_DELAY = 150;
+
+/**
+ * Vidéo lue en boucle, muette, sur sa vignette tant qu'elle est survolée (ou
+ * qu'elle a le focus clavier). L'élément vidéo n'existe que pendant la lecture :
+ * il est retiré au départ de la souris, ce qui coupe aussi le téléchargement.
+ * Au toucher, il n'y a pas de survol : un appui ouvre la visionneuse.
+ */
+function attachHoverPlayback(button: HTMLElement, url: string): void {
+  let video: HTMLVideoElement | null = null;
+  let timer: number | null = null;
+
+  const start = () => {
+    if (video) return;
+    video = document.createElement("video");
+    video.className = "feed__preview";
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.src = url;
+    // La vignette reste affichée jusqu'à la première image lue
+    video.addEventListener("playing", () => video?.classList.add("is-playing"), { once: true });
+    button.append(video);
+    void video.play().catch(() => {});
+  };
+  const stop = () => {
+    if (timer !== null) window.clearTimeout(timer);
+    timer = null;
+    if (!video) return;
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+    video.remove();
+    video = null;
+  };
+  const schedule = () => {
+    if (timer === null && !video) timer = window.setTimeout(() => ((timer = null), start()), HOVER_DELAY);
+  };
+
+  button.addEventListener("pointerenter", (e) => {
+    if (e.pointerType === "mouse" || e.pointerType === "pen") schedule();
+  });
+  button.addEventListener("pointerleave", stop);
+  button.addEventListener("focus", () => button.matches(":focus-visible") && schedule());
+  button.addEventListener("blur", stop);
+  // La visionneuse prend le relais : une seule lecture à la fois
+  button.addEventListener("click", stop);
 }
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });

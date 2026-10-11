@@ -1,4 +1,4 @@
--- Contributions du public (volet « Traces du public » de l'Event, formulaire /participer/).
+-- Contributions du public (volet « Impressions du public » de l'Event, formulaire /participer/).
 -- À coller dans Supabase → SQL Editor → Run. Rejouable : chaque objet est recréé ou mis à jour.
 --
 -- Publication immédiate, sans modération : le public ajoute et lit, rien d'autre.

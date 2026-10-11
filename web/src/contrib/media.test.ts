@@ -20,7 +20,7 @@ describe("compression des contributions", () => {
     expect(videoBitrate(1)).toBe(4_000_000);
   });
 
-  it("date les traces en temps relatif", () => {
+  it("date les impressions en temps relatif", () => {
     const now = Date.parse("2026-10-11T12:00:00Z");
     expect(relativeTime("2026-10-11T11:59:30Z", now)).toBe("à l'instant");
     expect(relativeTime("2026-10-11T11:55:00Z", now)).toBe("il y a 5 min");
