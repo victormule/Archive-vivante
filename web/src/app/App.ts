@@ -1,5 +1,5 @@
 import { loadSessionIndex } from "@/data/sessionRepository";
-import { ArchiveView } from "./ArchiveView";
+import { ArchiveView, FULL_VIEW_ID } from "./ArchiveView";
 
 /** Écart-type par défaut (s) du lissage du trajet caméra. */
 const DEFAULT_CAMERA_SMOOTHING = 0.7;
@@ -10,7 +10,7 @@ const IDLE_CROSSFADE_DURATION = 5000;
 
 /**
  * Point d'entrée applicatif. Paramètres d'URL :
- *  - `session=<id>`   session affichée (défaut : première de l'index)
+ *  - `session=<id>`   session affichée (défaut : première de l'index) ; `full` : toutes les sessions
  *  - `smoothing=<s>`  lissage du trajet caméra en secondes (0 = trajet brut), pour toutes les sessions
  *  - `idle=0`         désactive la rotation automatique (outils, captures)
  *  - `enter=0`        ouvre la scène sans bouton « Entrer » ni plein écran (outils, captures)
@@ -26,7 +26,8 @@ export class App {
       const requested = params.get("session");
       const smoothing = Number(params.get("smoothing") ?? DEFAULT_CAMERA_SMOOTHING);
       const { sessions, scene } = await loadSessionIndex();
-      const id = sessions.some((s) => s.id === requested) ? requested! : sessions[0]?.id;
+      const known = requested === FULL_VIEW_ID || sessions.some((s) => s.id === requested);
+      const id = known ? requested! : sessions[0]?.id;
       if (!id) throw new Error("Aucune session disponible. Lancer `python pipeline/build_sessions.py`.");
 
       // Toutes les sessions partagent la scène (repère commun calé sur la table) et se succèdent en fondu

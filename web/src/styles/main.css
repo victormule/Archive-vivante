@@ -776,6 +776,76 @@ html, body, #app {
 .sessions__item--event:hover { color: var(--accent); background: rgba(232, 176, 74, 0.1); }
 .sessions__item--event[data-state="active"] { color: var(--bg); background: var(--accent); box-shadow: none; }
 
+/* Vue d'ensemble : bouton détaché, à droite de la barre des sessions */
+.sessions-full {
+  flex: none;
+  display: grid;
+  gap: 1px;
+  margin-left: 10px;
+  padding: 10px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--fg-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+.sessions-full:hover { color: var(--fg); border-color: rgba(255, 255, 255, 0.2); }
+.sessions-full:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sessions-full[data-state="active"] { color: var(--bg); background: var(--fg); border-color: var(--fg); cursor: default; }
+
+/* Vue d'ensemble : bouton de lecture au départ de chaque trajet enregistré */
+.path-starts { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.4s ease; }
+.path-starts.is-hidden,
+.session:not(.is-ready) .path-starts { display: none; }
+.session.is-replay .path-starts,
+.session.is-idle .path-starts { opacity: 0; }
+.session.is-replay .path-start,
+.session.is-idle .path-start { pointer-events: none; }
+
+.path-start {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -50%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 4px;
+  border: 1px solid rgba(232, 176, 74, 0.45);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.path-start:hover { background: rgba(232, 176, 74, 0.16); border-color: var(--accent); }
+.path-start:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.path-start.is-active { border-color: var(--accent); background: rgba(232, 176, 74, 0.2); }
+.path-start.is-offscreen { display: none; }
+.path-start__play {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+}
+.path-start__play svg { width: 10px; height: 10px; margin-left: 1px; }
+
 /* Rotation automatique (inactivité) : l'interface s'efface, l'image reste */
 .session.is-idle .layers,
 .session.is-idle .session__footer,

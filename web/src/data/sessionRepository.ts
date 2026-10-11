@@ -1,4 +1,5 @@
 import { applyAnnotationConfig, EMPTY_CONFIG, parseAnnotationConfig, type AnnotationConfig } from "./annotationConfig";
+import { parsePlanConfig, type PlanConfig } from "./planConfig";
 import type { AnnotationsData, CameraPathData, SessionIndex, SessionManifest } from "./types";
 
 const SESSIONS_ROOT = `${import.meta.env.BASE_URL}sessions`;
@@ -33,6 +34,23 @@ export function loadAnnotationConfig(): Promise<AnnotationConfig> {
     }
   })();
   return annotationConfig;
+}
+
+let planConfig: Promise<PlanConfig | null> | null = null;
+
+/** Plan du bâtiment (`plan.config.json`), lu une fois ; absent ou illisible : pas de plan. */
+export function loadPlanConfig(): Promise<PlanConfig | null> {
+  planConfig ??= (async () => {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}plan.config.json`, { cache: "no-cache" });
+      if (!res.ok) return null;
+      return parsePlanConfig(await res.json(), (message) => console.warn(`[plan.config.json] ${message}`));
+    } catch (err) {
+      console.error("[plan.config.json] fichier illisible, plan désactivé :", err);
+      return null;
+    }
+  })();
+  return planConfig;
 }
 
 export function loadSessionIndex(): Promise<SessionIndex> {

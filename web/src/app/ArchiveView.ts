@@ -1,15 +1,19 @@
 import * as THREE from "three";
-import { loadSessionManifest } from "@/data/sessionRepository";
-import type { CameraView, LayerId, SceneConfig, SessionSummary } from "@/data/types";
+import { loadPlanConfig, loadSessionManifest } from "@/data/sessionRepository";
+import { placementMatrix, type PlanConfig } from "@/data/planConfig";
+import type { CameraView, LayerId, Quat, SceneConfig, SessionSummary, Vec3 } from "@/data/types";
 import type { Insets } from "@/ui/annotations/AnnotationOverlay";
 import { formatDayAndTime } from "@/ui/formatTime";
+import { AnnotationOverlay } from "@/ui/annotations/AnnotationOverlay";
 import { AudioPlayer } from "@/ui/AudioPlayer";
 import { ContributionFeed } from "@/ui/ContributionFeed";
 import { MediaLightbox } from "@/ui/MediaLightbox";
-import { ANNOTATIONS_ITEM, LAYER_ITEMS, type LayerToggleItem, LayerToggles, type ToggleId } from "@/ui/LayerToggles";
+import { ANNOTATIONS_ITEM, LAYER_ITEMS, type LayerToggleItem, LayerToggles, PLAN_ITEM, type ToggleId } from "@/ui/LayerToggles";
+import { PathStarts } from "@/ui/PathStarts";
 import { PlayerControls } from "@/ui/PlayerControls";
 import { SessionSwitcher, sessionLabel } from "@/ui/SessionSwitcher";
 import { AutoOrbit } from "@/viewer/AutoOrbit";
+import { loadPlanImage, PlanFloor } from "@/viewer/PlanFloor";
 import { SceneViewer } from "@/viewer/SceneViewer";
 import { IdleWatcher } from "./IdleWatcher";
 import { SessionScene } from "./SessionScene";
@@ -35,6 +39,12 @@ const LOAD_SHARE = 0.9;
 const DOWNLOAD_SHARE = 0.9;
 
 const easeInOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+
+/** Identifiant (URL, sélecteur) de la vue d'ensemble : toutes les sessions à la fois. */
+export const FULL_VIEW_ID = "full";
+/** Vue d'ensemble : recul horizontal et hauteur (m) de la caméra par rapport au centre du plan. */
+const OVERVIEW_DISTANCE = 34;
+const OVERVIEW_HEIGHT = 30;
 
 /**
  * Vue d'archive : une scène partagée où les sessions se succèdent en fondu
@@ -67,6 +77,20 @@ export class ArchiveView {
 
   private readonly layerVisible: Record<LayerId, boolean> = { splat: true, mesh: false, pointCloud: false };
   private annotationsVisible = true;
+  /** Plan du bâtiment et emplacement des sessions (`plan.config.json`). */
+  private planConfig: PlanConfig | null = null;
+  /** Plan du bâtiment au sol, fixe : option, allumée à l'arrivée. */
+  private planFloor: PlanFloor | null = null;
+  private planVisible = true;
+  /** Vue d'ensemble : toutes les sessions et leurs annotations à la fois. */
+  private full = false;
+  private fullButton: HTMLButtonElement | null = null;
+  /** Annotations de toutes les sessions, en une seule mise en page (vue d'ensemble). */
+  private fullAnnotations: AnnotationOverlay | null = null;
+  /** Départs des trajets enregistrés (vue d'ensemble). */
+  private pathStarts: PathStarts | null = null;
+  /** Fondu en cours : un nouveau fondu prend la main sur le précédent. */
+  private fadeToken = 0;
   private readonly disposers: Array<() => void> = [];
   private readonly sessionDisposers: Array<() => void> = [];
   private idle: IdleWatcher | null = null;
@@ -124,16 +148,18 @@ export class ArchiveView {
     this.setupSwitcher();
     this.disposers.push(this.viewer.onFrame(() => this.onFrame()));
 
-    // Toutes les sessions (manifestes, trajets, annotations)
+    // Emplacement de chaque session dans le bâtiment, puis toutes les sessions (manifestes, trajets, annotations)
+    this.planConfig = await loadPlanConfig();
     const scenes = await Promise.all(this.sessions.map((s) => this.scene(s.id)));
     const scene = scenes.find((s) => s.id === initialId) ?? scenes[0];
     this.requested = scene.id;
-    await Promise.all(scenes.map((s) => s.prepare()));
+    await Promise.all([...scenes.map((s) => s.prepare()), this.setupPlan()]);
     this.setupLayerToggles(scenes);
     scenes.forEach((s) => this.applyLayerState(s));
     if (scene.path) this.viewer.setFov(scene.path.fovY);
     this.placeInitialCamera(scene);
     this.activate(scene);
+    this.setupFullView(scenes);
 
     // Toutes les couches de toutes les sessions, puis préparation GPU :
     // aucune attente ni saccade ensuite, dès le premier changement de session
@@ -157,6 +183,23 @@ export class ArchiveView {
     window.addEventListener("keydown", this.onKeyDown);
     this.disposers.push(() => window.removeEventListener("keydown", this.onKeyDown));
     this.setupIdleOrbit();
+    if (initialId === FULL_VIEW_ID) await this.enterFull();
+  }
+
+  /** Plan du bâtiment au sol, fixe : les sessions y sont posées à leur endroit. */
+  private async setupPlan(): Promise<void> {
+    const config = this.planConfig;
+    if (!config) return;
+    try {
+      const anisotropy = this.viewer.renderer.capabilities.getMaxAnisotropy();
+      const image = await loadPlanImage(`${import.meta.env.BASE_URL}${config.svg}`, anisotropy);
+      this.planFloor = new PlanFloor(image, config, config.plan);
+      this.planFloor.setVisible(this.planVisible);
+      this.viewer.scene.add(this.planFloor.object);
+    } catch (err) {
+      // Le plan est une aide à la lecture : son absence ne bloque jamais la scène
+      console.error(err);
+    }
   }
 
   /** Bouton « Entrer » : le plein écran doit être demandé dans le geste de l'utilisateur. */
@@ -228,6 +271,9 @@ export class ArchiveView {
     for (let i = 0; i < scenes.length; i++) {
       const scene = scenes[i];
       const next = scenes[(i + 1) % scenes.length];
+      // Chaque session a son lieu : la caméra s'y place, sinon rien n'y serait rendu (hors champ)
+      const view = this.siteView(scene);
+      if (view) this.viewer.setView(view);
       show(scene, 0.5);
       show(next, 0.5);
       await this.viewer.settle();
@@ -238,15 +284,20 @@ export class ArchiveView {
       onProgress((i + 1) / (scenes.length + 1));
     }
     scenes.forEach((s) => this.applyLayerState(s));
+    this.placeInitialCamera(current);
     current.setOpacity(1);
     await this.viewer.settle();
     onProgress(1);
   }
 
-  /** Shift+V : copie la vue courante (à coller dans `days.<n>.initial_view` de sessions.json). */
+  /**
+   * Shift+V : copie la vue courante (à coller dans `scene.initial_view` de
+   * sessions.json), ramenée dans le repère commun des sessions.
+   */
   private readonly onKeyDown = (e: KeyboardEvent): void => {
     if (!e.shiftKey || e.code !== "KeyV" || e.ctrlKey || e.metaKey) return;
-    const json = JSON.stringify(this.viewer.currentView());
+    const view = this.viewer.currentView();
+    const json = JSON.stringify(this.current ? transformView(view, this.current.placement.clone().invert()) : view);
     console.info("Vue courante :", json);
     navigator.clipboard?.writeText(json).then(
       () => this.toast("Vue copiée dans le presse-papiers"),
@@ -291,6 +342,7 @@ export class ArchiveView {
     this.lightbox?.dispose();
     this.audioPlayer?.dispose();
     this.feed?.dispose();
+    this.planFloor?.dispose();
     for (const p of this.scenes.values()) p.then((s) => s.dispose());
     this.viewer?.dispose();
     this.root.remove();
@@ -308,6 +360,7 @@ export class ArchiveView {
             overlayContainer: this.stage,
             cameraSmoothing: this.options.cameraSmoothing,
             cameraSmoothingForced: this.options.cameraSmoothingForced === true,
+            placement: this.placementOf(id),
             insets: () => this.overlayInsets(),
             onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title),
             onPlayAudio: (audio, title) => this.audioPlayer?.open(audio, title),
@@ -318,6 +371,198 @@ export class ArchiveView {
       this.scenes.set(id, promise);
     }
     return promise;
+  }
+
+  /** Emplacement d'une session sur le plan du bâtiment ; à défaut, elle reste où la met sa `worldTransform`. */
+  private placementOf(id: string): THREE.Matrix4 | undefined {
+    const config = this.planConfig;
+    const placement = config?.sessions[id];
+    return config && placement ? placementMatrix(placement, config.plan.floor) : undefined;
+  }
+
+  /** Vue d'arrivée d'une session (la sienne pour l'Event), à son endroit du bâtiment. */
+  private siteView(scene: SessionScene): CameraView | null {
+    const view = scene.manifest.view ?? this.sceneConfig.initialView;
+    return view ? transformView(view, scene.placement) : null;
+  }
+
+  /** Axe de la rotation automatique d'une session, à son endroit du bâtiment. */
+  private orbitCenter(scene: SessionScene): THREE.Vector3 | null {
+    const config = scene.manifest.orbit ?? this.sceneConfig.orbit;
+    return config ? new THREE.Vector3(...config.center).applyMatrix4(scene.placement) : null;
+  }
+
+  /**
+   * Chaque session a son lieu : pendant le fondu, la caméra s'y rend (ou
+   * l'axe de la rotation automatique s'y déplace). Renvoie la durée du fondu,
+   * allongée s'il le faut pour couvrir le trajet.
+   */
+  private travel(from: SessionScene, to: SessionScene, duration: number): number {
+    if (this.orbit) {
+      const center = this.orbitCenter(to);
+      if (center) this.orbit.moveCenter(center, duration / 1000);
+      return duration;
+    }
+    // L'Event a sa propre vue : on la rejoint, et celle des sessions en le quittant ;
+    // ailleurs, la caméra garde son cadrage, transporté d'un lieu à l'autre
+    const view = to.manifest.view || from.manifest.view
+      ? this.siteView(to)
+      : transformView(this.viewer.currentView(), to.placement.clone().multiply(from.placement.clone().invert()));
+    return this.travelTo(view, duration);
+  }
+
+  /** Vol vers `view` ; renvoie la durée du fondu, allongée s'il le faut pour couvrir le trajet. */
+  private travelTo(view: CameraView | null, duration: number): number {
+    if (!view) return duration;
+    const position = new THREE.Vector3(...view.position);
+    const quaternion = new THREE.Quaternion(...view.quaternion);
+    const { camera } = this.viewer;
+    if (camera.position.distanceTo(position) < 0.01 && camera.quaternion.angleTo(quaternion) < 1e-3) return duration;
+    const flight = this.viewer.flightDuration(position, quaternion);
+    void this.flyToView(view, flight);
+    return Math.max(duration, flight * 1000);
+  }
+
+  // --- Vue d'ensemble -------------------------------------------------------------
+
+  /**
+   * Vue d'ensemble : un bouton à droite de la barre des sessions, une mise en
+   * page commune des annotations de toutes les sessions, et un bouton de
+   * lecture au départ de chaque trajet enregistré.
+   */
+  private setupFullView(scenes: SessionScene[]): void {
+    if (scenes.length < 2) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "sessions-full";
+    button.dataset.state = "idle";
+    button.innerHTML = `<span class="sessions__name">Toutes les sessions</span><span class="sessions__time">vue d'ensemble</span>`;
+    button.setAttribute("aria-label", "Toutes les sessions, réunies dans le bâtiment");
+    button.addEventListener("click", () => {
+      if (!this.full) this.enterFull().catch((err) => console.error(err));
+    });
+    this.root.querySelector(".session__topbar")!.appendChild(button);
+    this.fullButton = button;
+
+    // Une seule mise en page pour toutes les annotations : les étiquettes ne se chevauchent pas
+    const annotations = scenes.flatMap((s) => s.worldAnnotations());
+    if (annotations.length > 0) {
+      const occluder = new MultiOccluder(() => scenes.map((s) => s.layerObject("mesh")).filter((o): o is THREE.Object3D => o !== null));
+      this.fullAnnotations = new AnnotationOverlay({
+        container: this.stage,
+        camera: this.viewer.camera,
+        annotations,
+        occluder: () => occluder,
+        insets: () => this.overlayInsets(),
+        onOpenMedia: (items, index, title) => this.lightbox?.open(items, index, title),
+        onPlayAudio: (audio, title) => this.audioPlayer?.open(audio, title),
+      });
+      this.fullAnnotations.setOpacity(0);
+      this.disposers.push(() => this.fullAnnotations?.dispose());
+    }
+
+    const starts = scenes.flatMap((s) => {
+      const position = s.playback ? s.startPosition() : null;
+      return position ? [{ id: s.id, label: sessionLabel(s.manifest), position }] : [];
+    });
+    if (starts.length > 0) {
+      this.pathStarts = new PathStarts(this.stage, this.viewer.camera, starts, (id) => this.playFromFull(id).catch((err) => console.error(err)));
+      this.disposers.push(() => this.pathStarts?.dispose());
+    }
+    this.disposers.push(this.viewer.onCameraUpdated((dt) => {
+      this.fullAnnotations?.update(dt);
+      this.pathStarts?.update();
+    }));
+  }
+
+  /** Toutes les sessions apparaissent ensemble ; la caméra prend du recul sur le bâtiment. */
+  private async enterFull(): Promise<void> {
+    const previous = this.current;
+    if (!previous || this.full || !this.fullButton) return;
+    this.requested = FULL_VIEW_ID;
+    previous.playback?.pause();
+    this.audioPlayer?.close();
+    this.deactivate(previous);
+    this.setFull(true);
+    let duration = this.options.crossfadeDuration;
+    if (this.orbit) {
+      const center = this.overviewCenter();
+      this.orbit.moveCenter(center, duration / 1000);
+    } else {
+      duration = this.travelTo(this.overviewView(), duration);
+    }
+    await this.fade(() => 1, duration);
+  }
+
+  /** Entrée ou sortie de la vue d'ensemble : interface, annotations, départs des trajets. */
+  private setFull(full: boolean): void {
+    if (full === this.full) return;
+    this.full = full;
+    this.root.classList.toggle("is-full", full);
+    if (this.fullButton) {
+      this.fullButton.dataset.state = full ? "active" : "idle";
+      this.fullButton.setAttribute("aria-current", String(full));
+    }
+    this.fullAnnotations?.setOpacity(full ? 1 : 0);
+    this.fullAnnotations?.setVisible(this.annotationsVisible);
+    this.pathStarts?.setVisible(full);
+    this.pathStarts?.setActive(null);
+    for (const p of this.scenes.values()) p.then((s) => this.applyAnnotationVisibility(s));
+    if (!full) return;
+    for (const s of this.sessions) this.switcher?.setState(s.id, "idle");
+    this.root.querySelector(".session__title")!.textContent = "Toutes les sessions";
+    this.root.querySelector(".session__meta")!.textContent = "Chaque session à son endroit du bâtiment";
+    this.updateFeed();
+    const url = new URL(location.href);
+    url.searchParams.set("session", FULL_VIEW_ID);
+    history.replaceState(null, "", url);
+    document.title = "Toutes les sessions · Performance Archive";
+  }
+
+  /** Vue d'ensemble : lecture d'une session (son et caméra) depuis le départ de son trajet. */
+  private async playFromFull(id: string): Promise<void> {
+    if (!this.full) return;
+    const scene = await this.scene(id);
+    if (this.current !== scene || !this.controls) {
+      this.current?.playback?.pause();
+      if (this.current) this.deactivate(this.current);
+      this.current = scene;
+      this.setupPlayback(scene);
+      scene.playback?.preload();
+    }
+    this.pathStarts?.setActive(id);
+    this.root.querySelector(".session__meta")!.textContent = `${sessionLabel(scene.manifest)} · ${formatDayAndTime(scene.manifest.startDate)}`;
+    scene.playback?.seek(0);
+    await this.startPlayback(scene);
+  }
+
+  /** Centre de la vue d'ensemble : celui du plan, au sol ; à défaut, l'axe de la session courante. */
+  private overviewCenter(): THREE.Vector3 {
+    const plan = this.planConfig?.plan;
+    if (plan) return new THREE.Vector3(plan.center[0], plan.floor, plan.center[1]);
+    return (this.current && this.orbitCenter(this.current)) ?? new THREE.Vector3();
+  }
+
+  /** Vue d'ensemble : de haut, du côté de la vue d'arrivée. */
+  private overviewView(): CameraView {
+    const center = this.overviewCenter();
+    const initial = this.sceneConfig.initialView;
+    const forward = initial ? new THREE.Vector3(0, 0, -1).applyQuaternion(new THREE.Quaternion(...initial.quaternion)) : new THREE.Vector3(0, 0, -1);
+    forward.y = 0;
+    if (forward.lengthSq() < 1e-6) forward.set(0, 0, -1);
+    forward.normalize();
+    const position = center.clone().addScaledVector(forward, -OVERVIEW_DISTANCE).setY(center.y + OVERVIEW_HEIGHT);
+    const quaternion = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(position, center, new THREE.Vector3(0, 1, 0)));
+    return {
+      position: position.toArray() as Vec3,
+      quaternion: quaternion.toArray() as Quat,
+      target: center.toArray() as Vec3,
+    };
+  }
+
+  /** Annotations d'une session : les siennes hors vue d'ensemble, la mise en page commune sinon. */
+  private applyAnnotationVisibility(scene: SessionScene): void {
+    scene.setAnnotationsVisible(this.annotationsVisible && !this.full);
   }
 
   /** Préchargement à l'intention (survol du sélecteur). */
@@ -346,38 +591,45 @@ export class ArchiveView {
     previous.playback?.pause();
     this.audioPlayer?.close();
     this.deactivate(previous);
+    // Depuis la vue d'ensemble, la caméra rejoint la vue d'arrivée de la session
+    const fromFull = this.full;
+    this.setFull(false);
     this.activate(next);
-    // L'Event a son propre lieu : la caméra rejoint sa vue, et celle des sessions en le quittant
-    const view = next.manifest.view ?? (previous.manifest.view ? this.sceneConfig.initialView : null);
-    if (view && next !== previous) void this.flyToView(view);
+    if (fromFull) duration = this.travelTo(this.siteView(next), duration);
+    else if (next !== previous) duration = this.travel(previous, next, duration);
     await this.crossfade(next, duration);
   }
 
   /** Vol vers une vue enregistrée ; à l'arrivée, l'orbite reprend son pivot. */
-  private async flyToView(view: CameraView): Promise<void> {
+  private async flyToView(view: CameraView, duration?: number): Promise<void> {
     this.stopOrbit();
     const position = new THREE.Vector3(...view.position);
     const quaternion = new THREE.Quaternion(...view.quaternion);
-    if (await this.viewer.flyTo(position, quaternion, this.viewer.flightDuration(position, quaternion))) this.viewer.setView(view);
+    if (await this.viewer.flyTo(position, quaternion, duration ?? this.viewer.flightDuration(position, quaternion))) this.viewer.setView(view);
   }
 
   /**
    * Fondu enchaîné vers `to` : chaque autre session s'éteint depuis son
    * opacité courante (un fondu interrompu repart d'où il en était).
    */
-  private async crossfade(to: SessionScene, duration: number): Promise<void> {
+  private crossfade(to: SessionScene, duration: number): Promise<void> {
+    return this.fade((scene) => (scene === to ? 1 : 0), duration);
+  }
+
+  /** Fondu de chaque session vers son opacité cible ; une nouvelle demande prend la main. */
+  private async fade(target: (scene: SessionScene) => number, duration: number): Promise<void> {
+    const token = ++this.fadeToken;
     const scenes = await Promise.all(this.scenes.values());
     const starts = new Map(scenes.map((s) => [s, s.currentOpacity]));
     const start = performance.now();
     this.root.classList.add("is-transitioning");
     return new Promise((resolve) => {
       const step = () => {
-        // Une nouvelle demande prend la main sur ce fondu
-        if (this.current !== to) return resolve();
+        if (token !== this.fadeToken) return resolve();
         const x = Math.min(1, (performance.now() - start) / duration);
         const e = easeInOutCubic(x);
         for (const [scene, from] of starts) {
-          scene.setOpacity(from + ((scene === to ? 1 : 0) - from) * e);
+          scene.setOpacity(from + (target(scene) - from) * e);
         }
         if (x < 1) requestAnimationFrame(step);
         else {
@@ -398,7 +650,7 @@ export class ArchiveView {
     this.switcher?.reveal(scene.id);
     this.root.querySelector(".session__meta")!.textContent = formatDayAndTime(manifest.startDate);
     for (const s of this.sessions) this.switcher?.setState(s.id, s.id === scene.id ? "active" : "idle");
-    scene.setAnnotationsVisible(this.annotationsVisible);
+    this.applyAnnotationVisibility(scene);
     if (this.loaded) scene.playback?.preload();
     this.setupPlayback(scene);
     LAYER_ITEMS.forEach(({ id }) => this.refreshToggle(id));
@@ -428,7 +680,7 @@ export class ArchiveView {
   }
 
   private placeInitialCamera(scene: SessionScene): void {
-    const view = scene.manifest.view ?? this.sceneConfig.initialView;
+    const view = this.siteView(scene);
     if (view) return this.viewer.setView(view);
     const position = new THREE.Vector3();
     const quaternion = new THREE.Quaternion();
@@ -556,17 +808,24 @@ export class ArchiveView {
   private startOrbit(): void {
     const base = this.sceneConfig.orbit;
     if (!base || this.orbit || !this.current) return;
-    // L'Event tourne autour de son propre centre, à son échelle
+    // L'Event tourne autour de son propre centre, à son échelle ; la vue d'ensemble, autour du bâtiment
     const config = this.current.manifest.orbit ?? base;
     this.orbit = new AutoOrbit(
       this.viewer.camera,
-      {
-        center: new THREE.Vector3(...config.center),
-        turnSeconds: config.turn_seconds ?? base.turn_seconds ?? 80,
-        stepDegrees: config.switch_degrees ?? base.switch_degrees ?? 360,
-        radius: config.radius,
-        height: config.height,
-      },
+      this.full
+        ? {
+          center: this.overviewCenter(),
+          turnSeconds: (base.turn_seconds ?? 80) * 2,
+          radius: { min: OVERVIEW_DISTANCE * 0.7, max: OVERVIEW_DISTANCE * 1.3 },
+          height: { min: OVERVIEW_HEIGHT * 0.6, max: OVERVIEW_HEIGHT * 1.3 },
+        }
+        : {
+          center: this.orbitCenter(this.current) ?? new THREE.Vector3(...config.center),
+          turnSeconds: config.turn_seconds ?? base.turn_seconds ?? 80,
+          stepDegrees: config.switch_degrees ?? base.switch_degrees ?? 360,
+          radius: config.radius,
+          height: config.height,
+        },
       () => this.nextSessionOnTurn(),
     );
     this.viewer.setMode("auto");
@@ -592,8 +851,8 @@ export class ArchiveView {
 
   /** Chaque étape de l'orbite (`switch_degrees`) : session suivante, en fondu lent. */
   private nextSessionOnTurn(): void {
-    // L'Event se contemple seul ; les sessions se succèdent entre elles
-    if (!this.current || this.current.manifest.kind === "event") return;
+    // L'Event se contemple seul, la vue d'ensemble aussi ; les sessions se succèdent entre elles
+    if (!this.current || this.full || this.current.manifest.kind === "event") return;
     const cycle = this.sessions.filter((s) => s.kind !== "event");
     if (cycle.length < 2) return;
     const i = cycle.findIndex((s) => s.id === this.current!.id);
@@ -611,23 +870,34 @@ export class ArchiveView {
 
   private applyLayerState(scene: SessionScene): void {
     for (const { id } of LAYER_ITEMS) scene.setLayerVisible(id, this.layerVisible[id]);
-    scene.setAnnotationsVisible(this.annotationsVisible);
+    this.applyAnnotationVisibility(scene);
   }
 
   private setupLayerToggles(scenes: SessionScene[]): void {
     const items: LayerToggleItem[] = LAYER_ITEMS.filter((item) => scenes.some((s) => s.hasLayer(item.id)));
-    if (scenes.some((s) => s.annotations)) items.push(ANNOTATIONS_ITEM);
+    const hasAnnotations = scenes.some((s) => s.annotations);
+    if (hasAnnotations) items.push(ANNOTATIONS_ITEM);
+    // Sous les annotations, dans le même groupe (séparateur au-dessus s'il n'y a pas d'annotations)
+    if (this.planFloor) items.push({ ...PLAN_ITEM, groupStart: !hasAnnotations });
     this.toggles = new LayerToggles(items, (id) => this.toggle(id));
     this.root.appendChild(this.toggles.element);
     LAYER_ITEMS.forEach(({ id }) => this.refreshToggle(id));
     this.toggles.setState("annotations", this.annotationsVisible ? "on" : "off");
+    this.toggles.setState("plan", this.planVisible ? "on" : "off");
   }
 
   private toggle(id: ToggleId): void {
     if (id === "annotations") {
       this.annotationsVisible = !this.annotationsVisible;
-      for (const p of this.scenes.values()) p.then((s) => s.setAnnotationsVisible(this.annotationsVisible));
+      for (const p of this.scenes.values()) p.then((s) => this.applyAnnotationVisibility(s));
+      this.fullAnnotations?.setVisible(this.annotationsVisible);
       this.toggles?.setState("annotations", this.annotationsVisible ? "on" : "off");
+      return;
+    }
+    if (id === "plan") {
+      this.planVisible = !this.planVisible;
+      this.planFloor?.setVisible(this.planVisible);
+      this.toggles?.setState("plan", this.planVisible ? "on" : "off");
       return;
     }
     this.layerVisible[id] = !this.layerVisible[id];
@@ -659,5 +929,30 @@ export class ArchiveView {
       right: Math.max(margin + 6, feed ? box.right - feed.left + margin : 0),
       bottom: footer ? box.bottom - footer.top + margin : margin + 10,
     };
+  }
+}
+
+/** Vue transformée par une matrice (placement d'une session : déplacement, rotation, échelle). */
+function transformView(view: CameraView, matrix: THREE.Matrix4): CameraView {
+  const rotation = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().extractRotation(matrix));
+  return {
+    ...view,
+    position: new THREE.Vector3(...view.position).applyMatrix4(matrix).toArray() as Vec3,
+    quaternion: new THREE.Quaternion(...view.quaternion).premultiply(rotation).toArray() as Quat,
+    target: new THREE.Vector3(...view.target).applyMatrix4(matrix).toArray() as Vec3,
+  };
+}
+
+/**
+ * Occultation des annotations par la photogrammétrie de plusieurs sessions
+ * (vue d'ensemble) : chaque maillage est testé à son tour, sans être déplacé.
+ */
+class MultiOccluder extends THREE.Object3D {
+  constructor(private readonly parts: () => THREE.Object3D[]) {
+    super();
+  }
+
+  override raycast(raycaster: THREE.Raycaster, intersects: THREE.Intersection[]): void {
+    for (const part of this.parts()) raycaster.intersectObject(part, true, intersects);
   }
 }

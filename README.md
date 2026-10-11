@@ -4,7 +4,7 @@ Archive vivante de performances, capturées en photogrammétrie et en Gaussian S
 
 Chaque session se rejoue : le son de la vidéo d'origine est diffusé pendant que la caméra suit dans la scène 3D le trajet, lissé, de l'appareil au moment du tournage. Trois représentations de la scène se superposent, recalées dans un même repère : le Gaussian splat, la photogrammétrie texturée et le nuage de points LiDAR. Des annotations spatialisées (titre, note, images) y sont épinglées.
 
-Toutes les sessions, quel que soit le jour, sont recalées dans un repère commun, calé sur la table restée en place : on passe de l'une à l'autre en fondu enchaîné, sans que la caméra bouge. Après 30 s d'inactivité, la caméra tourne lentement autour de l'axe de la scène et les sessions se succèdent, une par demi-tour.
+Toutes les sessions, quel que soit le jour, sont recalées dans un repère commun, calé sur la table restée en place, puis posées à l'endroit du bâtiment où elles ont été captées, sur un plan fixe et au même niveau de sol. On passe de l'une à l'autre en fondu enchaîné, pendant que la caméra se rend au lieu de la suivante en gardant son cadrage. Après 30 s d'inactivité, la caméra tourne lentement autour de la scène et les sessions se succèdent, une par demi-tour ; l'axe de rotation glisse d'un lieu à l'autre pendant le fondu. Le bouton « Toutes les sessions », à droite de la barre, les réunit toutes dans le bâtiment avec leurs annotations ; un bouton « ▶ Session n » au départ de chaque trajet enregistré lance son écoute (son et caméra) au milieu des autres.
 
 ## Arborescence
 
@@ -37,6 +37,8 @@ Performance Archive/
     ├── public/sessions/        Assets générés par le pipeline (versionnés : servis tels quels en production)
     ├── public/annotations.config.json  Titres, textes, couleurs, médias des annotations (à éditer)
     ├── public/media/           Médias (images, vidéos, PDF) cités par ce fichier
+    ├── public/plan.config.json Plan du bâtiment et emplacement de chaque session (à éditer)
+    ├── public/plan/plan.svg    Plan du bâtiment
     └── src/
         ├── app/                Orchestration (App, ArchiveView, SessionScene, IdleWatcher)
         ├── data/               Contrat de données et chargement
@@ -74,7 +76,7 @@ npm run dev
 Ouvrir http://localhost:5173.
 
 Paramètres d'URL :
-- `?session=j1-s1` : session affichée ;
+- `?session=j1-s1` : session affichée (`?session=full` : toutes les sessions) ;
 - `?smoothing=0.7` : lissage du trajet caméra en secondes (`0` = trajet brut).
 
 Tests : `cd web && npm test`.
@@ -164,6 +166,18 @@ Voir [pipeline/README.md](pipeline/README.md) pour le détail du format et du re
 - **Médias** : déposer les fichiers dans [web/public/media/](web/public/media) et les citer par leur nom. Une vidéo se lit en boucle, sans le son, au survol et au clic ; un PDF s'ouvre dans la visionneuse ; un **audio** (`.m4a`, `.mp3`…) apparaît comme une rangée « ▶ Audio 1 » : au clic un petit lecteur s'ouvre et lit, met la vidéo de la session en pause, et se referme tout seul à la fin (`{ "file": "voix.m4a", "label": "Présentation", "duration": 40 }` pour le nommer). Garder les fichiers légers (images ≲ 1 Mo, vidéos de quelques Mo).
 - **Nouvelles annotations** posées dans dür.air : après le build du pipeline, `.venv/Scripts/python pipeline/sync_annotations_config.py` ajoute leurs entrées au fichier, sans toucher aux réglages existants.
 - **Erreurs** : une coquille (virgule, guillemet) ne casse pas le site, qui garde les valeurs d'origine ; la console du navigateur (F12) dit ce qui ne va pas, y compris une annotation introuvable ou un format de fichier inconnu.
+
+## Plan du bâtiment et lieu des sessions : `plan.config.json`
+
+Le plan du bâtiment ([web/public/plan/plan.svg](web/public/plan/plan.svg)) est fixe : chaque session y est posée à l'endroit où elle a été captée, tous les modèles au même niveau de sol. Le bouton « Plan du bâtiment » (touche 5), sous celui des annotations, l'affiche au sol en traits clairs et translucides ; il est allumé à l'arrivée.
+
+[web/public/plan.config.json](web/public/plan.config.json) (lu au chargement : on enregistre, on recharge la page) règle :
+
+- `metersPerUnit` : l'échelle du plan, en mètres par unité du SVG (0,104, d'après le mur courbe de l'amphithéâtre mesuré dans le nuage LiDAR de j3-s8) ; `color`, `opacity` : ses traits ;
+- `plan` : sa pose (`center` [x, z] du centre du SVG, `rotation` en degrés, `floor` : hauteur du sol, commune à tous les modèles) ;
+- `sessions` : l'emplacement de chaque session. Le point `anchor` [x, y, z] du modèle (au sol, dans le repère commun des sessions) est posé en `position` [x, z] sur le plan, au niveau du sol ; le modèle est tourné de `rotation` (degrés) et mis à l'échelle de `scale` autour de ce point. Pour déplacer un modèle : `position` ; le tourner : `rotation` ; l'agrandir : `scale`.
+
+Les emplacements viennent des maquettes « Plan- sessionN.png » (plan recalé dans chaque capture, caméra de la capture retrouvée par les épingles d'annotation), avec les échelles ajustées à l'œil (j1-s2, j2-s5, j3-s7 : 1,1 ; j3-s9 : 1,25) et le sol de chaque modèle mesuré sur les faces horizontales de sa photogrammétrie. La vue d'arrivée et l'axe de rotation automatique (`scene` dans `sessions.json`, `view` et `orbit` de l'Event) restent exprimés dans le repère commun ; le viewer les transporte au lieu de chaque session. Shift+V copie la vue courante dans ce même repère.
 
 ## Contrat de données
 

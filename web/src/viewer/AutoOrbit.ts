@@ -19,6 +19,8 @@ const EASE_IN = 7;
 const BREATH_RADIUS = 0.06;
 const BREATH_HEIGHT = 0.3;
 
+const easeInOutSine = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2;
+
 const smoothstep = (x: number) => {
   const t = THREE.MathUtils.clamp(x, 0, 1);
   return t * t * (3 - 2 * t);
@@ -31,6 +33,8 @@ const smoothstep = (x: number) => {
  * progressivement, le regard glisse vers l'axe, le rayon et la hauteur
  * rejoignent une orbite confortable. Une légère respiration (rayon, hauteur)
  * accompagne chaque tour. `onStep` est appelé tous les `stepDegrees` parcourus.
+ * L'axe peut glisser vers un autre lieu (`moveCenter`) : la caméra le suit
+ * sans interrompre sa rotation.
  */
 export class AutoOrbit {
   private readonly startQuaternion = new THREE.Quaternion();
@@ -38,6 +42,9 @@ export class AutoOrbit {
   private readonly matrix = new THREE.Matrix4();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private readonly lookAt = new THREE.Vector3();
+  /** Axe courant (il se déplace avec `moveCenter`). */
+  private readonly center: THREE.Vector3;
+  private move: { from: THREE.Vector3; to: THREE.Vector3; elapsed: number; duration: number } | null = null;
   private readonly startAngle: number;
   private readonly startRadius: number;
   private readonly startHeight: number;
@@ -53,8 +60,8 @@ export class AutoOrbit {
     private readonly options: AutoOrbitOptions,
     private readonly onStep: (step: number) => void,
   ) {
-    const { center } = options;
-    const offset = camera.position.clone().sub(center);
+    this.center = options.center.clone();
+    const offset = camera.position.clone().sub(this.center);
     this.startAngle = Math.atan2(offset.x, offset.z);
     this.startRadius = Math.hypot(offset.x, offset.z);
     this.startHeight = offset.y;
@@ -65,10 +72,22 @@ export class AutoOrbit {
     this.targetHeight = THREE.MathUtils.clamp(this.startHeight, height.min, height.max);
   }
 
+  /** Déplace l'axe vers `center` en `duration` secondes (départ et arrivée en douceur). */
+  moveCenter(center: THREE.Vector3, duration: number): void {
+    this.move = { from: this.center.clone(), to: center.clone(), elapsed: 0, duration: Math.max(duration, 1e-3) };
+  }
+
   update(dt: number): void {
     // Un onglet en arrière-plan peut renvoyer un très grand dt
     const step = Math.min(dt, 0.1);
     this.elapsed += step;
+    if (this.move) {
+      const m = this.move;
+      m.elapsed += step;
+      const x = Math.min(1, m.elapsed / m.duration);
+      this.center.lerpVectors(m.from, m.to, easeInOutSine(x));
+      if (x >= 1) this.move = null;
+    }
     const ease = smoothstep(this.elapsed / EASE_IN);
     const speed = (2 * Math.PI) / this.options.turnSeconds;
     // Sens horaire vu du dessus
@@ -78,7 +97,7 @@ export class AutoOrbit {
     const radius = THREE.MathUtils.lerp(this.startRadius, this.targetRadius, ease) * (1 + BREATH_RADIUS * breath * ease);
     const height = THREE.MathUtils.lerp(this.startHeight, this.targetHeight, ease) + BREATH_HEIGHT * Math.sin(this.travelled * 0.5) ** 2 * ease;
     const angle = this.startAngle - this.travelled;
-    const { center } = this.options;
+    const { center } = this;
     this.camera.position.set(center.x + radius * Math.sin(angle), center.y + height, center.z + radius * Math.cos(angle));
 
     // Le regard glisse de l'orientation de départ vers l'axe
@@ -97,7 +116,7 @@ export class AutoOrbit {
 
   /** Point regardé, pour que l'orbite manuelle reprenne sans à-coup. */
   focus(target: THREE.Vector3): THREE.Vector3 {
-    const distance = this.camera.position.distanceTo(this.options.center);
+    const distance = this.camera.position.distanceTo(this.center);
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
     return target.copy(this.camera.position).addScaledVector(forward, distance);
   }

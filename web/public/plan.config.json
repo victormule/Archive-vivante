@@ -1,0 +1,83 @@
+{
+  "$aide": {
+    "principe": "Plan du bâtiment, fixe, et emplacement de chaque session sur ce plan (bouton « Plan du bâtiment », sous celui des annotations). Lu par le site au chargement : modifier, enregistrer, recharger la page.",
+    "svg": "Fichier du plan, depuis web/public/.",
+    "metersPerUnit": "Mètres par unité du SVG. 0,104 : rayon du mur courbe de l'amphithéâtre (7,48 m, nuage LiDAR de j3-s8) rapporté au cercle du plan (71,7 unités).",
+    "color": "Couleur des traits.",
+    "opacity": "Opacité des traits (0 à 1).",
+    "plan": "Pose du plan : center = [x, z] où tombe le centre du SVG, rotation = degrés autour de la verticale (sens trigonométrique vu de dessus), floor = hauteur du sol, celle de tous les modèles.",
+    "sessions": "Emplacement de chaque session : le point anchor du modèle [x, y, z] (au sol, y = hauteur de son sol, repère commun des sessions) est posé en position [x, z] sur le plan, au niveau du sol ; le modèle est tourné de rotation (degrés) et mis à l'échelle de scale autour de ce point. Pour déplacer un modèle : position ; le tourner : rotation ; l'agrandir : scale. { \"sameAs\": \"j1-s1\", \"scale\": 1.1 } reprend l'emplacement d'une autre session.",
+    "calage": "Calculé le 2026-10-11 à partir des maquettes « Plan- sessionN.png » (plan recalé dans chaque capture, caméra retrouvée par les épingles d'annotation), échelles ajustées à l'œil (j1-s2, j2-s5, j3-s7 : 1,1 ; j3-s9 : 1,25), sols mesurés sur les faces horizontales de la photogrammétrie."
+  },
+  "svg": "plan/plan.svg",
+  "metersPerUnit": 0.104,
+  "color": "#d8d4cc",
+  "opacity": 0.32,
+  "plan": {
+    "center": [-6.165, -2.466],
+    "rotation": 68.44,
+    "floor": -1.456
+  },
+  "sessions": {
+    "j1-s1": {
+      "anchor": [-0.62, -1.456, -4.2],
+      "position": [-0.62, -4.2],
+      "rotation": 0.0,
+      "scale": 1
+    },
+    "j1-s2": {
+      "anchor": [-0.62, -1.4, -4.2],
+      "position": [-0.62, -4.2],
+      "rotation": 0.0,
+      "scale": 1.1
+    },
+    "j2-s3": {
+      "anchor": [-0.62, -1.4, -4.2],
+      "position": [9.977, -10.09],
+      "rotation": 130.14,
+      "scale": 1
+    },
+    "j2-s4": {
+      "anchor": [-1.175, -1.235, -3.21],
+      "position": [-1.386, 4.971],
+      "rotation": 92.44,
+      "scale": 1
+    },
+    "j2-s5": {
+      "anchor": [-1.175, -1.235, -3.21],
+      "position": [-1.386, 4.971],
+      "rotation": 92.44,
+      "scale": 1.1
+    },
+    "j3-s6": {
+      "anchor": [-1.017, -1.44, -3.113],
+      "position": [8.784, -6.028],
+      "rotation": -72.17,
+      "scale": 1
+    },
+    "j3-s7": {
+      "anchor": [-0.62, -1.4, -4.2],
+      "position": [9.977, -10.09],
+      "rotation": 130.14,
+      "scale": 1.1
+    },
+    "j3-s8": {
+      "anchor": [-4.14, -2.46, -1.64],
+      "position": [14.745, -0.572],
+      "rotation": 170.44,
+      "scale": 1
+    },
+    "j3-s9": {
+      "anchor": [1.199, -2.48, -5.115],
+      "position": [-11.965, -6.057],
+      "rotation": -15.47,
+      "scale": 1.25
+    },
+    "j4-event": {
+      "anchor": [-1.125, -0.36, 13.572],
+      "position": [21.605, -7.795],
+      "rotation": 77.0,
+      "scale": 1
+    }
+  }
+}

@@ -48,6 +48,23 @@ describe("AutoOrbit", () => {
     expect(steps).toEqual([1, 2, 3, 4]);
   });
 
+  it("suit en douceur l'axe déplacé vers un autre lieu, sans s'arrêter de tourner", () => {
+    const { camera, orbit } = setup();
+    for (let t = 0; t < 10; t += 1 / 60) orbit.update(1 / 60);
+    const target = new THREE.Vector3(10, -0.71, 6);
+    orbit.moveCenter(target, 5);
+    let previous = camera.position.clone();
+    for (let i = 0; i < 60 * 6; i++) {
+      orbit.update(1 / 60);
+      // 14 m en 5 s : < 10 cm par image, sans à-coup
+      expect(camera.position.distanceTo(previous)).toBeLessThan(0.1);
+      previous = camera.position.clone();
+    }
+    const offset = camera.position.clone().sub(target);
+    expect(Math.hypot(offset.x, offset.z)).toBeLessThan(9.5);
+    expect(orbit.focus(new THREE.Vector3()).distanceTo(target)).toBeLessThan(0.05);
+  });
+
   it("finit par regarder l'axe de rotation", () => {
     const { camera, orbit } = setup();
     for (let t = 0; t < 20; t += 1 / 30) orbit.update(1 / 30);

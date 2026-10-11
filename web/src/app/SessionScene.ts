@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { loadAnnotations, loadCameraPath, sessionAssetUrl } from "@/data/sessionRepository";
-import type { LayerId, MediaItem, SessionManifest } from "@/data/types";
+import type { Annotation, LayerId, MediaItem, SessionManifest, Vec3 } from "@/data/types";
 import { CameraPath } from "@/playback/CameraPath";
 import { PlaybackController } from "@/playback/PlaybackController";
 import { AnnotationOverlay, type Insets } from "@/ui/annotations/AnnotationOverlay";
@@ -26,6 +26,8 @@ export interface SessionSceneOptions {
   cameraSmoothing: number;
   /** Le lissage a été imposé (URL) : il prime sur celui d'une session. */
   cameraSmoothingForced: boolean;
+  /** Emplacement de la session sur le plan du bâtiment (`plan.config.json`), appliqué après sa `worldTransform`. */
+  placement?: THREE.Matrix4;
   insets: () => Insets;
   onOpenMedia: (items: MediaItem[], index: number, title: string) => void;
   onPlayAudio: (audio: Extract<MediaItem, { kind: "audio" }>, title: string) => void;
@@ -36,14 +38,20 @@ export interface SessionSceneOptions {
 /**
  * Contenu d'une session dans la scène partagée : couches, annotations, trajet
  * et lecture. Tout est placé dans le repère commun du projet par la
- * `worldTransform` du manifest ; l'opacité globale sert aux fondus enchaînés.
+ * `worldTransform` du manifest, puis à son endroit du bâtiment par son
+ * placement sur le plan ; l'opacité globale sert aux fondus enchaînés.
  */
 export class SessionScene {
   readonly group = new THREE.Group();
+  /** Repère de la session -> lieu commun (placement sur le plan compris). */
   readonly worldMatrix = new THREE.Matrix4();
+  /** Placement sur le plan : repère commun des sessions -> lieu de la session. */
+  readonly placement = new THREE.Matrix4();
   path: CameraPath | null = null;
   playback: PlaybackController | null = null;
   annotations: AnnotationOverlay | null = null;
+  /** Annotations de la session (repère de la session), pour la vue d'ensemble. */
+  annotationList: Annotation[] = [];
 
   private readonly slots = new Map<LayerId, LayerSlot>();
   private readonly layerVisible = new Map<LayerId, boolean>();
@@ -56,7 +64,8 @@ export class SessionScene {
   constructor(readonly manifest: SessionManifest, private readonly options: SessionSceneOptions) {
     this.group.name = `session:${manifest.id}`;
     this.group.matrixAutoUpdate = false;
-    this.worldMatrix.fromArray(manifest.worldTransform ?? new THREE.Matrix4().toArray());
+    if (options.placement) this.placement.copy(options.placement);
+    this.worldMatrix.fromArray(manifest.worldTransform ?? new THREE.Matrix4().toArray()).premultiply(this.placement);
     this.group.matrix.copy(this.worldMatrix);
     this.group.visible = false;
 
@@ -98,6 +107,7 @@ export class SessionScene {
         this.playback = new PlaybackController(sessionAssetUrl(manifest.id, manifest.playback!.audioUrl), this.path.duration);
         this.createPathLine(this.path);
       }
+      this.annotationList = annotationsData.annotations;
       if (annotationsData.annotations.length > 0) {
         this.annotations = new AnnotationOverlay({
           container: options.overlayContainer,
@@ -214,6 +224,21 @@ export class SessionScene {
     position.applyMatrix4(this.worldMatrix);
     quaternion.premultiply(rotationOf(this.worldMatrix));
     return true;
+  }
+
+  /** Annotations ramenées dans le lieu commun (vue d'ensemble : une seule mise en page pour toutes les sessions). */
+  worldAnnotations(): Annotation[] {
+    const p = new THREE.Vector3();
+    return this.annotationList.map((a) => ({
+      ...a,
+      points: a.points.map((point): Vec3 => p.set(...point).applyMatrix4(this.worldMatrix).toArray() as Vec3),
+    }));
+  }
+
+  /** Point de départ du trajet enregistré (début de la vidéo), dans le lieu commun. */
+  startPosition(): THREE.Vector3 | null {
+    const position = new THREE.Vector3();
+    return this.samplePose(0, position, new THREE.Quaternion()) ? position : null;
   }
 
   /** Boîte englobante du splat, dans le repère commun. */

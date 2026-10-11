@@ -1,6 +1,6 @@
 import type { LayerId } from "@/data/types";
 
-export type ToggleId = LayerId | "annotations";
+export type ToggleId = LayerId | "annotations" | "plan";
 
 export interface LayerToggleItem {
   id: ToggleId;
@@ -43,9 +43,17 @@ export const ANNOTATIONS_ITEM: LayerToggleItem = {
   icon: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c-3.6 0-6.5 2.9-6.5 6.5 0 4.9 6.5 12.5 6.5 12.5s6.5-7.6 6.5-12.5c0-3.6-2.9-6.5-6.5-6.5zm0 3.8a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z" fill-rule="evenodd"/></svg>`,
 };
 
+/** Plan du bâtiment au sol, sous le bouton des annotations (même groupe). */
+export const PLAN_ITEM: LayerToggleItem = {
+  id: "plan",
+  label: "Plan du bâtiment",
+  shortcut: "5",
+  icon: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M3.5 11.5H9M12 11.5h2.5V3.5M14.5 15v5.5M14.5 11.5h6"/></svg>`,
+};
+
 /**
  * Colonne de boutons à gauche : chaque couche s'active indépendamment et
- * les couches se cumulent. Raccourcis clavier 1, 2, 3 (+ 4 : annotations).
+ * les couches se cumulent. Raccourcis clavier 1, 2, 3 (+ 4 : annotations, 5 : plan).
  */
 export class LayerToggles {
   readonly element: HTMLElement;
