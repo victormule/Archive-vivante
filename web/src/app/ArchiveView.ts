@@ -14,6 +14,7 @@ import { PlayerControls } from "@/ui/PlayerControls";
 import { SessionSwitcher, sessionLabel } from "@/ui/SessionSwitcher";
 import { AutoOrbit } from "@/viewer/AutoOrbit";
 import { loadPlanImage, PlanFloor } from "@/viewer/PlanFloor";
+import { cameraFrame, transformView } from "@/viewer/cameraFrame";
 import { SceneViewer } from "@/viewer/SceneViewer";
 import { IdleWatcher } from "./IdleWatcher";
 import { SessionScene } from "./SessionScene";
@@ -72,6 +73,9 @@ export class ArchiveView {
   private pathStarts: PathStarts | null = null;
   /** Fondu en cours : un nouveau fondu prend la main sur le précédent. */
   private fadeToken = 0;
+  private readonly cameraFrames = new Map<SessionScene, THREE.Matrix4>();
+  /** Vue visée par le vol en cours : un nouveau départ se calcule depuis elle, pas depuis la pose à mi-chemin. */
+  private travelView: CameraView | null = null;
   private readonly disposers: Array<() => void> = [];
   private readonly sessionDisposers: Array<() => void> = [];
   private idle: IdleWatcher | null = null;
@@ -264,7 +268,7 @@ export class ArchiveView {
   private readonly onKeyDown = (e: KeyboardEvent): void => {
     if (!e.shiftKey || e.code !== "KeyV" || e.ctrlKey || e.metaKey) return;
     const view = this.viewer.currentView();
-    const json = JSON.stringify(this.current ? transformView(view, this.current.placement.clone().invert()) : view);
+    const json = JSON.stringify(this.current ? transformView(view, this.cameraFrame(this.current).clone().invert()) : view);
     console.info("Vue courante :", json);
     navigator.clipboard?.writeText(json).then(
       () => this.toast("Vue copiée dans le presse-papiers"),
@@ -334,14 +338,30 @@ export class ArchiveView {
     return config && placement ? placementMatrix(placement, config.plan.floor) : undefined;
   }
 
+  /**
+   * Repère où s'expriment la vue d'arrivée et l'axe de rotation d'une session. L'Event, qui a les siens, suit son
+   * placement ; les sessions partagent ceux de la scène, transportés sans changement d'échelle ni de hauteur.
+   */
+  private cameraFrame(scene: SessionScene): THREE.Matrix4 {
+    let frame = this.cameraFrames.get(scene);
+    if (!frame) {
+      const plan = this.planConfig?.plan;
+      const center = this.sceneConfig.orbit?.center ?? this.sceneConfig.initialView?.target;
+      const own = scene.manifest.view !== undefined || scene.manifest.orbit !== undefined;
+      frame = plan && center && !own ? cameraFrame(scene.placement, center, plan.floor) : scene.placement;
+      this.cameraFrames.set(scene, frame);
+    }
+    return frame;
+  }
+
   private siteView(scene: SessionScene): CameraView | null {
     const view = scene.manifest.view ?? this.sceneConfig.initialView;
-    return view ? transformView(view, scene.placement) : null;
+    return view ? transformView(view, this.cameraFrame(scene)) : null;
   }
 
   private orbitCenter(scene: SessionScene): THREE.Vector3 | null {
     const config = scene.manifest.orbit ?? this.sceneConfig.orbit;
-    return config ? new THREE.Vector3(...config.center).applyMatrix4(scene.placement) : null;
+    return config ? new THREE.Vector3(...config.center).applyMatrix4(this.cameraFrame(scene)) : null;
   }
 
   /** Renvoie la durée du fondu, allongée s'il le faut pour couvrir le trajet de la caméra. */
@@ -355,7 +375,7 @@ export class ArchiveView {
     // ailleurs, la caméra garde son cadrage, transporté d'un lieu à l'autre
     const view = to.manifest.view || from.manifest.view
       ? this.siteView(to)
-      : transformView(this.viewer.currentView(), to.placement.clone().multiply(from.placement.clone().invert()));
+      : transformView(this.travelView ?? this.viewer.currentView(), this.cameraFrame(to).clone().multiply(this.cameraFrame(from).clone().invert()));
     return this.travelTo(view, duration);
   }
 
@@ -557,7 +577,10 @@ export class ArchiveView {
     this.stopOrbit();
     const position = new THREE.Vector3(...view.position);
     const quaternion = new THREE.Quaternion(...view.quaternion);
-    if (await this.viewer.flyTo(position, quaternion, duration ?? this.viewer.flightDuration(position, quaternion))) this.viewer.setView(view);
+    this.travelView = view;
+    const arrived = await this.viewer.flyTo(position, quaternion, duration ?? this.viewer.flightDuration(position, quaternion));
+    if (arrived) this.viewer.setView(view);
+    if (this.travelView === view) this.travelView = null;
   }
 
   /** Un fondu interrompu repart de l'opacité courante. */
@@ -873,16 +896,6 @@ export class ArchiveView {
 
 function sessionTag(session: { kind?: string; index: number }): string {
   return session.kind === "event" ? "Év" : `S${session.index}`;
-}
-
-function transformView(view: CameraView, matrix: THREE.Matrix4): CameraView {
-  const rotation = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().extractRotation(matrix));
-  return {
-    ...view,
-    position: new THREE.Vector3(...view.position).applyMatrix4(matrix).toArray() as Vec3,
-    quaternion: new THREE.Quaternion(...view.quaternion).premultiply(rotation).toArray() as Quat,
-    target: new THREE.Vector3(...view.target).applyMatrix4(matrix).toArray() as Vec3,
-  };
 }
 
 /** Occultation par les maillages de plusieurs sessions, testés chacun à son tour. */

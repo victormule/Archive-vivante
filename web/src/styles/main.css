@@ -10,6 +10,8 @@ html, body, #app {
   color: var(--fg);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
+  /* Téléphone : un geste sur la scène ou l'interface ne tire ni ne recharge la page */
+  overscroll-behavior: none;
 }
 
 .visually-hidden {

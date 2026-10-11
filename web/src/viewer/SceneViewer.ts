@@ -13,6 +13,10 @@ export interface SceneViewerOptions {
 
 /** Distance (m) du pivot de l'orbite devant la caméra. */
 const ORBIT_TARGET_DISTANCE = 1.5;
+/** En deçà (m), le pivot est repoussé devant la caméra : le zoom avant ne bute jamais sur lui, on traverse la scène. */
+const MIN_ORBIT_DISTANCE = 0.5;
+/** Recul maximal (m) : la scène ne se perd pas de vue. */
+const MAX_ORBIT_DISTANCE = 200;
 
 const easeInOutSine = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2;
 
@@ -66,6 +70,7 @@ export class SceneViewer {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.08;
     this.controls.zoomSpeed = 0.6;
+    this.controls.maxDistance = MAX_ORBIT_DISTANCE;
     // La pose exacte (roulis compris) est conservée jusqu'à la première interaction
     this.controls.addEventListener("start", () => {
       if (this.orbitSynced) return;
@@ -139,6 +144,7 @@ export class SceneViewer {
         duration: duration * 1000,
         resolve,
       };
+      this.syncControls();
     });
   }
 
@@ -149,6 +155,7 @@ export class SceneViewer {
   cancelFlight(): void {
     const flight = this.flight;
     this.flight = null;
+    this.syncControls();
     flight?.resolve(false);
   }
 
@@ -167,7 +174,12 @@ export class SceneViewer {
   setMode(mode: CameraMode): void {
     if (mode === this._mode) return;
     this._mode = mode;
-    this.controls.enabled = mode === "free";
+    this.syncControls();
+  }
+
+  /** Pendant un vol, les gestes sont ignorés : ils ne s'accumulent pas pour s'appliquer d'un coup à l'arrivée. */
+  private syncControls(): void {
+    this.controls.enabled = this._mode === "free" && !this.flight;
   }
 
   /**
@@ -251,7 +263,10 @@ export class SceneViewer {
 
     this.updateFlight(now);
     this.frameCallbacks.forEach((cb) => cb(dt));
-    if (this._mode === "free" && this.orbitSynced && !this.flight) this.controls.update();
+    if (this._mode === "free" && this.orbitSynced && !this.flight) {
+      this.controls.update();
+      if (this.camera.position.distanceTo(this.controls.target) < MIN_ORBIT_DISTANCE) this.retargetOrbit();
+    }
     this.camera.updateMatrixWorld();
     this.cameraCallbacks.forEach((cb) => cb(dt));
     // Scène cachée : on ne rend que pour une préparation en cours, et pas pendant un tri Spark
@@ -296,6 +311,7 @@ export class SceneViewer {
     this.pendingTarget = null;
     if (x >= 1) {
       this.flight = null;
+      this.syncControls();
       f.resolve(true);
     }
   }
