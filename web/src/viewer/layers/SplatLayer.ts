@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { SplatMesh } from "@sparkjsdev/spark";
 import type { Layer, ProgressCallback } from "./Layer";
+import { RadialFade } from "./radialFade";
 
 export interface SplatSource {
   url: string;
@@ -19,6 +20,8 @@ export class SplatLayer implements Layer {
   readonly object = new THREE.Group();
   private meshes: SplatMesh[] = [];
   private opacity = 1;
+  /** Vue d'ensemble : les splats s'effacent loin du centre de la session. */
+  private readonly fade = new RadialFade();
 
   constructor(private readonly sources: SplatSource[]) {
     this.object.name = "splat";
@@ -34,6 +37,7 @@ export class SplatLayer implements Layer {
     this.meshes = this.sources.map((source, i) => {
       const mesh = new SplatMesh({
         url: source.url,
+        worldModifier: this.fade.modifier,
         onProgress: (e: ProgressEvent) => {
           if (e.lengthComputable && e.total > 0) ratios[i] = e.loaded / e.total;
           report();
@@ -55,6 +59,12 @@ export class SplatLayer implements Layer {
   setOpacity(opacity: number): void {
     this.opacity = opacity;
     for (const mesh of this.meshes) mesh.opacity = opacity;
+  }
+
+  /** Atténuation radiale (repère monde) ; `strength` 0 la coupe. */
+  setRadialFade(center: THREE.Vector3, inner: number, outer: number, strength: number): void {
+    if (!this.fade.set(center, inner, outer, strength)) return;
+    for (const mesh of this.meshes) mesh.updateVersion();
   }
 
   dispose(): void {

@@ -56,6 +56,11 @@ export class SessionScene {
   private readonly slots = new Map<LayerId, LayerSlot>();
   private readonly layerVisible = new Map<LayerId, boolean>();
   private pathLine: THREE.Line | null = null;
+  /** Trajet demandé par la lecture / la navigation ; `pathForced` (vue d'ensemble) prime. */
+  private pathRequested = true;
+  private pathForced: boolean | null = null;
+  /** Vue d'ensemble : atténuation des splats loin du centre de la session (`strength` 0 = sans effet). */
+  private readonly splatFade = { center: new THREE.Vector3(), inner: 0, outer: 1, strength: 0 };
   private prepared: Promise<void> | null = null;
   private opacity = 0;
   private annotationsVisible = true;
@@ -161,6 +166,7 @@ export class SessionScene {
         });
         slot.status = "ready";
         slot.layer.setOpacity(this.opacity);
+        this.applySplatFade();
         this.applyVisibility(id);
         this.options.viewer.invalidateSplats();
       } catch (err) {
@@ -214,7 +220,31 @@ export class SessionScene {
   }
 
   setPathVisible(visible: boolean): void {
-    if (this.pathLine) this.pathLine.visible = visible;
+    this.pathRequested = visible;
+    this.applyPathVisibility();
+  }
+
+  /** Impose l'affichage du trajet (vue d'ensemble : seulement au survol de son départ) ; `null` rend la main. */
+  forcePathVisible(visible: boolean | null): void {
+    this.pathForced = visible;
+    this.applyPathVisibility();
+  }
+
+  /** Zone gardée nette autour de `center` (repère monde, distances horizontales en m). */
+  configureSplatFade(center: THREE.Vector3, inner: number, outer: number): void {
+    Object.assign(this.splatFade, { inner, outer });
+    this.splatFade.center.copy(center);
+    this.applySplatFade();
+  }
+
+  get splatFadeStrength(): number {
+    return this.splatFade.strength;
+  }
+
+  setSplatFadeStrength(strength: number): void {
+    if (strength === this.splatFade.strength) return;
+    this.splatFade.strength = strength;
+    this.applySplatFade();
   }
 
   /** Pose caméra du trajet enregistré, dans le repère commun. */
@@ -262,11 +292,23 @@ export class SessionScene {
     if (slot) slot.layer.object.visible = slot.status === "ready" && (this.layerVisible.get(id) ?? false);
   }
 
+  private applyPathVisibility(): void {
+    if (this.pathLine) this.pathLine.visible = this.pathForced ?? this.pathRequested;
+  }
+
+  private applySplatFade(): void {
+    const layer = this.slots.get("splat")?.layer;
+    if (!(layer instanceof SplatLayer)) return;
+    const { center, inner, outer, strength } = this.splatFade;
+    layer.setRadialFade(center, inner, outer, strength);
+  }
+
   private createPathLine(path: CameraPath): void {
     const geometry = new THREE.BufferGeometry().setFromPoints(path.polyline());
     const material = new THREE.LineBasicMaterial({ color: 0xe8b04a, transparent: true, opacity: 0.8 * this.opacity, depthTest: false });
     this.pathLine = new THREE.Line(geometry, material);
     this.pathLine.renderOrder = 1;
+    this.applyPathVisibility();
     this.group.add(this.pathLine);
   }
 }

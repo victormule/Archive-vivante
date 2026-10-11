@@ -37,6 +37,14 @@ describe("parsePlanConfig", () => {
     expect(warnings.join("\n")).toMatch(/b : « sameAs » vise « a »/);
   });
 
+  it("lit l'atténuation de la vue d'ensemble ; une valeur incohérente garde celle par défaut", () => {
+    const base = { svg: "plan/plan.svg", metersPerUnit: 0.1, plan };
+    expect(parsePlanConfig({ ...base, fullFade: { inner: 2, outer: 6 } })?.fullFade).toEqual({ inner: 2, outer: 6 });
+    const warnings: string[] = [];
+    expect(parsePlanConfig({ ...base, fullFade: { inner: 5, outer: 4 } }, (m) => warnings.push(m))?.fullFade).toEqual({ inner: 3, outer: 5 });
+    expect(warnings.join("\n")).toMatch(/fullFade/);
+  });
+
   it("sans plan, ni échelle, ni pose du plan : pas de plan", () => {
     expect(parsePlanConfig({ metersPerUnit: 0.1, plan }, () => {})).toBeNull();
     expect(parsePlanConfig({ svg: "p.svg", metersPerUnit: -1, plan }, () => {})).toBeNull();

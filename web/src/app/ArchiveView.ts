@@ -444,8 +444,9 @@ export class ArchiveView {
     this.root.querySelector(".session__topbar")!.appendChild(button);
     this.fullButton = button;
 
-    // Une seule mise en page pour toutes les annotations : les étiquettes ne se chevauchent pas
-    const annotations = scenes.flatMap((s) => s.worldAnnotations());
+    // Une seule mise en page pour toutes les annotations : les étiquettes ne se chevauchent pas ;
+    // chacune porte sa session d'origine
+    const annotations = scenes.flatMap((s) => s.worldAnnotations().map((a) => ({ ...a, tag: sessionTag(s.manifest) })));
     if (annotations.length > 0) {
       const occluder = new MultiOccluder(() => scenes.map((s) => s.layerObject("mesh")).filter((o): o is THREE.Object3D => o !== null));
       this.fullAnnotations = new AnnotationOverlay({
@@ -466,8 +467,26 @@ export class ArchiveView {
       return position ? [{ id: s.id, label: sessionLabel(s.manifest), position }] : [];
     });
     if (starts.length > 0) {
-      this.pathStarts = new PathStarts(this.stage, this.viewer.camera, starts, (id) => this.playFromFull(id).catch((err) => console.error(err)));
+      // Les trajets ne se montrent qu'au survol de leur départ : tous ensemble, ils brouillent la vue
+      this.pathStarts = new PathStarts(
+        this.stage,
+        this.viewer.camera,
+        starts,
+        (id) => this.playFromFull(id).catch((err) => console.error(err)),
+        (id) => {
+          if (!this.full) return;
+          for (const s of scenes) s.forcePathVisible(s.id === id);
+        },
+      );
       this.disposers.push(() => this.pathStarts?.dispose());
+    }
+    // Splats des sessions effacés loin de leur centre : moins de bruit là où tout se croise (l'Event reste entier)
+    const fade = this.planConfig?.fullFade;
+    if (fade) {
+      for (const s of scenes) {
+        const center = s.manifest.kind === "event" ? null : this.orbitCenter(s);
+        if (center) s.configureSplatFade(center, fade.inner, fade.outer);
+      }
     }
     this.disposers.push(this.viewer.onCameraUpdated((dt) => {
       this.fullAnnotations?.update(dt);
@@ -507,7 +526,12 @@ export class ArchiveView {
     this.fullAnnotations?.setVisible(this.annotationsVisible);
     this.pathStarts?.setVisible(full);
     this.pathStarts?.setActive(null);
-    for (const p of this.scenes.values()) p.then((s) => this.applyAnnotationVisibility(s));
+    for (const p of this.scenes.values()) {
+      p.then((s) => {
+        this.applyAnnotationVisibility(s);
+        s.forcePathVisible(full ? false : null);
+      });
+    }
     if (!full) return;
     for (const s of this.sessions) this.switcher?.setState(s.id, "idle");
     this.root.querySelector(".session__title")!.textContent = "Toutes les sessions";
@@ -621,6 +645,9 @@ export class ArchiveView {
     const token = ++this.fadeToken;
     const scenes = await Promise.all(this.scenes.values());
     const starts = new Map(scenes.map((s) => [s, s.currentOpacity]));
+    const fadeStarts = new Map(scenes.map((s) => [s, s.splatFadeStrength]));
+    // Vue d'ensemble : l'atténuation des splats suit le fondu
+    const fadeTarget = (s: SessionScene) => (this.full && s.manifest.kind !== "event" ? 1 : 0);
     const start = performance.now();
     this.root.classList.add("is-transitioning");
     return new Promise((resolve) => {
@@ -630,6 +657,8 @@ export class ArchiveView {
         const e = easeInOutCubic(x);
         for (const [scene, from] of starts) {
           scene.setOpacity(from + (target(scene) - from) * e);
+          const fadeFrom = fadeStarts.get(scene)!;
+          scene.setSplatFadeStrength(fadeFrom + (fadeTarget(scene) - fadeFrom) * e);
         }
         if (x < 1) requestAnimationFrame(step);
         else {
@@ -930,6 +959,11 @@ export class ArchiveView {
       bottom: footer ? box.bottom - footer.top + margin : margin + 10,
     };
   }
+}
+
+/** Étiquette courte de la session d'une annotation (vue d'ensemble) : « S3 », « Év ». */
+function sessionTag(session: { kind?: string; index: number }): string {
+  return session.kind === "event" ? "Év" : `S${session.index}`;
 }
 
 /** Vue transformée par une matrice (placement d'une session : déplacement, rotation, échelle). */

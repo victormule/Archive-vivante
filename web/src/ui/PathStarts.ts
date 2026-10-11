@@ -26,6 +26,8 @@ export class PathStarts {
     private readonly camera: THREE.Camera,
     starts: PathStart[],
     onSelect: (id: string) => void,
+    /** Survol (ou focus) d'un départ : `null` quand il cesse. */
+    onHover: (id: string | null) => void,
   ) {
     this.element = document.createElement("div");
     this.element.className = "path-starts is-hidden";
@@ -37,6 +39,8 @@ export class PathStarts {
       button.querySelector(".path-start__label")!.textContent = start.label;
       button.setAttribute("aria-label", `Écouter ${start.label} depuis son départ`);
       button.addEventListener("click", () => onSelect(start.id));
+      for (const type of ["pointerenter", "focus"]) button.addEventListener(type, () => onHover(start.id));
+      for (const type of ["pointerleave", "blur"]) button.addEventListener(type, () => onHover(null));
       this.element.appendChild(button);
       return { start, button };
     });

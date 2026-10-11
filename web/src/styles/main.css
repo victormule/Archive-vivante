@@ -358,6 +358,16 @@ html, body, #app {
 }
 .annotation-label__head svg { flex: none; width: 13px; height: 13px; opacity: 0.9; }
 .annotation-label__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Vue d'ensemble : session d'origine de l'annotation */
+.annotation-label__tag {
+  flex: none;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
 
 /* Dépliage : la hauteur passe de 0 à auto via une grille animée */
 .annotation-label__detail {

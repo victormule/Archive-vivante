@@ -223,6 +223,12 @@ export class AnnotationOverlay {
       <div class="annotation-label__detail"><div class="annotation-label__inner"></div></div>
     `;
     label.querySelector(".annotation-label__title")!.textContent = data.title || "Sans titre";
+    if (data.tag) {
+      const tag = document.createElement("span");
+      tag.className = "annotation-label__tag";
+      tag.textContent = data.tag;
+      label.querySelector(".annotation-label__head svg")!.after(tag);
+    }
     const videos: HTMLVideoElement[] = [];
     this.fillDetail(label.querySelector<HTMLElement>(".annotation-label__inner")!, data, videos);
 

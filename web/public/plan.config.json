@@ -7,12 +7,14 @@
     "opacity": "Opacité des traits (0 à 1).",
     "plan": "Pose du plan : center = [x, z] où tombe le centre du SVG, rotation = degrés autour de la verticale (sens trigonométrique vu de dessus), floor = hauteur du sol, celle de tous les modèles.",
     "sessions": "Emplacement de chaque session : le point anchor du modèle [x, y, z] (au sol, y = hauteur de son sol, repère commun des sessions) est posé en position [x, z] sur le plan, au niveau du sol ; le modèle est tourné de rotation (degrés) et mis à l'échelle de scale autour de ce point. Pour déplacer un modèle : position ; le tourner : rotation ; l'agrandir : scale. { \"sameAs\": \"j1-s1\", \"scale\": 1.1 } reprend l'emplacement d'une autre session.",
+    "fullFade": "Vue d'ensemble (« Toutes les sessions ») : les splats de chaque session (pas l'Event) restent nets jusqu'à inner mètres de son centre (axe de la rotation automatique), puis s'effacent progressivement jusqu'à disparaître à outer mètres (distance horizontale). Moins de bruit là où les sessions se croisent.",
     "calage": "Calculé le 2026-10-11 à partir des maquettes « Plan- sessionN.png » (plan recalé dans chaque capture, caméra retrouvée par les épingles d'annotation), échelles ajustées à l'œil (j1-s2, j2-s5, j3-s7 : 1,1 ; j3-s9 : 1,25), sols mesurés sur les faces horizontales de la photogrammétrie."
   },
   "svg": "plan/plan.svg",
   "metersPerUnit": 0.104,
   "color": "#d8d4cc",
   "opacity": 0.32,
+  "fullFade": { "inner": 2, "outer": 5 },
   "plan": {
     "center": [-6.165, -2.466],
     "rotation": 68.44,

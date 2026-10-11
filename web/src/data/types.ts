@@ -211,6 +211,8 @@ export interface Annotation {
   color?: string;
   /** Médias dans l'ordre voulu (annotations.config.json) : prioritaires sur images / vidéos / documents. */
   media?: AnnotationMediaEntry[];
+  /** Session d'origine (« S3 »), affichée dans la vue d'ensemble. */
+  tag?: string;
 }
 
 export interface AnnotationsData {

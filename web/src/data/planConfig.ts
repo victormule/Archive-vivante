@@ -43,7 +43,11 @@ export interface PlanConfig {
   plan: PlanPose;
   /** Emplacement de chaque session (`{ "sameAs": "j1-s1" }` reprend celui d'une autre, `scale` en plus). */
   sessions: Record<string, SessionPlacement>;
+  /** Vue d'ensemble : splats d'une session nets jusqu'à `inner` m de son centre, effacés au-delà de `outer` m. */
+  fullFade: { inner: number; outer: number };
 }
+
+const DEFAULT_FULL_FADE = { inner: 3, outer: 5 };
 
 type Warn = (message: string) => void;
 
@@ -94,6 +98,12 @@ export function parsePlanConfig(raw: unknown, warn: Warn = () => {}): PlanConfig
     if (placement) sessions[id] = { ...placement, scale: scale ?? placement.scale };
     else warn(`${id} : « sameAs » vise « ${target} », qui n'a pas d'emplacement propre`);
   }
+  let fullFade = DEFAULT_FULL_FADE;
+  if (raw.fullFade !== undefined) {
+    const f = isRecord(raw.fullFade) ? raw.fullFade : {};
+    if (isFiniteNumber(f.inner) && isFiniteNumber(f.outer) && f.inner >= 0 && f.outer > f.inner) fullFade = { inner: f.inner, outer: f.outer };
+    else warn("« fullFade » : attendu { \"inner\": m, \"outer\": m } avec 0 ≤ inner < outer");
+  }
   return {
     svg: raw.svg,
     metersPerUnit: raw.metersPerUnit,
@@ -101,6 +111,7 @@ export function parsePlanConfig(raw: unknown, warn: Warn = () => {}): PlanConfig
     opacity,
     plan: { center: [plan.center[0], plan.center[1]], rotation: plan.rotation, floor: plan.floor },
     sessions,
+    fullFade,
   };
 }
 
