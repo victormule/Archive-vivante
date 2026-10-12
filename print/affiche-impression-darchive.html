@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Impression d'archive — affiche</title>
+<style>
+  @page { size: A3; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    width: 297mm; height: 420mm; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 24mm 20mm; text-align: center;
+    font-family: "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+    background: #0b0b0c; color: #fff;
+  }
+  .kicker { margin: 0; font-size: 22pt; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #e8b04a; }
+  h1 { margin: 0; font-size: 118pt; line-height: 0.95; font-weight: 900; letter-spacing: -0.03em; text-transform: uppercase; }
+  h1 span { color: #e8b04a; }
+  .lead { margin: 0; font-size: 31pt; line-height: 1.25; font-weight: 500; }
+  .lead b { color: #e8b04a; font-weight: 700; }
+  .qrbox { background: #fff; padding: 9mm; border-radius: 6mm; }
+  .qr { display: block; width: 150mm; height: 150mm; }
+  .scan { margin: 0; font-size: 28pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+  .url { margin: 3mm 0 0; font-size: 18pt; color: #bdbdc2; }
+  .bar { width: 50mm; height: 2.5mm; border-radius: 1mm; background: #e8b04a; }
+</style>
+</head>
+<body>
+  <p class="kicker">Théâtre · Pièce N°2</p>
+  <h1>Impression<br /><span>d'archive</span></h1>
+  <p class="lead">Vous étiez là ?<br /><b>Dites-nous ce que vous avez vécu&nbsp;:</b><br />vos impressions, avis, pensées, sentiments.</p>
+  <div class="qrbox"><img class="qr" src="participer-qr.svg" alt="QR code" /></div>
+  <div>
+    <p class="scan">Flashez avec votre téléphone</p>
+    <p class="url">impressiondarchive.netlify.app/participer</p>
+  </div>
+  <div class="bar"></div>
+</body>
+</html>

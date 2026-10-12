@@ -54,10 +54,25 @@ export class PlaybackController {
     this.audio.preload = "auto";
   }
 
-  async play(): Promise<void> {
+  private pendingPlay: Promise<void> | null = null;
+
+  /**
+   * Lance la lecture. Un appel pendant que le chargement de l'audio est déjà en
+   * cours rejoint la demande existante (sinon un pause() intermédiaire l'annule),
+   * et un pause() volontaire pendant l'attente n'est pas une erreur.
+   */
+  play(): Promise<void> {
+    if (this.pendingPlay) return this.pendingPlay;
     if (this._state === "ended") this.audio.currentTime = 0;
     this.reanchor();
-    await this.audio.play();
+    const request = this.audio.play().catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      throw err;
+    }).finally(() => {
+      if (this.pendingPlay === request) this.pendingPlay = null;
+    });
+    this.pendingPlay = request;
+    return request;
   }
 
   pause(): void {
