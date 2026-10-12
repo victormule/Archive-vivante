@@ -43,6 +43,9 @@ export interface AnnotationOverlayOptions {
 
 interface Pin {
   data: Annotation;
+  color: string;
+  /** Écartée par le filtre de couleurs. */
+  filtered: boolean;
   anchor: THREE.Vector3;
   dot: HTMLButtonElement;
   label: HTMLDivElement;
@@ -99,6 +102,24 @@ export class AnnotationOverlay {
     this._visible = visible;
     this.element.classList.toggle("is-hidden", !visible);
     this.syncVideos();
+  }
+
+  /** Couleurs des annotations et nombre d'annotations de chacune, dans l'ordre de leur première apparition. */
+  colors(): Array<{ color: string; count: number }> {
+    const counts = new Map<string, number>();
+    for (const pin of this.pins) counts.set(pin.color, (counts.get(pin.color) ?? 0) + 1);
+    return [...counts].map(([color, count]) => ({ color, count }));
+  }
+
+  /** Masque les annotations de ces couleurs (les autres restent affichées). */
+  setHiddenColors(hidden: ReadonlySet<string>): void {
+    for (const pin of this.pins) {
+      pin.filtered = hidden.has(pin.color);
+      if (pin.filtered && pin.pinned) {
+        pin.pinned = false;
+        this.refreshExpanded(pin);
+      }
+    }
   }
 
   setOpacity(opacity: number): void {
@@ -224,7 +245,7 @@ export class AnnotationOverlay {
     for (const el of [dot, label, leader]) el.classList.add("is-offscreen");
 
     const pin: Pin = {
-      data, anchor, dot, label, leader,
+      data, color, filtered: false, anchor, dot, label, leader,
       ax: 0, ay: 0, x: 0, y: 0, placed: false, collapsedHeight: 0,
       visible: false, occluded: false, hovered: false, pinned: false, videos,
     };
@@ -377,7 +398,7 @@ export class AnnotationOverlay {
       const inFront = this.projected.z > -1 && this.projected.z < 1;
       const sx = (this.projected.x * 0.5 + 0.5) * width;
       const sy = (-this.projected.y * 0.5 + 0.5) * height;
-      const onScreen = inFront && sx >= 0 && sx <= width && sy >= 0 && sy <= height;
+      const onScreen = !pin.filtered && inFront && sx >= 0 && sx <= width && sy >= 0 && sy <= height;
 
       pin.ax = sx;
       pin.ay = sy;

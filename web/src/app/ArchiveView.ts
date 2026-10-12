@@ -420,6 +420,9 @@ export class ArchiveView {
       });
       this.fullAnnotations.setOpacity(0);
       this.disposers.push(() => this.fullAnnotations?.dispose());
+      // Vue d'ensemble seulement : une pastille par couleur, sous le bouton des annotations
+      const overlay = this.fullAnnotations;
+      this.toggles?.setColors(overlay.colors(), (hidden) => overlay.setHiddenColors(hidden));
     }
 
     const starts = scenes.flatMap((s) => {
@@ -480,6 +483,7 @@ export class ArchiveView {
     }
     this.fullAnnotations?.setOpacity(full ? 1 : 0);
     this.fullAnnotations?.setVisible(this.annotationsVisible);
+    this.toggles?.setColorsEnabled(full);
     this.pathStarts?.setVisible(full);
     this.pathStarts?.setActive(null);
     for (const p of this.scenes.values()) {
@@ -882,12 +886,14 @@ export class ArchiveView {
     const rect = (selector: string) => this.root.querySelector(selector)?.getBoundingClientRect();
     const header = rect(".session__header");
     const layers = rect(".layers");
+    // Écran bas : la palette de couleurs se prolonge à droite des boutons
+    const palette = rect(".layers__group.has-colors .layers__colors-tray");
     const footer = this.root.classList.contains("has-playback") ? rect(".session__footer") : undefined;
     const feed = this.feed?.isOpen ? this.feed.element.getBoundingClientRect() : undefined;
     const margin = 14;
     return {
       top: header ? header.bottom - box.top + margin : margin,
-      left: layers ? layers.right - box.left + margin : margin,
+      left: layers ? Math.max(layers.right, palette?.right ?? 0) - box.left + margin : margin,
       right: Math.max(margin + 6, feed ? box.right - feed.left + margin : 0),
       bottom: footer ? box.bottom - footer.top + margin : margin + 10,
     };

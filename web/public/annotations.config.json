@@ -23,7 +23,7 @@
       },
       "Doc2": {
         "title": "2 · Carte mentale",
-        "color": "#d99a35",
+        "color": "#4f9066",
         "text": "Carte mentale définissant l’axe de travail pour la réalisation du happening, avec les premières idées clés.",
         "media": [
           "sessions/j1-s1/annotations/103ebf36-1.jpg"
@@ -39,7 +39,7 @@
       },
       "Doc4": {
         "title": "4 · Documentation du workshop",
-        "color": "#7b5bb5",
+        "color": "#4f9066",
         "text": "Documentation générale du workshop : liste des projets et organisation.",
         "media": [
           "sessions/j1-s1/annotations/8dc3fea8-1.jpg",
@@ -69,7 +69,7 @@
       },
       "Doc2": {
         "title": "2 · Carte mentale",
-        "color": "#d99a35",
+        "color": "#4f9066",
         "text": "Carte mentale définissant l’axe de travail pour la réalisation du happening, avec les premières idées clés.",
         "media": [
           "sessions/j1-s2/annotations/c5ef1735-1.jpg"
@@ -85,7 +85,7 @@
       },
       "Doc4": {
         "title": "4 · Documentation du workshop",
-        "color": "#7b5bb5",
+        "color": "#4f9066",
         "text": "Documentation générale du workshop : liste des projets et organisation.",
         "media": [
           "sessions/j1-s2/annotations/f2f0da75-1.jpg",
@@ -206,7 +206,7 @@
     "j3-s6": {
       "Element 1": {
         "title": "16 · Élément 1",
-        "color": "#4f9066",
+        "color": "#3f74b5",
         "text": "Maille tricotée.",
         "media": [
           "sessions/j3-s6/annotations/d955242a-1.jpg"
@@ -214,7 +214,7 @@
       },
       "Element 2": {
         "title": "17 · Élément 2",
-        "color": "#d99a35",
+        "color": "#3f74b5",
         "text": "Maille tricotée.",
         "media": [
           "sessions/j3-s6/annotations/f8338aa7-1.jpg"
@@ -253,7 +253,7 @@
       },
       "C7693253": {
         "title": "21 · Bon appétit, déroulé de la performance",
-        "color": "#c25a87",
+        "color": "#4f9066",
         "text": [
           "Passage « café-savon » (imprévisibilité) : les performeuses montrent les mélanges possibles, puis invitent les spectateurs à les faire eux-mêmes ; plusieurs sortes de papier sont à disposition. 15 min maximum.",
           "Le carnet liste aussi les autres passages (golem, circuit, bordel) et une performance sonore de 7 min."
@@ -265,7 +265,7 @@
       },
       "Philosophie": {
         "title": "22 · Philosophie en action",
-        "color": "#7b5bb5",
+        "color": "#c25a87",
         "text": "Carte mentale autour de « Bon appétit » : cliché, ironie, imprévisible, rôle du public ; « l’action ne produit pas seulement un résultat, elle produit aussi de nouvelles questions ». Planche de cinq traces de café sur papier (n° 1 à 5).",
         "media": [
           "sessions/j3-s7/annotations/7df376c3-x1.jpg",
@@ -276,7 +276,7 @@
     "j3-s8": {
       "Commentaire dartist": {
         "title": "23 · Commentaire d’artiste",
-        "color": "#c25a87",
+        "color": "#7b5bb5",
         "text": "Présentation du projet vidéo.",
         "media": []
       }
@@ -284,7 +284,7 @@
     "j3-s9": {
       "Corps du golem": {
         "title": "24 · Corps du golem",
-        "color": "#3e8f93",
+        "color": "#b8613a",
         "text": "Corps en carton, papier et ruban adhésif, recouvert de papier ; habillage final en tissu (rouge rayé, vert à motifs) et fourrure grise aux épaules.",
         "media": [
           "sessions/j3-s9/annotations/7260d9cc-x1.jpg",
@@ -299,13 +299,13 @@
       },
       "Pieds du golem": {
         "title": "26 · Pieds du golem",
-        "color": "#4f9066",
+        "color": "#b8613a",
         "text": "Basket, bois, sangle et carton.",
         "media": []
       },
       "Tête du golem": {
         "title": "27 · Tête du golem",
-        "color": "#d99a35",
+        "color": "#b8613a",
         "text": "Carton, papier et mousse polyuréthane. Essai de port du masque : croissant de mousse rose sur structure en carton.",
         "media": [
           "sessions/j3-s9/annotations/f0906f62-x1.jpg"

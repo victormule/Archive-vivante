@@ -193,8 +193,8 @@ html, body, #app {
 .layers {
   position: absolute;
   left: var(--gutter);
-  top: 50%;
-  transform: translateY(-50%);
+  /* Centrée sur sa hauteur au repos : le volet des couleurs pousse vers le bas sans déplacer les boutons du haut */
+  top: calc(50% - var(--layers-rest, 242px) / 2);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -276,7 +276,7 @@ html, body, #app {
 .layers__toggle:focus-visible .layers__label { opacity: 1; transform: translate(0, -50%); }
 
 @media (max-width: 480px) {
-  .layers { top: auto; bottom: calc(var(--gutter) + 72px); transform: none; }
+  .layers { top: auto; bottom: calc(var(--gutter) + 72px); }
   .layers__label { display: none; }
 }
 
@@ -289,6 +289,109 @@ html, body, #app {
   right: 10px;
   height: 1px;
   background: var(--panel-border);
+}
+
+/* Couleurs d'annotations (vue d'ensemble) : palette soudée au bouton, en une seule barre qui pousse le bouton du plan */
+
+.layers__group { position: relative; display: flex; flex-direction: column; }
+.layers__group > .layers__toggle { transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, border-radius 0.3s ease; }
+
+.layers__colors {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows 0.32s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.22s ease, visibility 0s linear 0.32s;
+}
+.layers__colors-list { min-height: 0; overflow: hidden; }
+.layers__colors-tray {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0 5px;
+  border: 1px solid var(--panel-border);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color 0.2s ease;
+}
+
+.layers__color {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.layers__color::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color);
+  background: var(--color);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color) 45%, transparent);
+  transition: background 0.18s ease, opacity 0.18s ease, scale 0.18s ease, box-shadow 0.18s ease;
+}
+.layers__color[aria-pressed="false"]::before { background: transparent; opacity: 0.65; box-shadow: none; }
+.layers__color:hover::before { scale: 1.2; opacity: 1; }
+.layers__color:active::before { scale: 0.92; }
+.layers__color:focus-visible { outline: none; }
+.layers__color:focus-visible::before { outline: 2px solid var(--fg); outline-offset: 3px; }
+
+/* Vue d'ensemble : la palette est dépliée, bouton et palette ne font qu'un */
+.layers__group.has-colors > .layers__toggle { border-radius: 12px 12px 0 0; }
+.layers__group.has-colors .layers__colors {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.layers__group.has-colors:has(> .layers__toggle[data-state="on"]) .layers__colors-tray { border-color: rgba(232, 176, 74, 0.45); }
+/* Annotations masquées : la palette reste là, en retrait */
+.layers__group.has-colors:has(> .layers__toggle[data-state="off"]) .layers__color::before { opacity: 0.3; box-shadow: none; }
+
+@media (hover: none) {
+  .layers__color { height: 30px; }
+}
+
+/* Écran bas (téléphone couché) : la barre se prolonge à droite du bouton, sur une ligne, sans rien pousser */
+@media (max-height: 560px) {
+  .layers__colors {
+    position: absolute;
+    left: 100%;
+    bottom: 0;
+    display: block;
+    height: 40px;
+    translate: -8px 0;
+    transition: translate 0.28s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.22s ease, visibility 0s linear 0.28s;
+  }
+  .layers__colors-list { overflow: visible; }
+  .layers__colors-tray {
+    flex-direction: row;
+    width: max-content;
+    height: 40px;
+    padding: 0 5px 0 3px;
+    border: 1px solid var(--panel-border);
+    border-left: 0;
+    border-radius: 0 12px 12px 0;
+  }
+  .layers__color { width: 28px; height: 38px; }
+  .layers__group.has-colors > .layers__toggle { border-radius: 12px 0 0 12px; }
+  .layers__group.has-colors .layers__colors { translate: 0 0; }
+  .layers__group.has-colors .layers__label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layers__colors, .layers__color::before, .layers__group > .layers__toggle { transition-duration: 0s; transition-delay: 0s; }
 }
 
 /* ---------- Annotations ---------- */

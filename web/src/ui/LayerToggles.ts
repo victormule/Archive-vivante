@@ -13,6 +13,12 @@ export interface LayerToggleItem {
 
 export type LayerToggleState = "off" | "loading" | "on" | "error";
 
+export interface ColorSwatch {
+  color: string;
+  /** Nombre d'annotations de cette couleur. */
+  count: number;
+}
+
 export const LAYER_ITEMS: Array<LayerToggleItem & { id: LayerId }> = [
   {
     id: "splat",
@@ -53,6 +59,10 @@ export class LayerToggles {
   readonly element: HTMLElement;
   private readonly buttons = new Map<ToggleId, HTMLButtonElement>();
   private readonly shortcuts: Map<string, ToggleId>;
+  private colorGroup: HTMLElement | null = null;
+  private readonly swatches = new Map<string, HTMLButtonElement>();
+  private readonly hiddenColors = new Set<string>();
+  private onColors: (hidden: ReadonlySet<string>) => void = () => {};
 
   constructor(items: LayerToggleItem[], private readonly onToggle: (id: ToggleId) => void) {
     this.element = document.createElement("nav");
@@ -71,6 +81,9 @@ export class LayerToggles {
       this.buttons.set(item.id, button);
       this.element.appendChild(button);
     }
+    // Hauteur au repos : la barre reste ancrée en haut quand le volet des couleurs s'ouvre
+    const groups = items.filter((i, n) => i.groupStart && n > 0).length;
+    this.element.style.setProperty("--layers-rest", `${items.length * 40 + (items.length - 1) * 8 + groups * 10}px`);
 
     this.shortcuts = new Map(items.map((i) => [i.shortcut, i.id]));
     window.addEventListener("keydown", this.onKeyDown);
@@ -82,6 +95,74 @@ export class LayerToggles {
     button.dataset.state = state;
     button.setAttribute("aria-pressed", String(state === "on"));
     button.style.setProperty("--progress", String(progress ?? 0));
+  }
+
+  /**
+   * Palette sous le bouton des annotations, soudée à lui : chaque pastille affiche ou masque les annotations
+   * de sa couleur. Elle est dépliée tant que `setColorsEnabled(true)` (vue d'ensemble).
+   */
+  setColors(swatches: ColorSwatch[], onChange: (hidden: ReadonlySet<string>) => void): void {
+    const button = this.buttons.get("annotations");
+    if (!button || swatches.length < 2 || this.colorGroup) return;
+    this.onColors = onChange;
+
+    const group = document.createElement("div");
+    group.className = "layers__group";
+    button.replaceWith(group);
+    const panel = document.createElement("div");
+    panel.className = "layers__colors";
+    panel.setAttribute("role", "group");
+    panel.setAttribute("aria-label", "Couleurs d'annotations affichées");
+    const list = document.createElement("div");
+    list.className = "layers__colors-list";
+    const tray = document.createElement("div");
+    tray.className = "layers__colors-tray";
+    list.appendChild(tray);
+    panel.appendChild(list);
+    group.append(button, panel);
+
+    for (const { color, count } of swatches) {
+      const swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "layers__color";
+      swatch.style.setProperty("--color", color);
+      swatch.title = `${count} annotation${count > 1 ? "s" : ""} · double-clic : isoler`;
+      swatch.addEventListener("click", () => this.toggleColor(color));
+      swatch.addEventListener("dblclick", () => this.soloColor(color));
+      this.swatches.set(color, swatch);
+      tray.appendChild(swatch);
+    }
+    this.colorGroup = group;
+    this.refreshColors();
+  }
+
+  setColorsEnabled(enabled: boolean): void {
+    this.colorGroup?.classList.toggle("has-colors", enabled);
+    // Palette repliée : ses pastilles sortent de l'ordre de tabulation
+    for (const swatch of this.swatches.values()) swatch.tabIndex = enabled ? 0 : -1;
+  }
+
+  private toggleColor(color: string): void {
+    if (!this.hiddenColors.delete(color)) this.hiddenColors.add(color);
+    this.refreshColors();
+  }
+
+  /** Ne garde que cette couleur ; si elle est déjà seule, les réaffiche toutes. */
+  private soloColor(color: string): void {
+    const alone = !this.hiddenColors.has(color) && this.hiddenColors.size === this.swatches.size - 1;
+    this.hiddenColors.clear();
+    if (!alone) for (const other of this.swatches.keys()) if (other !== color) this.hiddenColors.add(other);
+    this.refreshColors();
+  }
+
+  private refreshColors(): void {
+    let index = 0;
+    for (const [color, swatch] of this.swatches) {
+      const shown = !this.hiddenColors.has(color);
+      swatch.setAttribute("aria-pressed", String(shown));
+      swatch.setAttribute("aria-label", `Annotations de couleur ${++index} : ${shown ? "affichées" : "masquées"}`);
+    }
+    this.onColors(this.hiddenColors);
   }
 
   dispose(): void {
