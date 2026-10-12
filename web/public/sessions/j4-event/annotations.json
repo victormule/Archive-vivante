@@ -1,0 +1,289 @@
+{
+  "annotations": [
+    {
+      "id": "7076A243-B7DB-4106-B283-38B6B5060A62",
+      "title": "28",
+      "colorIndex": 3,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -11.464,
+          0.345,
+          3.687
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:27:31Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "66BF175B-3B7D-4473-8757-61B426473E46",
+      "title": "29",
+      "colorIndex": 2,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          7.089,
+          0.992,
+          0.96
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:31:27Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "B90E8E97-7A23-445D-822F-26EF9EFC7C9B",
+      "title": "30",
+      "colorIndex": 2,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          5.888,
+          1.443,
+          0.174
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:36:14Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "ABE45D6B-07AD-4858-835F-72878FC530A4",
+      "title": "31",
+      "colorIndex": 2,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          3.794,
+          0.739,
+          0.055
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:37:16Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "FD3454E6-8C7F-4E28-89B5-C1151B3DA1D2",
+      "title": "32",
+      "colorIndex": 4,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -8.939,
+          -0.493,
+          27.26
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:42:43Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "12EE6755-43D8-4A38-9210-5BC1B82B531A",
+      "title": "33",
+      "colorIndex": 4,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -8.433,
+          -0.435,
+          27.945
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:43:28Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "A1D63A59-B853-47AD-9816-C8C9C00A87D8",
+      "title": "34",
+      "colorIndex": 5,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          8.53,
+          0.6,
+          32.09
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T03:42:16Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "3A5C1E72-6D0B-4F19-8B3E-5A7D2C9E4F35",
+      "title": "35",
+      "colorIndex": 5,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          10.16,
+          0.6,
+          25.96
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:15:33Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "3B6D2F83-7E1C-4A2A-9C4F-6B8E3D0F5A36",
+      "title": "36",
+      "colorIndex": 5,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          10.58,
+          0.7,
+          20.2
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:15:33Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "8560506D-FA73-43DB-8D57-FC1D23065407",
+      "title": "37",
+      "colorIndex": 6,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          6.671,
+          -0.361,
+          12.338
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:10:50Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "B73ABDA3-FC4F-4032-84E7-A411D828B355",
+      "title": "38",
+      "colorIndex": 6,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          5.991,
+          0.949,
+          12.178
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:12:34Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "A42D7528-7453-4E5D-B1EA-3F938561C8B6",
+      "title": "39",
+      "colorIndex": 6,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          2.927,
+          0.338,
+          14.511
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:13:50Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "0EADB5F6-46E0-4BD9-B725-F2B671DD49BF",
+      "title": "40",
+      "colorIndex": 6,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          7.444,
+          -0.268,
+          9.679
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:14:36Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "F9109F1C-8A60-4456-97CA-035A81B31B18",
+      "title": "41",
+      "colorIndex": 6,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          6.062,
+          0.48,
+          12.159
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:15:33Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
+      "id": "4C7E3A94-8F2D-4B3B-AD5A-7C9F4E1A6B42",
+      "title": "42",
+      "colorIndex": 1,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -15.78,
+          0.6,
+          -11.27
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T04:15:33Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    }
+  ]
+}

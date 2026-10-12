@@ -145,6 +145,7 @@ class EventBuilder:
         if "playback" in steps and video_export is not None:
             self.build_playback(video_export)
         self._apply_view()
+        self._keep_annotations()
         write_json(self.out / "manifest.json", self.manifest)
         return self.manifest
 
@@ -513,6 +514,14 @@ class EventBuilder:
         }
         self.log(f"  playback    {len(videos)} vidéos ({', '.join(v.id for v in videos)}) -> {total / 60:.1f} min, "
                  f"{len(t)} keyframes (lissage {smoothing} s)")
+
+    def _keep_annotations(self) -> None:
+        """Les annotations de l'Event sont posées à la main (annotations.json) : un build les conserve."""
+        import json
+        path = self.out / "annotations.json"
+        if path.exists():
+            count = len(json.loads(path.read_text(encoding="utf-8"))["annotations"])
+            self.manifest["annotations"] = {"url": path.name, "count": count}
 
     # --- Vue d'arrivée et rotation automatique ---------------------------------
 

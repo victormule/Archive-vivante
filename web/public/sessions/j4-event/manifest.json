@@ -159,7 +159,10 @@
       ]
     }
   },
-  "annotations": null,
+  "annotations": {
+    "url": "annotations.json",
+    "count": 15
+  },
   "alignment": {
     "reference": "lidar:1A4B75F5-097F-4A7A-B4F2-AC3F9D631C00",
     "parts": [
@@ -649,11 +652,27 @@
           ]
         },
         {
-          "t": 2930,
+          "t": 2716,
           "offset": [
             -0.25,
             0.8,
             0.0
+          ]
+        },
+        {
+          "t": 2745,
+          "offset": [
+            -1.75,
+            0.8,
+            1.6
+          ]
+        },
+        {
+          "t": 2930,
+          "offset": [
+            -1.75,
+            0.8,
+            1.6
           ]
         }
       ]
