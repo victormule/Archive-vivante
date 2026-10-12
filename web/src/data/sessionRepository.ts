@@ -5,7 +5,8 @@ import type { AnnotationsData, CameraPathData, SessionIndex, SessionManifest } f
 const SESSIONS_ROOT = `${import.meta.env.BASE_URL}sessions`;
 
 async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+  // Revalidés à chaque visite : une mise à jour (annotations, trajet) est visible sans attendre la fin du cache
+  const res = await fetch(url, { cache: "no-cache" });
   if (!res.ok) throw new Error(`Chargement impossible : ${url} (${res.status})`);
   return res.json() as Promise<T>;
 }

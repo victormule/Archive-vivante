@@ -314,17 +314,24 @@
     },
     "j4-event": {
       "28": {
-        "title": "28 · Projection dans l’amphithéâtre",
+        "title": "28 · Amphithéâtre, le public",
         "color": "#7b5bb5",
-        "text": "Projection d’une vidéo devant le public installé dans les gradins.",
+        "text": "Le public installé dans les gradins, face à l’écran.",
         "media": [
           { "file": "sessions/j4-event/annotations/ev28.mp4", "poster": "sessions/j4-event/annotations/ev28-poster.jpg" },
-          "sessions/j4-event/annotations/ev28-2.jpg",
+          "sessions/j4-event/annotations/ev28-2.jpg"
+        ]
+      },
+      "28bis": {
+        "title": "29 · Projection, l’écran",
+        "color": "#7b5bb5",
+        "text": "Vidéo projetée sur l’écran de l’amphithéâtre, filmée depuis les gradins.",
+        "media": [
           { "file": "sessions/j4-event/annotations/ev28bis.mp4", "poster": "sessions/j4-event/annotations/ev28bis-poster.jpg" }
         ]
       },
       "29": {
-        "title": "29 · Filets, installation",
+        "title": "30 · Filets, installation",
         "color": "#3f74b5",
         "text": "Mise en place des filets au crochet (blanc, rouge, brun, mauve), tendus dans le hall entre les murs et le plafond.",
         "media": [
@@ -335,7 +342,7 @@
         ]
       },
       "30": {
-        "title": "30 · Filets et papiers",
+        "title": "31 · Filets et papiers",
         "color": "#3f74b5",
         "text": "Papiers de couleur portant des phrases manuscrites, accrochés aux filets avec des pinces à linge. Vêtements déposés au sol.",
         "media": [
@@ -346,7 +353,7 @@
         ]
       },
       "31": {
-        "title": "31 · Filets, traversée",
+        "title": "32 · Filets, traversée",
         "color": "#3f74b5",
         "text": "Vidéo : le public circule entre les filets, où tissus et papiers ont été accrochés.",
         "media": [
@@ -354,7 +361,7 @@
         ]
       },
       "32": {
-        "title": "32 · Bon appétit, installation",
+        "title": "33 · Bon appétit, installation",
         "color": "#c25a87",
         "text": "Mise en place en extérieur : papiers blancs et kraft posés au sol, gobelets de café, pailles.",
         "media": [
@@ -364,7 +371,7 @@
         ]
       },
       "33": {
-        "title": "33 · Bon appétit, participation du public",
+        "title": "34 · Bon appétit, participation du public",
         "color": "#c25a87",
         "text": "Vidéo : le public, à genoux, souffle le café à la paille sur le papier.",
         "media": [
@@ -372,7 +379,7 @@
         ]
       },
       "34": {
-        "title": "34 · Peinture corporelle",
+        "title": "35 · Peinture corporelle",
         "color": "#3e8f93",
         "text": "Les trois performeuses, la peau marquée d’empreintes de mains à la peinture noire.",
         "media": [
@@ -380,7 +387,7 @@
         ]
       },
       "35": {
-        "title": "35 · Performance dansée",
+        "title": "36 · Performance dansée",
         "color": "#3e8f93",
         "text": "Trio au sol, corps en contact, sur le parking.",
         "media": [
@@ -389,7 +396,7 @@
         ]
       },
       "36": {
-        "title": "36 · Performance dansée, déplacement",
+        "title": "37 · Performance dansée, déplacement",
         "color": "#3e8f93",
         "text": "Vidéo : le trio se déplace au sol, du parking vers l’herbe.",
         "media": [
@@ -397,7 +404,7 @@
         ]
       },
       "37": {
-        "title": "37 · Le golem, costume porté",
+        "title": "38 · Le golem, costume porté",
         "color": "#b8613a",
         "text": "Salle préparée : tapis rouge, coussins, chaise. Le costume du golem, porté, traverse le hall.",
         "media": [
@@ -407,7 +414,7 @@
         ]
       },
       "38": {
-        "title": "38 · Le golem installé",
+        "title": "39 · Le golem installé",
         "color": "#b8613a",
         "text": "Le golem assis sur la chaise, au centre du tapis rouge.",
         "media": [
@@ -415,7 +422,7 @@
         ]
       },
       "39": {
-        "title": "39 · Le golem et le public",
+        "title": "40 · Le golem et le public",
         "color": "#b8613a",
         "text": "Vidéo : le golem debout, parmi le public assis au sol.",
         "media": [
@@ -423,7 +430,7 @@
         ]
       },
       "40": {
-        "title": "40 · Le golem, performance",
+        "title": "41 · Le golem, performance",
         "color": "#b8613a",
         "text": "Vidéo : le golem évolue au milieu du public, dans la salle.",
         "media": [
@@ -431,7 +438,7 @@
         ]
       },
       "41": {
-        "title": "41 · Le golem, traces",
+        "title": "42 · Le golem, traces",
         "color": "#b8613a",
         "text": "Le golem assis, couvert de peinture, de papiers et d’autocollants.",
         "media": [
@@ -439,7 +446,7 @@
         ]
       },
       "42": {
-        "title": "42 · À la prochaine, inhumation",
+        "title": "43 · À la prochaine, inhumation",
         "color": "#d99a35",
         "text": "Une pelle, un trou creusé dans le jardin, puis la terre refermée. Plaque gravée « Theater Piece n° 2 », datée d’octobre.",
         "media": [

@@ -20,6 +20,25 @@
       "documents": []
     },
     {
+      "id": "2D8F4B05-9A3E-4C4C-BE6B-8D0A5F2B7C28",
+      "title": "28bis",
+      "colorIndex": 3,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -11.236,
+          2.9,
+          1.585
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T05:20:00Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
       "id": "66BF175B-3B7D-4473-8757-61B426473E46",
       "title": "29",
       "colorIndex": 2,
