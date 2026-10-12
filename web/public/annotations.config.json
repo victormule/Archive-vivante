@@ -10,15 +10,7 @@
     "offset": "[x, y, z] : décale l'épingle (mètres, repère de la session, y vers le haut).",
     "numerotation": "Le numéro précède le titre (« 12 · Premiers essais »). Il suit l’ordre des sessions ; un même document présent dans deux sessions (j1-s1 et j1-s2) garde le même numéro."
   },
-  "palette": [
-    "#4f9066",
-    "#d99a35",
-    "#3f74b5",
-    "#7b5bb5",
-    "#c25a87",
-    "#3e8f93",
-    "#b8613a"
-  ],
+  "palette": ["#4f9066", "#d99a35", "#3f74b5", "#7b5bb5", "#c25a87", "#3e8f93", "#b8613a"],
   "sessions": {
     "j1-s1": {
       "Doc1": {
@@ -126,7 +118,8 @@
         "color": "#b8613a",
         "text": "Préparation de la structure porteuse, en bois et en branchages.",
         "media": [
-          "sessions/j2-s3/annotations/71fa26a8-1.jpg"
+          "sessions/j2-s3/annotations/71fa26a8-1.jpg",
+          "sessions/j2-s3/annotations/71fa26a8-x1.jpg"
         ]
       },
       "Tissage": {
@@ -162,10 +155,7 @@
         "color": "#c25a87",
         "text": "Tests d’utilisation du café et du savon sur papier ; élaboration d’un protocole.",
         "media": [
-          {
-            "file": "sessions/j2-s4/annotations/37580959-v1.mp4",
-            "poster": "sessions/j2-s4/annotations/37580959-v1.jpg"
-          }
+          { "file": "sessions/j2-s4/annotations/37580959-v1.mp4", "poster": "sessions/j2-s4/annotations/37580959-v1.jpg" }
         ]
       },
       "Premiers essais": {
@@ -173,11 +163,7 @@
         "color": "#c25a87",
         "text": "Papier kraft ou papier blanc ?",
         "media": [
-          {
-            "file": "sessions/j2-s4/annotations/frame_0061.jpg",
-            "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg",
-            "pages": 5
-          }
+          { "file": "sessions/j2-s4/annotations/frame_0061.jpg", "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg", "pages": 5 }
         ]
       }
     },
@@ -195,17 +181,25 @@
         "color": "#c25a87",
         "text": "Rédaction d’un protocole de recherche.\nSimulation et préparation en vue de la présentation.",
         "media": [
-          {
-            "file": "sessions/j2-s5/annotations/2b83b87e-d1.pdf",
-            "thumbnail": "sessions/j2-s5/annotations/2b83b87e-d1.jpg",
-            "pages": 5
-          }
+          "sessions/j2-s5/annotations/cbdb6957-x1.jpg",
+          "sessions/j2-s5/annotations/cbdb6957-x2.jpg",
+          "sessions/j2-s5/annotations/cbdb6957-x3.jpg",
+          "sessions/j2-s5/annotations/cbdb6957-x4.jpg",
+          "sessions/j2-s5/annotations/cbdb6957-x5.jpg"
+        ]
+      },
+      "Note d'intention": {
+        "title": "15 · Note d’intention",
+        "color": "#c25a87",
+        "text": "Synthèse et note d’intention du projet : bilan des essais, réflexion sur l’imprévisible et la propriété de l’œuvre, préparation de la simulation.",
+        "media": [
+          { "file": "sessions/j2-s5/annotations/2b83b87e-d1.pdf", "thumbnail": "sessions/j2-s5/annotations/2b83b87e-d1.jpg", "pages": 5 }
         ]
       }
     },
     "j3-s6": {
       "Element 1": {
-        "title": "15 · Élément 1",
+        "title": "16 · Élément 1",
         "color": "#4f9066",
         "text": "Maille tricotée.",
         "media": [
@@ -213,7 +207,7 @@
         ]
       },
       "Element 2": {
-        "title": "16 · Élément 2",
+        "title": "17 · Élément 2",
         "color": "#d99a35",
         "text": "Maille tricotée.",
         "media": [
@@ -221,7 +215,7 @@
         ]
       },
       "Technique": {
-        "title": "17 · Technique de tricot",
+        "title": "18 · Technique de tricot",
         "color": "#3f74b5",
         "text": "Tricot en mailles, avec une grosse laine.",
         "media": [
@@ -232,33 +226,47 @@
     },
     "j3-s7": {
       "14FDC0AF": {
-        "title": "18 · Bon appétit",
-        "color": "#c25a87",
-        "text": "Présentation du protocole.\nPouvoir l’expliquer.",
-        "media": []
-      },
-      "4B2C779B": {
         "title": "19 · Bon appétit",
         "color": "#c25a87",
-        "text": "",
-        "media": []
+        "text": "Présentation du protocole.\nPouvoir l’expliquer.",
+        "media": [
+          { "file": "sessions/j3-s7/annotations/14fdc0af-xv1.mp4", "poster": "sessions/j3-s7/annotations/14fdc0af-xv1.jpg" }
+        ]
       },
-      "C7693253": {
+      "4B2C779B": {
         "title": "20 · Bon appétit",
         "color": "#c25a87",
+        "text": "",
+        "media": [
+          "sessions/j3-s7/annotations/4b2c779b-x1.jpg",
+          "sessions/j3-s7/annotations/4b2c779b-x2.jpg",
+          "sessions/j3-s7/annotations/4b2c779b-x3.jpg",
+          { "file": "sessions/j3-s7/annotations/4b2c779b-xv5.mp4", "poster": "sessions/j3-s7/annotations/4b2c779b-xv5.jpg" },
+          { "file": "sessions/j3-s7/annotations/4b2c779b-xv6.mp4", "poster": "sessions/j3-s7/annotations/4b2c779b-xv6.jpg" }
+        ]
+      },
+      "C7693253": {
+        "title": "21 · Bon appétit",
+        "color": "#c25a87",
         "text": "Faire expérimenter les spectateurs.",
-        "media": []
+        "media": [
+          "sessions/j3-s7/annotations/c7693253-x1.jpg",
+          "sessions/j3-s7/annotations/c7693253-x2.jpg"
+        ]
       },
       "Philosophie": {
-        "title": "21 · Philosophie",
+        "title": "22 · Philosophie",
         "color": "#7b5bb5",
         "text": "",
-        "media": []
+        "media": [
+          "sessions/j3-s7/annotations/7df376c3-x1.jpg",
+          "sessions/j3-s7/annotations/7df376c3-x2.jpg"
+        ]
       }
     },
     "j3-s8": {
       "Commentaire dartist": {
-        "title": "22 · Commentaire d’artiste",
+        "title": "23 · Commentaire d’artiste",
         "color": "#c25a87",
         "text": "Présentation du projet vidéo.",
         "media": []
@@ -266,28 +274,33 @@
     },
     "j3-s9": {
       "Corps du golem": {
-        "title": "23 · Corps du golem",
+        "title": "24 · Corps du golem",
         "color": "#3e8f93",
         "text": "Modélisation en carton, papier et ruban adhésif.",
-        "media": []
+        "media": [
+          "sessions/j3-s9/annotations/7260d9cc-x1.jpg",
+          "sessions/j3-s9/annotations/7260d9cc-x2.jpg"
+        ]
       },
       "Jambe du golem": {
-        "title": "24 · Jambe du golem",
+        "title": "25 · Jambe du golem",
         "color": "#b8613a",
         "text": "Carton et ruban adhésif.",
         "media": []
       },
       "Pieds du golem": {
-        "title": "25 · Pieds du golem",
+        "title": "26 · Pieds du golem",
         "color": "#4f9066",
         "text": "Basket, bois, sangle et carton.",
         "media": []
       },
       "Tête du golem": {
-        "title": "26 · Tête du golem",
+        "title": "27 · Tête du golem",
         "color": "#d99a35",
         "text": "Carton, papier et mousse polyuréthane.",
-        "media": []
+        "media": [
+          "sessions/j3-s9/annotations/f0906f62-x1.jpg"
+        ]
       }
     }
   }

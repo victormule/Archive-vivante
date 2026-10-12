@@ -1,6 +1,25 @@
 {
   "annotations": [
     {
+      "id": "5F1A7C3E-0B2D-4E86-9A41-D7C8B6E20F14",
+      "title": "Note d'intention",
+      "colorIndex": 13,
+      "text": "",
+      "kind": "point",
+      "points": [
+        [
+          -1.83,
+          -0.819,
+          -2.16
+        ]
+      ],
+      "closed": false,
+      "updatedAt": "2026-10-12T05:00:00Z",
+      "images": [],
+      "videos": [],
+      "documents": []
+    },
+    {
       "id": "CBDB6957-B576-40DA-8781-11ACA1E9EF5E",
       "title": "Rédaction du projet",
       "colorIndex": 13,
