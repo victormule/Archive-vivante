@@ -116,7 +116,10 @@
       "Le golem": {
         "title": "7 · Le golem",
         "color": "#b8613a",
-        "text": "Préparation de la structure porteuse, en bois et en branchages.",
+        "text": [
+          "Préparation de la structure porteuse, en bois et en branchages.",
+          "Matériaux triés : cartons épais, papier kraft, « mouches », cartons encombrants ; casque à refaire."
+        ],
         "media": [
           "sessions/j2-s3/annotations/71fa26a8-1.jpg",
           "sessions/j2-s3/annotations/71fa26a8-x1.jpg"
@@ -143,7 +146,7 @@
       "Doc1-carnet de recherche": {
         "title": "10 · Bon appétit, carnet de recherche",
         "color": "#c25a87",
-        "text": "",
+        "text": "Carnet du 6 octobre 2026. Documenter et filmer chaque étape (« le début du processus fait partie de l’œuvre ») ; essais de café en poudre et de savon ; grand papier incliné par chacun à tour de rôle. Lexique : imprévisible, pencher, rouler, renverser, laisser une trace.",
         "media": [
           "sessions/j2-s4/annotations/b255ad04-1.jpg",
           "sessions/j2-s4/annotations/b255ad04-2.jpg",
@@ -161,7 +164,7 @@
       "Premiers essais": {
         "title": "12 · Premiers essais",
         "color": "#c25a87",
-        "text": "Papier kraft ou papier blanc ?",
+        "text": "Comparaison du papier kraft et du papier blanc.",
         "media": [
           { "file": "sessions/j2-s4/annotations/frame_0061.jpg", "thumbnail": "sessions/j2-s4/annotations/2b83b87e-d1.jpg", "pages": 5 }
         ]
@@ -171,15 +174,18 @@
       "Résultat de la deuxième journée": {
         "title": "13 · Résultat de la deuxième journée",
         "color": "#c25a87",
-        "text": "",
+        "text": "Six feuilles marquées par le café, cinq blanches et une kraft, mises à sécher.",
         "media": [
           "sessions/j2-s5/annotations/b78bf1c8-1.jpg"
         ]
       },
       "Rédaction du projet": {
-        "title": "14 · Rédaction du projet",
+        "title": "14 · Rédaction du protocole",
         "color": "#c25a87",
-        "text": "Rédaction d’un protocole de recherche.\nSimulation et préparation en vue de la présentation.",
+        "text": [
+          "Rédaction du protocole : le café remplace l’encre ; chacun incline à son tour un grand papier sur lequel il est versé, pour une image finale imprévisible qui évolue dans le temps.",
+          "Échanges écrits : mélanges envisagés (huile, savon, bulles à la paille), réponse au thème « individu et collectif », archivage du processus et préparation de la présentation."
+        ],
         "media": [
           "sessions/j2-s5/annotations/cbdb6957-x1.jpg",
           "sessions/j2-s5/annotations/cbdb6957-x2.jpg",
@@ -191,7 +197,7 @@
       "Note d'intention": {
         "title": "15 · Note d’intention",
         "color": "#c25a87",
-        "text": "Synthèse et note d’intention du projet : bilan des essais, réflexion sur l’imprévisible et la propriété de l’œuvre, préparation de la simulation.",
+        "text": "Notes de synthèse du projet : essais café-savon, questions posées au projet, discussion sur le titre « Bon appétit », philosophie de l’action, préparation de la simulation.",
         "media": [
           { "file": "sessions/j2-s5/annotations/2b83b87e-d1.pdf", "thumbnail": "sessions/j2-s5/annotations/2b83b87e-d1.jpg", "pages": 5 }
         ]
@@ -226,17 +232,17 @@
     },
     "j3-s7": {
       "14FDC0AF": {
-        "title": "19 · Bon appétit",
+        "title": "19 · Bon appétit, présentation du protocole",
         "color": "#c25a87",
-        "text": "Présentation du protocole.\nPouvoir l’expliquer.",
+        "text": "Présentation du protocole : pouvoir l’expliquer. La vidéo montre du café répandu sur du papier kraft, en extérieur.",
         "media": [
           { "file": "sessions/j3-s7/annotations/14fdc0af-xv1.mp4", "poster": "sessions/j3-s7/annotations/14fdc0af-xv1.jpg" }
         ]
       },
       "4B2C779B": {
-        "title": "20 · Bon appétit",
+        "title": "20 · Bon appétit, café soufflé",
         "color": "#c25a87",
-        "text": "",
+        "text": "Café soufflé à la paille métallique sur grand papier : bulles et traces. Plusieurs participants autour d’une même feuille.",
         "media": [
           "sessions/j3-s7/annotations/4b2c779b-x1.jpg",
           "sessions/j3-s7/annotations/4b2c779b-x2.jpg",
@@ -246,18 +252,21 @@
         ]
       },
       "C7693253": {
-        "title": "21 · Bon appétit",
+        "title": "21 · Bon appétit, déroulé de la performance",
         "color": "#c25a87",
-        "text": "Faire expérimenter les spectateurs.",
+        "text": [
+          "Passage « café-savon » (imprévisibilité) : les performeuses montrent les mélanges possibles, puis invitent les spectateurs à les faire eux-mêmes ; plusieurs sortes de papier sont à disposition. 15 min maximum.",
+          "Le carnet liste aussi les autres passages (golem, circuit, bordel) et une performance sonore de 7 min."
+        ],
         "media": [
           "sessions/j3-s7/annotations/c7693253-x1.jpg",
           "sessions/j3-s7/annotations/c7693253-x2.jpg"
         ]
       },
       "Philosophie": {
-        "title": "22 · Philosophie",
+        "title": "22 · Philosophie en action",
         "color": "#7b5bb5",
-        "text": "",
+        "text": "Carte mentale autour de « Bon appétit » : cliché, ironie, imprévisible, rôle du public ; « l’action ne produit pas seulement un résultat, elle produit aussi de nouvelles questions ». Planche de cinq traces de café sur papier (n° 1 à 5).",
         "media": [
           "sessions/j3-s7/annotations/7df376c3-x1.jpg",
           "sessions/j3-s7/annotations/7df376c3-x2.jpg"
@@ -276,7 +285,7 @@
       "Corps du golem": {
         "title": "24 · Corps du golem",
         "color": "#3e8f93",
-        "text": "Modélisation en carton, papier et ruban adhésif.",
+        "text": "Corps en carton, papier et ruban adhésif, recouvert de papier ; habillage final en tissu (rouge rayé, vert à motifs) et fourrure grise aux épaules.",
         "media": [
           "sessions/j3-s9/annotations/7260d9cc-x1.jpg",
           "sessions/j3-s9/annotations/7260d9cc-x2.jpg"
@@ -297,7 +306,7 @@
       "Tête du golem": {
         "title": "27 · Tête du golem",
         "color": "#d99a35",
-        "text": "Carton, papier et mousse polyuréthane.",
+        "text": "Carton, papier et mousse polyuréthane. Essai de port du masque : croissant de mousse rose sur structure en carton.",
         "media": [
           "sessions/j3-s9/annotations/f0906f62-x1.jpg"
         ]
